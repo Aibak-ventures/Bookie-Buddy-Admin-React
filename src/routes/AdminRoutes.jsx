@@ -6,6 +6,7 @@ import DashBoard from "../components/sections/DashBoard";
 import Shops from "../components/sections/Shops";
 import Users from "../components/sections/Users";
 import AddShop from "../components/sections/AddShop";
+import SingleShop from "../components/sections/SingleShop";
 
 
 
@@ -23,6 +24,9 @@ const AdminRoutes = () => {
         <Route path="shops" element={<Shops />} />
         <Route path="users" element={<Users />} />
         <Route path="add-shop" element={<AddShop />} />
+        <Route path="single-shop" element={<SingleShop />} />
+
+
 
 
         {/* Add more admin routes here */}
