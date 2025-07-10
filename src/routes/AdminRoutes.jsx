@@ -5,6 +5,7 @@ import MainLayout from "../pages/MainLayout";
 import DashBoard from "../components/sections/DashBoard";
 import Shops from "../components/sections/Shops";
 import Users from "../components/sections/Users";
+import AddShop from "../components/sections/AddShop";
 
 
 
@@ -21,6 +22,8 @@ const AdminRoutes = () => {
         <Route index element={<DashBoard />} />
         <Route path="shops" element={<Shops />} />
         <Route path="users" element={<Users />} />
+        <Route path="add-shop" element={<AddShop />} />
+
 
         {/* Add more admin routes here */}
       </Route>

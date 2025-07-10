@@ -9,8 +9,11 @@ import { useLocation, useNavigate } from 'react-router-dom';
 const menuItems = [
   { name: 'Dashboard', icon: LayoutDashboard, path: '/admin/' },
 //   { name: 'Add bookings', icon: Plus, path: '/admin/add-bookings' },
+  { name: 'Add shops', icon: Plus, path: '/admin/add-shop' },
+
   { name: 'Shops', icon: Store, path: '/admin/shops' },
   { name: 'Users', icon: Users, path: '/admin/users' },
+  
 //   { name: 'Category Management', icon: FolderOpen, path: '/admin/categories' },
 //   { name: 'Revenue', icon: DollarSign, path: '/admin/revenue' },
 //   { name: 'Settings', icon: Settings, path: '/admin/settings' },
