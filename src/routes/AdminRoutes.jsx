@@ -1,14 +1,31 @@
 import { Routes, Route } from "react-router-dom";
 import LoginPage from "../pages/LoginPage";
 import SignupPage from "../pages/SignupPage";
-import Home from "../pages/Home";
+import MainLayout from "../pages/MainLayout";
+import DashBoard from "../components/sections/DashBoard";
+import Shops from "../components/sections/Shops";
+import Users from "../components/sections/Users";
+
+
+
+
+
 const AdminRoutes = () => {
-    return (
-        <Routes>
-            <Route path="" element={<Home />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/registration" element={<SignupPage />} />
-        </Routes>
-    )
-}
+  return (
+    <Routes>
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/registration" element={<SignupPage />} />
+      
+      {/* Main layout with sidebar */}
+      <Route path="/" element={<MainLayout />}>
+        <Route index element={<DashBoard />} />
+        <Route path="shops" element={<Shops />} />
+        <Route path="users" element={<Users />} />
+
+        {/* Add more admin routes here */}
+      </Route>
+    </Routes>
+  );
+};
+
 export default AdminRoutes;   
