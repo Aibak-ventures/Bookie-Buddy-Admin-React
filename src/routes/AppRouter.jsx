@@ -7,7 +7,7 @@ import AdminRoutes from './AdminRoutes';
 const AppRouter = () => {
   return (
       <Routes>
-         <Route path="/admin/*" element={<AdminRoutes />} />
+         <Route path="/*" element={<AdminRoutes />} />
       </Routes>
   );
 };

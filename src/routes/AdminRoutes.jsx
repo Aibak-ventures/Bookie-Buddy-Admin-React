@@ -1,6 +1,5 @@
 import { Routes, Route } from "react-router-dom";
 import LoginPage from "../pages/LoginPage";
-import SignupPage from "../pages/SignupPage";
 import MainLayout from "../pages/MainLayout";
 import DashBoard from "../components/sections/DashBoard";
 import Shops from "../components/sections/Shops";
@@ -16,7 +15,6 @@ const AdminRoutes = () => {
   return (
     <Routes>
       <Route path="/login" element={<LoginPage />} />
-      <Route path="/registration" element={<SignupPage />} />
       
       {/* Main layout with sidebar */}
       <Route path="/" element={<MainLayout />}>
@@ -24,7 +22,7 @@ const AdminRoutes = () => {
         <Route path="shops" element={<Shops />} />
         <Route path="users" element={<Users />} />
         <Route path="add-shop" element={<AddShop />} />
-        <Route path="single-shop" element={<SingleShop />} />
+        <Route path="/shops/:shopId" element={<SingleShop />} />
 
 
 

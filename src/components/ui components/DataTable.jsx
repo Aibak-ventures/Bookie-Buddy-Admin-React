@@ -1,16 +1,25 @@
 import React from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
+import { useNavigate } from 'react-router-dom';
+
 const DataTable = ({
   columns = [],
   data = [],
-  currentPage,
-  totalPages,
-  onPageChange,
-  startIndex,
-  endIndex,
-  totalEntries
+  totalEntries,
+  onNextPage,
+  onPreviousPage,
+  disableNext,
+  disablePrevious,
 }) => {
+  const navigate = useNavigate();
+
+  const handleRowClick = (row) => {
+    if (row?.id) {
+      navigate(`/admin/shops/${row.id}`);
+    }
+  };
+
   return (
     <div className="overflow-x-auto">
       <table className="w-full">
@@ -25,7 +34,11 @@ const DataTable = ({
         </thead>
         <tbody>
           {data.map((row, rowIndex) => (
-            <tr key={row.id || rowIndex} className="border-b border-gray-100 hover:bg-gray-50">
+            <tr
+              key={row.id || rowIndex}
+              className="border-b border-gray-100 hover:bg-gray-50 cursor-pointer"
+              onClick={() => handleRowClick(row)}
+            >
               {columns.map((col) => (
                 <td key={col.accessor} className="py-4 px-4 text-gray-600">
                   {col.cell ? col.cell(row) : row[col.accessor]}
@@ -36,37 +49,19 @@ const DataTable = ({
         </tbody>
       </table>
 
-      {/* Pagination */}
       <div className="flex items-center justify-between mt-6 pt-6 border-t border-gray-200">
-        <span className="text-gray-600">
-          Showing {startIndex + 1} to {endIndex} of {totalEntries} entries
-        </span>
+        <span className="text-gray-600">Total entries: {totalEntries}</span>
         <div className="flex items-center space-x-2">
           <button
-            onClick={() => onPageChange(currentPage - 1)}
-            disabled={currentPage === 1}
+            onClick={onPreviousPage}
+            disabled={disablePrevious}
             className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
-
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-            <button
-              key={page}
-              onClick={() => onPageChange(page)}
-              className={`px-3 py-2 rounded-lg ${
-                currentPage === page
-                  ? 'bg-blue-500 text-white'
-                  : 'border border-gray-300 hover:bg-gray-50'
-              }`}
-            >
-              {page}
-            </button>
-          ))}
-
           <button
-            onClick={() => onPageChange(currentPage + 1)}
-            disabled={currentPage === totalPages}
+            onClick={onNextPage}
+            disabled={disableNext}
             className="p-2 border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <ChevronRight className="w-5 h-5" />
@@ -78,3 +73,4 @@ const DataTable = ({
 };
 
 export default DataTable;
+

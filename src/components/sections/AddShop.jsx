@@ -4,7 +4,8 @@ import FormInput from '../ui components/FormInput';
 import FileUpload from '../ui components/FileUpload';
 import MultiSelectTags from '../ui components/MultiSelectTags';
 import FormSelect from '../ui components/FormSelect';
-
+import apiClient from '../../api/AxiosConfig';
+import { registerShopWithUser } from '../../api/AdminApis';
 
 const ShopRegistrationForm = () => {
   const [formData, setFormData] = useState({
@@ -46,6 +47,19 @@ const ShopRegistrationForm = () => {
     }));
   };
 
+ const handleSubmit = async (e) => {
+  e.preventDefault();
+
+  try {
+    const response = await registerShopWithUser(formData, logoFiles[0]);
+    console.log('Shop registered successfully:', response);
+    // You can also redirect or show a success toast here
+  } catch (error) {
+    console.error('Shop registration failed:', error);
+    // Handle error toast or validation display here
+  }
+};
+
   const stateOptions = [
     { value: 'kerala', label: 'Kerala' },
     { value: 'tamil-nadu', label: 'Tamil Nadu' },
@@ -66,12 +80,6 @@ const ShopRegistrationForm = () => {
     { value: 'catering', label: 'Catering' },
     { value: 'decoration', label: 'Decoration' }
   ];
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('Form Data:', formData);
-    console.log('Logo Files:', logoFiles);
-  };
 
   return (
     <div className="max-w-6xl mx-auto p-6 bg-white">

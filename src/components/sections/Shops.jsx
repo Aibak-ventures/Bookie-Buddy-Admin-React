@@ -1,58 +1,54 @@
-import React, { useState, useMemo } from 'react';
-import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Search } from 'lucide-react';
 import DataTable from '../ui components/DataTable';
-
+import { fetchShops } from '../../api/AdminApis';
 
 const Shops = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [entriesPerPage, setEntriesPerPage] = useState(10);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [shops, setShops] = useState([]);
+  const [count, setCount] = useState(0);
+  const [next, setNext] = useState(null);
+  const [previous, setPrevious] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [currentUrl, setCurrentUrl] = useState('/api/v1/shop/admin/shops/');
 
-  const shops = [
-    { id: 1, name: 'Abram Schleifer', owner: 'Manu Kumar', phone: '+91 9073 544 834', place: 'Kozhikkode', plan: 'Basic', status: 'Active' },
-    { id: 2, name: 'Abram Schleifer', owner: 'Manu Kumar', phone: '+91 9073 544 834', place: 'Kozhikkode', plan: 'Standard', status: 'Active' },
-    { id: 3, name: 'Abram Schleifer', owner: 'Manu Kumar', phone: '+91 9073 544 834', place: 'Kozhikkode', plan: 'Enterprise', status: 'Blocked' },
-    { id: 4, name: 'Abram Schleifer', owner: 'Manu Kumar', phone: '+91 9073 544 834', place: 'Kozhikkode', plan: 'Basic', status: 'Active' },
-    { id: 5, name: 'Abram Schleifer', owner: 'Manu Kumar', phone: '+91 9073 544 834', place: 'Kozhikkode', plan: 'Basic', status: 'Active' },
-    { id: 6, name: 'Abram Schleifer', owner: 'Manu Kumar', phone: '+91 9073 544 834', place: 'Kozhikkode', plan: 'Basic', status: 'Active' },
-    { id: 7, name: 'Abram Schleifer', owner: 'Manu Kumar', phone: '+91 9073 544 834', place: 'Kozhikkode', plan: 'Basic', status: 'Active' },
-    { id: 8, name: 'Abram Schleifer', owner: 'Manu Kumar', phone: '+91 9073 544 834', place: 'Kozhikkode', plan: 'Basic', status: 'Active' },
-    { id: 9, name: 'Abram Schleifer', owner: 'Manu Kumar', phone: '+91 9073 544 834', place: 'Kozhikkode', plan: 'Basic', status: 'Active' },
-    { id: 10, name: 'Abram Schleifer', owner: 'Manu Kumar', phone: '+91 9073 544 834', place: 'Kozhikkode', plan: 'Basic', status: 'Active' },
-    { id: 11, name: 'Sample Shop', owner: 'John Doe', phone: '+91 9876 543 210', place: 'Mumbai', plan: 'Premium', status: 'Active' },
-    { id: 12, name: 'Test Store', owner: 'Jane Smith', phone: '+91 8765 432 109', place: 'Delhi', plan: 'Basic', status: 'Inactive' }
-  ];
+  useEffect(() => {
+    const loadShops = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await fetchShops(currentUrl);
+        setShops(data.results);
+        setCount(data.count);
+        setNext(data.next);
+        setPrevious(data.previous);
+      } catch (err) {
+        setError('Unable to load shops. Please try again.');
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const filteredShops = useMemo(() => {
-    return shops.filter(shop => 
-      shop.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      shop.owner.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      shop.place.toLowerCase().includes(searchTerm.toLowerCase())
+    loadShops();
+  }, [currentUrl]);
+
+  const filteredShops = shops.filter(shop =>
+    [shop.name, shop.place, shop.email]
+      .filter(Boolean)
+      .some(field => field.toLowerCase().includes(searchTerm.toLowerCase()))
+  );
+
+  const handleToggleStatus = (shopId, currentStatus) => {
+    // Replace with actual API call to block/unblock shop
+    alert(`Toggling status for shop ID ${shopId}`);
+
+    // Optional optimistic update
+    setShops(prev =>
+      prev.map(shop =>
+        shop.id === shopId ? { ...shop, is_active: !currentStatus } : shop
+      )
     );
-  }, [searchTerm]);
-
-  const totalPages = Math.ceil(filteredShops.length / entriesPerPage);
-  const startIndex = (currentPage - 1) * entriesPerPage;
-  const endIndex = startIndex + entriesPerPage;
-  const currentShops = filteredShops.slice(startIndex, endIndex);
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'Active': return 'bg-green-100 text-green-800';
-      case 'Blocked': return 'bg-red-100 text-red-800';
-      case 'Inactive': return 'bg-gray-100 text-gray-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const getPlanColor = (plan) => {
-    switch (plan) {
-      case 'Basic': return 'text-blue-600';
-      case 'Standard': return 'text-purple-600';
-      case 'Enterprise': return 'text-orange-600';
-      case 'Premium': return 'text-green-600';
-      default: return 'text-gray-600';
-    }
   };
 
   const columns = [
@@ -61,30 +57,49 @@ const Shops = () => {
       accessor: 'name',
       cell: (row) => (
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">BB</span>
-          </div>
+          <img
+            src={row.img ||  'https://ui-avatars.com/api/?name=NA&background=random&size=40&rounded=true'}
+            alt={row.name}
+            className="w-10 h-10 rounded-lg object-cover"
+          />
           <span className="font-medium text-gray-800">{row.name}</span>
         </div>
       )
     },
-    { header: 'Shop owner', accessor: 'owner' },
+    { header: 'Email', accessor: 'email' },
     { header: 'Phone', accessor: 'phone' },
     { header: 'Place', accessor: 'place' },
     {
-      header: 'Subscription Plan',
-      accessor: 'plan',
+      header: 'Subscription',
+      accessor: 'subscription_status',
       cell: (row) => (
-        <span className={`font-medium ${getPlanColor(row.plan)}`}>{row.plan}</span>
+        <span className="text-sm font-medium text-gray-700">
+          {row.subscription_status || 'NONE'}
+        </span>
       )
     },
     {
-      header: 'Status',
-      accessor: 'status',
+      header: 'Created At',
+      accessor: 'created_at',
       cell: (row) => (
-        <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(row.status)}`}>
-          {row.status}
-        </span>
+        <span className="text-sm text-gray-500">{row.created_at}</span>
+      )
+    },
+    
+    {
+      header: 'Action',
+      accessor: 'action',
+      cell: (row) => (
+        <button
+          className={`px-3 py-1 rounded text-sm font-medium ${
+            row.is_active
+              ? 'bg-red-500 text-white hover:bg-red-600'
+              : 'bg-green-500 text-white hover:bg-green-600'
+          }`}
+          onClick={() => handleToggleStatus(row.id, row.is_active)}
+        >
+          {row.is_active ? 'Block' : 'Unblock'}
+        </button>
       )
     }
   ];
@@ -109,16 +124,21 @@ const Shops = () => {
           </div>
         </div>
 
-        <DataTable
-          columns={columns}
-          data={currentShops}
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-          startIndex={startIndex}
-          endIndex={Math.min(endIndex, filteredShops.length)}
-          totalEntries={filteredShops.length}
-        />
+        {loading ? (
+          <p className="text-blue-600">Loading shops...</p>
+        ) : error ? (
+          <p className="text-red-600">{error}</p>
+        ) : (
+          <DataTable
+            columns={columns}
+            data={filteredShops}
+            totalEntries={count}
+            onNextPage={() => setCurrentUrl(next)}
+            onPreviousPage={() => setCurrentUrl(previous)}
+            disableNext={!next}
+            disablePrevious={!previous}
+          />
+        )}
       </div>
     </div>
   );

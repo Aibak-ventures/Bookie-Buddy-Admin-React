@@ -1,107 +1,69 @@
-import React, { useState, useMemo } from 'react';
-import { Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useState, useEffect, useMemo } from 'react';
+import { Search } from 'lucide-react';
 import DataTable from '../ui components/DataTable';
+import { fetchUsers } from '../../api/AdminApis'; // make sure this function exists
 
+const Users = () => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [users, setUsers] = useState([]);
+  const [count, setCount] = useState(0);
+  const [next, setNext] = useState(null);
+  const [previous, setPrevious] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-function Users() {
-   const [searchTerm, setSearchTerm] = useState('');
-    const [entriesPerPage, setEntriesPerPage] = useState(10);
-    const [currentPage, setCurrentPage] = useState(1);
-  
-    // Sample data - you can replace this with your actual data
-    const shops = [
-      { id: 1, name: 'Abram Schleifer', owner: 'Manu Kumar', phone: '+91 9073 544 834', place: 'Kozhikkode', plan: 'Basic', status: 'Active' },
-      { id: 2, name: 'Abram Schleifer', owner: 'Manu Kumar', phone: '+91 9073 544 834', place: 'Kozhikkode', plan: 'Standard', status: 'Active' },
-      { id: 3, name: 'Abram Schleifer', owner: 'Manu Kumar', phone: '+91 9073 544 834', place: 'Kozhikkode', plan: 'Enterprise', status: 'Blocked' },
-      { id: 4, name: 'Abram Schleifer', owner: 'Manu Kumar', phone: '+91 9073 544 834', place: 'Kozhikkode', plan: 'Basic', status: 'Active' },
-      { id: 5, name: 'Abram Schleifer', owner: 'Manu Kumar', phone: '+91 9073 544 834', place: 'Kozhikkode', plan: 'Basic', status: 'Active' },
-      { id: 6, name: 'Abram Schleifer', owner: 'Manu Kumar', phone: '+91 9073 544 834', place: 'Kozhikkode', plan: 'Basic', status: 'Active' },
-      { id: 7, name: 'Abram Schleifer', owner: 'Manu Kumar', phone: '+91 9073 544 834', place: 'Kozhikkode', plan: 'Basic', status: 'Active' },
-      { id: 8, name: 'Abram Schleifer', owner: 'Manu Kumar', phone: '+91 9073 544 834', place: 'Kozhikkode', plan: 'Basic', status: 'Active' },
-      { id: 9, name: 'Abram Schleifer', owner: 'Manu Kumar', phone: '+91 9073 544 834', place: 'Kozhikkode', plan: 'Basic', status: 'Active' },
-      { id: 10, name: 'Abram Schleifer', owner: 'Manu Kumar', phone: '+91 9073 544 834', place: 'Kozhikkode', plan: 'Basic', status: 'Active' },
-      { id: 11, name: 'Sample Shop', owner: 'John Doe', phone: '+91 9876 543 210', place: 'Mumbai', plan: 'Premium', status: 'Active' },
-      { id: 12, name: 'Test Store', owner: 'Jane Smith', phone: '+91 8765 432 109', place: 'Delhi', plan: 'Basic', status: 'Inactive' }
-    ];
-  
-    // Filter shops based on search term
-    const filteredShops = useMemo(() => {
-      return shops.filter(shop => 
-        shop.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        shop.owner.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        shop.place.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }, [searchTerm]);
-  
-    // Pagination logic
-    const totalPages = Math.ceil(filteredShops.length / entriesPerPage);
-    const startIndex = (currentPage - 1) * entriesPerPage;
-    const endIndex = startIndex + entriesPerPage;
-    const currentShops = filteredShops.slice(startIndex, endIndex);
-  
-    const getStatusColor = (status) => {
-      switch (status) {
-        case 'Active':
-          return 'bg-green-100 text-green-800';
-        case 'Blocked':
-          return 'bg-red-100 text-red-800';
-        case 'Inactive':
-          return 'bg-gray-100 text-gray-800';
-        default:
-          return 'bg-gray-100 text-gray-800';
-      }
-    };
-  
-    const getPlanColor = (plan) => {
-      switch (plan) {
-        case 'Basic':
-          return 'text-blue-600';
-        case 'Standard':
-          return 'text-purple-600';
-        case 'Enterprise':
-          return 'text-orange-600';
-        case 'Premium':
-          return 'text-green-600';
-        default:
-          return 'text-gray-600';
+  const [currentUrl, setCurrentUrl] = useState('/api/v1/auth/admin/users/');
+
+  useEffect(() => {
+    const loadUsers = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await fetchUsers(currentUrl);
+        setUsers(data.results);
+        setCount(data.count);
+        setNext(data.next);
+        setPrevious(data.previous);
+      } catch (err) {
+        setError('Failed to load users.');
+      } finally {
+        setLoading(false);
       }
     };
 
-     const columns = [
+    loadUsers();
+  }, [currentUrl]);
+
+  const filteredUsers = useMemo(() => {
+    return users.filter(user =>
+      [user.full_name, user.email, user.phone]
+        .filter(Boolean)
+        .some(field => field.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+  }, [searchTerm, users]);
+
+  const columns = [
     {
-      header: 'Shop',
-      accessor: 'name',
+      header: 'Name',
+      accessor: 'full_name',
       cell: (row) => (
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">BB</span>
-          </div>
-          <span className="font-medium text-gray-800">{row.name}</span>
+          <img
+            src={`https://ui-avatars.com/api/?name=${encodeURIComponent(row.full_name || 'User')}&background=random&size=40&rounded=true`}
+            alt={row.full_name}
+            className="w-10 h-10 rounded-lg object-cover"
+          />
+          <span className="font-medium text-gray-800">{row.full_name || 'N/A'}</span>
         </div>
       )
     },
-    { header: 'Shop owner', accessor: 'owner' },
     { header: 'Phone', accessor: 'phone' },
-    { header: 'Place', accessor: 'place' },
-    {
-      header: 'Subscription Plan',
-      accessor: 'plan',
-      cell: (row) => (
-        <span className={`font-medium ${getPlanColor(row.plan)}`}>{row.plan}</span>
-      )
-    },
-    {
-      header: 'Status',
-      accessor: 'status',
-      cell: (row) => (
-        <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(row.status)}`}>
-          {row.status}
-        </span>
-      )
-    }
+    { header: 'Email', accessor: 'email' },
+    { header: 'Role', accessor: 'role' }
   ];
-  return  (
-     <div className="min-h-screen bg-gray-50 p-8">
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-8">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold text-gray-800">Users</h1>
       </div>
@@ -112,7 +74,7 @@ function Users() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
             <input
               type="text"
-              placeholder="Search or type command..."
+              placeholder="Search by name, phone, or email"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-64"
@@ -120,19 +82,24 @@ function Users() {
           </div>
         </div>
 
-        <DataTable
-          columns={columns}
-          data={currentShops}
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-          startIndex={startIndex}
-          endIndex={Math.min(endIndex, filteredShops.length)}
-          totalEntries={filteredShops.length}
-        />
+        {loading ? (
+          <p className="text-blue-600">Loading users...</p>
+        ) : error ? (
+          <p className="text-red-600">{error}</p>
+        ) : (
+          <DataTable
+            columns={columns}
+            data={filteredUsers}
+            totalEntries={count}
+            onNextPage={() => setCurrentUrl(next)}
+            onPreviousPage={() => setCurrentUrl(previous)}
+            disableNext={!next}
+            disablePrevious={!previous}
+          />
+        )}
       </div>
     </div>
   );
-}
+};
 
-export default Users
+export default Users;

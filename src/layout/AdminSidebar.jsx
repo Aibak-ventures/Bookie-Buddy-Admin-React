@@ -7,12 +7,12 @@ import {
 import { useLocation, useNavigate } from 'react-router-dom';
 
 const menuItems = [
-  { name: 'Dashboard', icon: LayoutDashboard, path: '/admin/' },
+  { name: 'Dashboard', icon: LayoutDashboard, path: '/' },
 //   { name: 'Add bookings', icon: Plus, path: '/admin/add-bookings' },
-  { name: 'Add shops', icon: Plus, path: '/admin/add-shop' },
+  { name: 'Add shops', icon: Plus, path: '/add-shop' },
 
-  { name: 'Shops', icon: Store, path: '/admin/shops' },
-  { name: 'Users', icon: Users, path: '/admin/users' },
+  { name: 'Shops', icon: Store, path: '/shops' },
+  { name: 'Users', icon: Users, path: '/users' },
   
 //   { name: 'Category Management', icon: FolderOpen, path: '/admin/categories' },
 //   { name: 'Revenue', icon: DollarSign, path: '/admin/revenue' },
