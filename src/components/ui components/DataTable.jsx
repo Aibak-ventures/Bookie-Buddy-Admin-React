@@ -16,7 +16,7 @@ const DataTable = ({
 
   const handleRowClick = (row) => {
     if (row?.id) {
-      navigate(`/admin/shops/${row.id}`);
+      navigate(`/shops/${row.id}`);
     }
   };
 
