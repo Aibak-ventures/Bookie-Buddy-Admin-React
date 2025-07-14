@@ -6,6 +6,8 @@ import Shops from "../components/sections/Shops";
 import Users from "../components/sections/Users";
 import AddShop from "../components/sections/AddShop";
 import SingleShop from "../components/sections/SingleShop";
+import RedirectIfAuth from "./route protection/RedirectIfAuth ";
+import RequireAuth from "./route protection/RequireAuth ";
 
 
 
@@ -14,20 +16,20 @@ import SingleShop from "../components/sections/SingleShop";
 const AdminRoutes = () => {
   return (
     <Routes>
-      <Route path="/login" element={<LoginPage />} />
-      
-      {/* Main layout with sidebar */}
-      <Route path="/" element={<MainLayout />}>
-        <Route index element={<DashBoard />} />
-        <Route path="shops" element={<Shops />} />
-        <Route path="users" element={<Users />} />
-        <Route path="add-shop" element={<AddShop />} />
-        <Route path="/shops/:shopId" element={<SingleShop />} />
+      {/* Protect login route if already authenticated */}
+      <Route element={<RedirectIfAuth />}>
+        <Route path="/login" element={<LoginPage />} />
+      </Route>
 
-
-
-
-        {/* Add more admin routes here */}
+      {/*Protected routes - require login */}
+      <Route element={<RequireAuth />}>
+        <Route path="/" element={<MainLayout />}>
+          <Route index element={<DashBoard />} />
+          <Route path="shops" element={<Shops />} />
+          <Route path="users" element={<Users />} />
+          <Route path="add-shop" element={<AddShop />} />
+          <Route path="shops/:shopId" element={<SingleShop />} />
+        </Route>
       </Route>
     </Routes>
   );

@@ -1,19 +1,17 @@
-import apiClient from "./AxiosConfig";
-
+import API_URLS from './ApiUrl';
+import apiClient from './AxiosConfig';
 
 // Login Function
 export const loginUser = async ({ phone, password }) => {
   try {
-    const response = await apiClient.post('/api/v1/auth/admin/login/', {
+    const response = await apiClient.post(API_URLS.LOGIN, {
       phone,
       password
     });
 
     const { access, refresh, user } = response.data;
-
-    localStorage.setItem('access', access);
-    localStorage.setItem('refresh', refresh);
-    localStorage.setItem('user', JSON.stringify(user));
+    sessionStorage.setItem('access', access);
+    sessionStorage.setItem('user', JSON.stringify(user));
 
     return user;
   } catch (error) {
@@ -21,14 +19,16 @@ export const loginUser = async ({ phone, password }) => {
   }
 };
 
+// Logout
+export const logoutUser = () => {
+  sessionStorage.removeItem('access');
+  sessionStorage.removeItem('user');
+};
 
-
-// to fetch shop details
-export const fetchShops = async (url = '/api/v1/shop/admin/shops/') => {
+// Fetch all shops
+export const fetchShops = async (url = API_URLS.SHOPS) => {
   try {
     const response = await apiClient.get(url);
-    console.log("this is my response", response.data);
-
     return response.data;
   } catch (error) {
     console.error('Failed to fetch shops:', error);
@@ -36,11 +36,10 @@ export const fetchShops = async (url = '/api/v1/shop/admin/shops/') => {
   }
 };
 
-
-// To fetch individual shop details
+// Fetch a single shop
 export const fetchSingleShop = async (shopId) => {
   try {
-    const response = await apiClient.get(`/api/v1/shop/admin/shops/${shopId}/`);
+    const response = await apiClient.get(API_URLS.SINGLE_SHOP(shopId));
     return response.data;
   } catch (error) {
     console.error(`Failed to fetch shop with ID ${shopId}:`, error);
@@ -48,13 +47,10 @@ export const fetchSingleShop = async (shopId) => {
   }
 };
 
-
-
-// to fetch users
-export const fetchUsers = async (url = '/api/v1/auth/admin/users/') => {
+// Fetch users
+export const fetchUsers = async (url = API_URLS.USERS) => {
   try {
     const response = await apiClient.get(url);
-
     return response.data;
   } catch (error) {
     console.error('Failed to fetch users:', error);
@@ -62,13 +58,10 @@ export const fetchUsers = async (url = '/api/v1/auth/admin/users/') => {
   }
 };
 
-
-// to fetch related users of the sho
+// Fetch linked users
 export const fetchLinkedUsers = async (shopId) => {
   try {
-    const response = await apiClient.get(`/api/v1/shop/admin/link-user/?shop_id=${shopId}`);
-    console.log("my users",response);
-    
+    const response = await apiClient.get(API_URLS.LINKED_USERS(shopId));
     return response.data.users;
   } catch (error) {
     console.error('Failed to fetch linked users:', error);
@@ -76,11 +69,7 @@ export const fetchLinkedUsers = async (shopId) => {
   }
 };
 
-
-
-
-
-// Register a new shop with owner
+// Register shop with user
 export const registerShopWithUser = async (formData, logoFile) => {
   try {
     const data = new FormData();
@@ -112,13 +101,11 @@ export const registerShopWithUser = async (formData, logoFile) => {
       'No refund after wash'
     ]));
 
-    // Append selected services
     formData.services.forEach(service => {
       data.append('services', service);
     });
 
-
-    const response = await apiClient.post('/api/v1/shop/admin/shop-with-user/', data, {
+    const response = await apiClient.post(API_URLS.SHOP_WITH_USER, data, {
       headers: {
         'Content-Type': 'multipart/form-data',
       }

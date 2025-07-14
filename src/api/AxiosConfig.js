@@ -22,7 +22,7 @@ export default apiClient;
 // interceptor
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('access');
+    const token = sessionStorage.getItem('access');
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }

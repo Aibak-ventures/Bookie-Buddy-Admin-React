@@ -5,6 +5,7 @@ import {
   FolderOpen, DollarSign, Settings, LogOut
 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { logoutUser } from '../api/AdminApis';
 
 const menuItems = [
   { name: 'Dashboard', icon: LayoutDashboard, path: '/' },
@@ -68,7 +69,13 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
       </nav>
 
       <div className="p-4 border-t">
-        <button className="w-full flex items-center px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg">
+        <button
+          onClick={() => {
+            logoutUser();         // Clear session storage
+            navigate('/login');   // Redirect to login page
+          }}
+          className="w-full flex items-center px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg"
+        >
           <LogOut size={20} className="mr-3" />
           <span>Log out</span>
         </button>
