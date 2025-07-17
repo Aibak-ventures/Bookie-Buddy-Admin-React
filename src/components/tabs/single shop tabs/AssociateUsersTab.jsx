@@ -3,7 +3,7 @@ import { Plus, Edit, Trash2 } from 'lucide-react';
 import AddUserModal from '../../Modals/AddUser';
 import { fetchLinkedUsers } from '../../../api/AdminApis';
 
-const AssociateUsersTab = ({ shopId }) => {
+const AssociateUsersTab = ({ shopId ,shopName }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -92,7 +92,7 @@ const AssociateUsersTab = ({ shopId }) => {
         </div>
       )}
 
-      <AddUserModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <AddUserModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}   shopId={shopId}  shopName={shopName} />
     </div>
   );
 };

@@ -52,11 +52,8 @@ const ShopDetailsCard = ({ shopData }) => {
           text={`${shopData.address || ''}, ${shopData.city || ''}, ${shopData.state || ''}, ${shopData.pincode || ''}, ${shopData.place || ''}`}
         />
 
-        <ShopDetailItem icon={Package} text={`Stock Limit: ${shopData.stock_limit || 'Not set'}`} />
+        <ShopDetailItem icon={Package} text={`Stock Limit: ${shopData.extra_stock_limit }`} />
         <ShopDetailItem icon={Calendar} text={`Created: ${shopData.created_at}`} />
-        <ShopDetailItem icon={BadgeCheck} text={`Subscription Status: ${shopData.subscription_status}`} />
-        <ShopDetailItem icon={ScrollText} text={`Subscribed On: ${shopData.subscribed_date || 'Not available'}`} />
-        <ShopDetailItem icon={ScrollText} text={`Renewal Due: ${shopData.renewal_due_date || 'Not available'}`} />
         
         {Array.isArray(shopData.terms_and_conditions) && shopData.terms_and_conditions.length > 0 && (
           <div className="flex items-start gap-2 text-gray-700">

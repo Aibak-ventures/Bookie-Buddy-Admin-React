@@ -6,8 +6,10 @@ import MultiSelectTags from '../ui components/MultiSelectTags';
 import FormSelect from '../ui components/FormSelect';
 import apiClient from '../../api/AxiosConfig';
 import { registerShopWithUser } from '../../api/AdminApis';
+import { Navigate, useNavigate } from 'react-router-dom';
 
 const ShopRegistrationForm = () => {
+  const naigations = useNavigate()
   const [formData, setFormData] = useState({
     businessName: '',
     place: '',
@@ -53,6 +55,9 @@ const ShopRegistrationForm = () => {
   try {
     const response = await registerShopWithUser(formData, logoFiles[0]);
     console.log('Shop registered successfully:', response);
+    if (response.status == 201){
+      naigations("/shops")
+    }
     // You can also redirect or show a success toast here
   } catch (error) {
     console.error('Shop registration failed:', error);
@@ -62,24 +67,24 @@ const ShopRegistrationForm = () => {
 
   const stateOptions = [
     { value: 'kerala', label: 'Kerala' },
-    { value: 'tamil-nadu', label: 'Tamil Nadu' },
-    { value: 'karnataka', label: 'Karnataka' },
-    { value: 'andhra-pradesh', label: 'Andhra Pradesh' }
+    // { value: 'tamil-nadu', label: 'Tamil Nadu' },
+    // { value: 'karnataka', label: 'Karnataka' },
+    // { value: 'andhra-pradesh', label: 'Andhra Pradesh' }
   ];
 
-  const subscriptionOptions = [
-    { value: 'basic', label: 'Basic - plan' },
-    { value: 'premium', label: 'Premium - plan' },
-    { value: 'enterprise', label: 'Enterprise - plan' }
-  ];
+  // const subscriptionOptions = [
+  //   { value: 'basic', label: 'Basic - plan' },
+  //   { value: 'premium', label: 'Premium - plan' },
+  //   { value: 'enterprise', label: 'Enterprise - plan' }
+  // ];
 
-  const serviceOptions = [
-    { value: 'rentals', label: 'Rentals' },
-    { value: 'groom-rentals', label: 'Groom Rentals' },
-    { value: 'photography', label: 'Photography' },
-    { value: 'catering', label: 'Catering' },
-    { value: 'decoration', label: 'Decoration' }
-  ];
+  // const serviceOptions = [
+  //   { value: 'rentals', label: 'Rentals' },
+  //   { value: 'groom-rentals', label: 'Groom Rentals' },
+  //   { value: 'photography', label: 'Photography' },
+  //   { value: 'catering', label: 'Catering' },
+  //   { value: 'decoration', label: 'Decoration' }
+  // ];
 
   return (
     <div className="max-w-6xl mx-auto p-6 bg-white">
@@ -118,12 +123,12 @@ const ShopRegistrationForm = () => {
           </div>
         </div>
 
-        <div className="bg-gray-50 p-6 rounded-lg">
+        {/* <div className="bg-gray-50 p-6 rounded-lg">
           <h2 className="text-lg font-semibold mb-4">Other details</h2>
           <MultiSelectTags label="Services" options={serviceOptions} selectedValues={formData.services} onChange={handleServicesChange} />
           <FormInput label="Maximum allowed products" type="number" value={formData.maxProducts} onChange={handleInputChange('maxProducts')} min="1" />
           <FormSelect label="Subscription Plan" options={subscriptionOptions} value={formData.subscriptionPlan} onChange={handleInputChange('subscriptionPlan')} required />
-        </div>
+        </div> */}
 
         <div className="lg:col-span-3 flex justify-end">
           <button type="button" onClick={handleSubmit} className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">

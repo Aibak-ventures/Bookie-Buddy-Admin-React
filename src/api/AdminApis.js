@@ -69,6 +69,26 @@ export const fetchLinkedUsers = async (shopId) => {
   }
 };
 
+// create user alone
+// Create a new user and associate with shop
+export const createUserForShop = async (userData, shopId) => {
+  try {
+    const payload = {
+      ...userData,
+      shop: shopId, // ensure the backend expects this field
+    };
+
+    console.log("LLLLLLLLLLL",payload);
+    
+
+    const response = await apiClient.post(API_URLS.USERS, payload);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to create user:', error);
+    throw error;
+  }
+};
+
 // Register shop with user
 export const registerShopWithUser = async (formData, logoFile) => {
   try {
@@ -89,31 +109,80 @@ export const registerShopWithUser = async (formData, logoFile) => {
     data.append('shop_city', formData.city);
     data.append('shop_state', formData.state);
     data.append('shop_pincode', formData.postCode);
-    data.append('subscription_plan', formData.subscriptionPlan);
-    data.append('max_products', formData.maxProducts);
+    // data.append('subscription_plan', formData.subscriptionPlan);
+    // data.append('max_products', formData.maxProducts);
 
     if (logoFile) {
       data.append('image', logoFile);
     }
-
-    data.append('terms_and_conditions', JSON.stringify([
-      'Clothes must be collected within 7 days',
-      'No refund after wash'
-    ]));
-
-    formData.services.forEach(service => {
-      data.append('services', service);
-    });
-
+    
+    console.log("this is my dasta",data);
+    
     const response = await apiClient.post(API_URLS.SHOP_WITH_USER, data, {
       headers: {
         'Content-Type': 'multipart/form-data',
       }
     });
 
-    return response.data;
+    return response;
   } catch (error) {
     console.error('Error registering shop:', error);
+    throw error;
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// service section apis
+
+
+// Fetch general services with pagination
+export const fetchGeneralServices = async () => {
+  try {
+    const response = await apiClient.get(API_URLS.GENERAL_SERVICES);
+    return response.data; // includes count, next, previous, results
+  } catch (error) {
+    console.error('Failed to fetch services:', error);
+    throw error;
+  }
+};
+
+
+
+// Fetch services related to a specific shop
+export const fetchShopServices = async (shopId) => {
+  try {
+    const response = await apiClient.get(`${API_URLS.SERVICE_UNDER_SHOP}?shop_id=${shopId}`);
+    return response.data; // Expecting an array of services
+  } catch (error) {
+    console.error(`Failed to fetch services for shop ${shopId}:`, error);
+    throw error;
+  }
+};
+
+
+// assign service to shop
+export const assignServicesToShop = async ({ shop_id, service_ids }) => {
+  try {
+    const response = await apiClient.post(
+      API_URLS.ASSIGN_SERVICES_TO_SHOP,
+      { shop_id, service_ids }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Failed to assign services to shop:", error);
     throw error;
   }
 };

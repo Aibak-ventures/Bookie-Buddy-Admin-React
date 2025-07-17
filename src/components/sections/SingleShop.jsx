@@ -16,9 +16,9 @@ const SingleShop = () => {
 
   const tabs = [
     { id: 'associate-users', label: 'Associate users', icon: Users },
-    { id: 'subscription', label: 'Subscription', icon: CreditCard },
+    // { id: 'subscription', label: 'Subscription', icon: CreditCard },
     { id: 'services-products', label: 'Services & products', icon: Package },
-    { id: 'activities', label: 'Activities', icon: BarChart3 }
+    // { id: 'activities', label: 'Activities', icon: BarChart3 }
   ];
 
   useEffect(() => {
@@ -56,6 +56,7 @@ const SingleShop = () => {
                 activeTab={activeTab}
                 setActiveTab={setActiveTab}
                   shopId={shopId}
+                  shopName= {shopData.name}
               />
             </div>
           </div>

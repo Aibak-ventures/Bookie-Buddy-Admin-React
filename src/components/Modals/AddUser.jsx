@@ -1,51 +1,97 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { X } from 'lucide-react';
 import FormInput from '../ui components/FormInput';
 import FormSelect from '../ui components/FormSelect';
+import { createUserForShop } from '../../api/AdminApis';
 
-const AddUserModal = ({ isOpen, onClose }) => {
+
+const AddUserModal = ({ isOpen, onClose, shopId,shopName }) => {
   if (!isOpen) return null;
 
   const roleOptions = [
-    { label: 'Admin', value: 'admin' },
-    { label: 'Staff', value: 'staff' },
-    { label: 'Manager', value: 'manager' },
+    { label: 'Admin', value: 'ADMIN' },
+    { label: 'Staff', value: 'STAFF' },
   ];
+
+  const [formData, setFormData] = useState({
+    phone: '',
+    email: '',
+    full_name: '',
+    password: '',
+    secondary_password: '',
+    role: '',
+  });
+
+  const handleChange = (key, value) => {
+    setFormData(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleSubmit = async () => {
+    try {
+      await createUserForShop(formData, shopId);
+      alert('User assigned successfully');
+      onClose();
+    } catch (err) {
+      console.error('Failed to assign user:', err);
+      alert('Failed to assign user');
+    }
+  };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
       <div className="bg-white w-full max-w-3xl p-6 rounded-xl shadow-lg relative">
-        <button onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-gray-700">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
+        >
           <X size={20} />
         </button>
 
-        <h2 className="text-xl font-semibold mb-4">Add user details</h2>
+        <h2 className="text-xl font-semibold mb-4">Add user details for {shopName}</h2>
 
-        {/* Search User */}
-        <div className="mb-6">
-          <FormInput
-            label="Search existing user"
-            placeholder="Search by name or phone"
-            className="w-full"
-          />
-        </div>
+       
 
         {/* Add New User Form */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormInput label="First name" placeholder="Enter first name" required />
-          <FormInput label="Last name" placeholder="Enter last name" required />
-          <FormInput label="Phone" placeholder="+91 00000 00000" required />
-          <FormInput label="Email" placeholder="info@gmail.com" type="email" required />
-          <FormInput label="Password" type="password" placeholder="Password" required />
-          <FormInput label="Confirm Password" type="password" placeholder="Confirm Password" required />
-          <FormInput label="Secret Password" type="password" placeholder="Secret Password" required />
-          <FormInput label="Confirm Secret Password" type="password" placeholder="Confirm Secret Password" required />
-          <FormInput label="Shop" placeholder="Bookie buddy - Kozhikode" required />
+          <FormInput
+            label="Full Name"
+            placeholder="Enter full name"
+            required
+            onChange={(e) => handleChange('full_name', e.target.value)}
+          />
+          <FormInput
+            label="Phone"
+            placeholder="+91 00000 00000"
+            required
+            onChange={(e) => handleChange('phone', e.target.value)}
+          />
+          <FormInput
+            label="Email"
+            placeholder="info@gmail.com"
+            type="email"
+            required
+            onChange={(e) => handleChange('email', e.target.value)}
+          />
+          <FormInput
+            label="Password"
+            type="password"
+            placeholder="Password"
+            required
+            onChange={(e) => handleChange('password', e.target.value)}
+          />
+          <FormInput
+            label="Secret Password"
+            type="password"
+            placeholder="Secret Password"
+            required
+            onChange={(e) => handleChange('secondary_password', e.target.value)}
+          />
           <FormSelect
             label="Role"
             options={roleOptions}
             placeholder="Select Role"
             required
+            onChange={(e) => handleChange('role', e.target.value)}
           />
         </div>
 
@@ -56,7 +102,10 @@ const AddUserModal = ({ isOpen, onClose }) => {
           >
             Close
           </button>
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+          <button
+            onClick={handleSubmit}
+            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
             Assign →
           </button>
         </div>

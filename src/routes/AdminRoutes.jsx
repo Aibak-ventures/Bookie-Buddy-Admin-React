@@ -6,8 +6,8 @@ import Shops from "../components/sections/Shops";
 import Users from "../components/sections/Users";
 import AddShop from "../components/sections/AddShop";
 import SingleShop from "../components/sections/SingleShop";
-import RedirectIfAuth from "./route protection/RedirectIfAuth ";
-import RequireAuth from "./route protection/RequireAuth ";
+import RedirectIfAuth from "./route protection/RedirectIfAuth";
+import RequireAuth from "./route protection/RequireAuth";
 
 
 
