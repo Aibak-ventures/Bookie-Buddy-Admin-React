@@ -1,58 +1,12 @@
-import React, { useState, useEffect } from "react";
-import { Settings, Plus } from 'lucide-react';
-import AddServiceModal from "../../Modals/AddServiceModal";
-import { assignServicesToShop, fetchShopServices } from "../../../api/AdminApis"; 
+import React from "react";
+import {  Settings, Plus } from 'lucide-react';
 
-const ServicesProductsTab = ({ shop_id }) => {
-  const [services, setServices] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [reload,setReload] = useState(false)
-
-  //  Fetch services from API
-  useEffect(() => {
-    if (!shop_id) return;
-
-    const loadServices = async () => {
-      try {
-        const data = await fetchShopServices(shop_id);
-        
-        setServices(data?.services || []);
-      } catch (error) {
-        console.error("Failed to load shop services:", error);
-      }
-    };
-
-    loadServices();
-  }, [shop_id,reload]);
-
-  // Handle modal submission
-const handleAddService = async (serviceIds) => {
-  console.log("this is  my service");
-  
-  const payload = { shop_id, service_ids: serviceIds };
-  console.log("this is my payload",payload);
-   const allAreIntegers = serviceIds.every(id => Number.isInteger(id));
-   console.log("all integers",allAreIntegers);
-   
-
-  if (!allAreIntegers) {
-    console.error("Service IDs must all be integers. Received:", serviceIds);
-    return;
-  }
-
-  
-  
-  try {
-    const response = await assignServicesToShop(payload);
-    console.log("my reponse in service card",response);
-    
-    const updated = await fetchShopServices(shop_id);
-    setServices(updated?.assigned || []);
-    setReload(!reload)
-  } catch (error) {
-    console.error("Failed to assign services:", error);
-  }
-};
+const ServicesProductsTab = () => {
+  const services = [
+    { id: 1, name: 'Photography', status: 'Active', products: 25 },
+    { id: 2, name: 'Catering', status: 'Active', products: 15 },
+    { id: 3, name: 'Decoration', status: 'Inactive', products: 8 },
+  ];
 
   return (
     <div>
