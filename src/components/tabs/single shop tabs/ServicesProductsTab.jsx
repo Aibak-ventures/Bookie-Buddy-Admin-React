@@ -15,7 +15,6 @@ const ServicesProductsTab = ({ shop_id }) => {
     const loadServices = async () => {
       try {
         const data = await fetchShopServices(shop_id);
-        console.log("this is my data",data);
         
         setServices(data?.services || []);
       } catch (error) {
@@ -29,7 +28,6 @@ const ServicesProductsTab = ({ shop_id }) => {
   // Handle modal submission
 const handleAddService = async (serviceIds) => {
   const payload = { shop_id, service_ids: serviceIds };
-  console.log("these are my shop ids",payload);
   
   try {
     await assignServicesToShop(payload);

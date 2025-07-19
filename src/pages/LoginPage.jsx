@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Eye, EyeOff, Phone, Lock, User } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { loginUser } from '../api/AdminApis';
+import FormInput from '../components/ui components/FormInput'; // update the path if needed
 
 export default function LoginComponent() {
   const [formData, setFormData] = useState({
@@ -75,24 +76,20 @@ export default function LoginComponent() {
         </div>
 
         <div className="space-y-6">
+          {/* Phone Input */}
           <div>
-            <label htmlFor="phone" className="block text-sm font-medium text-gray-700 mb-2">
-              Phone Number
-            </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <div className="absolute inset-y-0 left-0 pl-3  pt-5  flex items-center pointer-events-none">
                 <Phone className="h-5 w-5 text-purple-400" />
               </div>
-              <input
+              <FormInput
+                label="Phone Number"
                 type="tel"
-                id="phone"
                 name="phone"
+                placeholder="+919876543210"
                 value={formData.phone}
                 onChange={handleInputChange}
-                placeholder="+919876543210"
-                className={`w-full pl-10 pr-4 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 ${
-                  errors.phone ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-purple-300'
-                }`}
+                className={`pl-10 ${errors.phone ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-purple-300'}`}
               />
             </div>
             {errors.phone && (
@@ -100,29 +97,25 @@ export default function LoginComponent() {
             )}
           </div>
 
+          {/* Password Input */}
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-              Password
-            </label>
             <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <div className="absolute inset-y-0 left-0 pl-3 pt-5 flex items-center pointer-events-none">
                 <Lock className="h-5 w-5 text-purple-400" />
               </div>
-              <input
+              <FormInput
+                label="Password"
                 type={showPassword ? 'text' : 'password'}
-                id="password"
                 name="password"
+                placeholder="Enter your password"
                 value={formData.password}
                 onChange={handleInputChange}
-                placeholder="Enter your password"
-                className={`w-full pl-10 pr-12 py-3 border-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all duration-200 ${
-                  errors.password ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-purple-300'
-                }`}
+                className={`pl-10 pr-12 ${errors.password ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-purple-300'}`}
               />
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-purple-400 hover:text-purple-600"
+                className="absolute inset-y-0 right-0 pr-3  pt-5 flex items-center text-purple-400 hover:text-purple-600"
               >
                 {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
               </button>
@@ -132,6 +125,7 @@ export default function LoginComponent() {
             )}
           </div>
 
+          {/* Submit Button */}
           <button
             onClick={handleSubmit}
             className="w-full bg-gradient-to-r from-purple-600 to-violet-600 text-white py-3 px-4 rounded-lg font-medium hover:from-purple-700 hover:to-violet-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 transition-all duration-200"
@@ -139,7 +133,6 @@ export default function LoginComponent() {
             Sign In
           </button>
 
-          {/* Show login error */}
           {loginError && (
             <p className="text-sm text-red-600 text-center mt-2">{loginError}</p>
           )}

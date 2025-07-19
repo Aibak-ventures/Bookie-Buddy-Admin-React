@@ -25,7 +25,6 @@ const SingleShop = () => {
     const loadShop = async () => {
       try {
         const data = await fetchSingleShop(shopId);
-        console.log("shopp details",data);
         
         setShopData(data);
       } catch (err) {

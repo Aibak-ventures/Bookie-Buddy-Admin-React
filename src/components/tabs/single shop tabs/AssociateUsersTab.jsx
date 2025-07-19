@@ -19,7 +19,6 @@ const AssociateUsersTab = ({ shopId ,shopName }) => {
         const data = await fetchLinkedUsers(shopId);
         setUsers(data);
       } catch (err) {
-        console.log("error",err)
         setError('Failed to load associated users.');
       } finally {
         setLoading(false);

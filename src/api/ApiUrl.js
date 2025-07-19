@@ -10,7 +10,8 @@ const API_URLS = {
   REFRESH_TOKEN_URL : '/api/token/refresh/',
   GENERAL_SERVICES : '/api/v1/service/admin/general-services/',
   SERVICE_UNDER_SHOP:'/api/v1/service/admin/general-services/shop-services/',
-  ASSIGN_SERVICES_TO_SHOP:"/api/v1/service/admin/general-services/assign-to-shop/"
+  ASSIGN_SERVICES_TO_SHOP:"/api/v1/service/admin/general-services/assign-to-shop/",
+  ADD_USER_WITH_ROLE:'/api/v1/shop/admin/shop-with-user/create-with-role/'
  
 
 };

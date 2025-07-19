@@ -86,7 +86,7 @@ export const refreshToken = async () =>{
 
         // Update the failed request with the new token and retry
         originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
-        return apiClient(originalRequest);
+        // return apiClient(originalRequest);
       } catch (refreshError) {
         // // Optional: logout user
         // sessionStorage.clear();

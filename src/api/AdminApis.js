@@ -77,17 +77,19 @@ export const createUserForShop = async (userData, shopId) => {
       ...userData,
       shop: shopId, // ensure the backend expects this field
     };
-
-    console.log("LLLLLLLLLLL",payload);
+    const response = await apiClient.post(API_URLS.ADD_USER_WITH_ROLE, payload);
     
-
-    const response = await apiClient.post(API_URLS.USERS, payload);
     return response.data;
   } catch (error) {
     console.error('Failed to create user:', error);
     throw error;
   }
 };
+
+
+
+
+
 
 // Register shop with user
 export const registerShopWithUser = async (formData, logoFile) => {
@@ -116,7 +118,6 @@ export const registerShopWithUser = async (formData, logoFile) => {
       data.append('image', logoFile);
     }
     
-    console.log("this is my dasta",data);
     
     const response = await apiClient.post(API_URLS.SHOP_WITH_USER, data, {
       headers: {

@@ -10,6 +10,8 @@ const AddServiceModal = ({ isOpen, onClose, onSubmit }) => {
     previous: null,
     currentUrl: '/api/v1/service/admin/general-services/',
   });
+  const [formError, setFormError] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -31,7 +33,6 @@ const AddServiceModal = ({ isOpen, onClose, onSubmit }) => {
     loadServices();
   }, [pagination.currentUrl, isOpen]);
 
-  // Toggle selected service ID
   const toggleService = (id) => {
     setSelectedServices(prev => {
       const updated = new Set(prev);
@@ -44,17 +45,20 @@ const AddServiceModal = ({ isOpen, onClose, onSubmit }) => {
     });
   };
 
-  // Submit multiple selected services
   const handleAddServices = () => {
     if (selectedServices.size === 0) {
-      alert('Please select at least one service.');
+      setFormError('Please select at least one service.');
       return;
     }
 
+    setIsSubmitting(true);
+
     const serviceIds = Array.from(selectedServices);
-    onSubmit(serviceIds );
+    onSubmit(serviceIds);
 
     setSelectedServices(new Set());
+    setFormError('');
+    setIsSubmitting(false);
     onClose();
   };
 
@@ -85,7 +89,10 @@ const AddServiceModal = ({ isOpen, onClose, onSubmit }) => {
           ))}
         </div>
 
-        {/* Pagination Controls */}
+        {formError && (
+          <p className="text-sm text-red-500 mb-2">{formError}</p>
+        )}
+
         <div className="flex justify-between text-sm text-blue-600 mb-4">
           <button
             disabled={!pagination.previous}
@@ -118,9 +125,12 @@ const AddServiceModal = ({ isOpen, onClose, onSubmit }) => {
           </button>
           <button
             onClick={handleAddServices}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            disabled={isSubmitting}
+            className={`px-4 py-2 text-white rounded ${
+              isSubmitting ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+            }`}
           >
-            Assign
+            {isSubmitting ? 'Assigning...' : 'Assign'}
           </button>
         </div>
       </div>
