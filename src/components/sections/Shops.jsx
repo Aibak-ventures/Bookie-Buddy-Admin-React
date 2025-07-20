@@ -69,15 +69,15 @@ const Shops = () => {
     { header: 'Email', accessor: 'email' },
     { header: 'Phone', accessor: 'phone' },
     { header: 'Place', accessor: 'place' },
-    {
-      header: 'Subscription',
-      accessor: 'subscription_status',
-      cell: (row) => (
-        <span className="text-sm font-medium text-gray-700">
-          {row.subscription_status || 'NONE'}
-        </span>
-      )
-    },
+    // {
+    //   header: 'Subscription',
+    //   accessor: 'subscription_status',
+    //   cell: (row) => (
+    //     <span className="text-sm font-medium text-gray-700">
+    //       {row.subscription_status || 'NONE'}
+    //     </span>
+    //   )
+    // },
     {
       header: 'Created At',
       accessor: 'created_at',

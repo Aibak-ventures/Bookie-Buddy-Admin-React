@@ -5,7 +5,7 @@ import ServicesProductsTab from '../tabs/single shop tabs/ServicesProductsTab';
 import ActivitiesContent from '../tabs/single shop tabs/ActivitiesContent';
 
 
-const TabbedContentCard = ({ tabs, activeTab, setActiveTab,shopId }) => {
+const TabbedContentCard = ({ tabs, activeTab, setActiveTab,shopId ,shopName }) => {
   return (
     <div className="bg-white rounded-lg shadow-sm border">
       <div className="border-b">
@@ -28,10 +28,10 @@ const TabbedContentCard = ({ tabs, activeTab, setActiveTab,shopId }) => {
       </div>
 
       <div className="p-6">
-        {activeTab === 'associate-users' && <AssociateUsersTab shopId={shopId} />}
-        {activeTab === 'subscription' && <SubscriptionTab />}
-        {activeTab === 'services-products' && <ServicesProductsTab />}
-        {activeTab === 'activities' && <ActivitiesContent />}
+        {activeTab === 'associate-users' && <AssociateUsersTab shopId={shopId} shopName={shopName}/>}
+        {/* {activeTab === 'subscription' && <SubscriptionTab />} */}
+        {activeTab === 'services-products' && <ServicesProductsTab shop_id={shopId} />}
+        {/* {activeTab === 'activities' && <ActivitiesContent />} */}
         
       </div>
     </div>
