@@ -251,7 +251,6 @@ export const toggleShopServiceStatus = async ({ shop_service_id, is_active }) =>
 
 
 
-
 ///////////////////////////////////////////////////////////////////////// SERVICE RELATED APIS ///////////////////////////////////////
 
 // Fetch general services with pagination

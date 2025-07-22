@@ -15,7 +15,6 @@ import SingleUser from "../components/sections/SingleUser";
 
 
 
-
 const AdminRoutes = () => {
   return (
     <Routes>
