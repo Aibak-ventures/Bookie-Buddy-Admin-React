@@ -12,6 +12,7 @@ const apiClient = axios.create({
   baseURL: apiUrl,
   headers: {
     'Content-Type': 'application/json',
+     'Content-Type': 'multipart/form-data',
   },
   withCredentials: true,
 });
@@ -74,24 +75,27 @@ apiClient.interceptors.response.use(
 
 
 
-export const refreshToken = async () =>{
-    try {
-        // Call refresh endpoint — backend should read refresh token from cookies
-        const refreshResponse = await apiClient.post(API_URLS.REFRESH_TOKEN_URL, null); // no body needed if using cookie
 
-        const newAccessToken = refreshResponse.data.access;
-        console.log("new acess token",newAccessToken);
-        
-        sessionStorage.setItem('access', newAccessToken);
 
-        // Update the failed request with the new token and retry
-        originalRequest.headers['Authorization'] = `Bearer ${newAccessToken}`;
-        // return apiClient(originalRequest);
-      } catch (refreshError) {
-        // // Optional: logout user
-        // sessionStorage.clear();
-        // return Promise.reject(refreshError);
-        console.log("error",refreshError);
-        
-      }
-}
+
+export const refreshToken = async () => {
+  try {
+    console.log("Trying to refresh token...");
+
+    const refreshResponse = await axios.post(
+  'http://dev.bookiebuddy.in/api/admin-token/refresh/',
+  {}, // empty body
+  { withCredentials: true } // ✅ correct placement
+);
+
+    console.log("Refresh Response:", refreshResponse);
+
+    const newAccessToken = refreshResponse.data.access;
+    console.log("New Access Token:", newAccessToken);
+
+    sessionStorage.setItem('access', newAccessToken);
+  } catch (err) {
+    console.error("Refresh token error:", err);
+    // Optional: sessionStorage.clear();
+  }
+};

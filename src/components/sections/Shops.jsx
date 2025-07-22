@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
 import DataTable from '../ui components/DataTable';
-import { fetchShops } from '../../api/AdminApis';
+import { fetchShops ,blockUnblockShop} from '../../api/AdminApis';
 
 const Shops = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -39,17 +39,7 @@ const Shops = () => {
       .some(field => field.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
-  const handleToggleStatus = (shopId, currentStatus) => {
-    // Replace with actual API call to block/unblock shop
-    alert(`Toggling status for shop ID ${shopId}`);
 
-    // Optional optimistic update
-    setShops(prev =>
-      prev.map(shop =>
-        shop.id === shopId ? { ...shop, is_active: !currentStatus } : shop
-      )
-    );
-  };
 
   const columns = [
     {
@@ -104,6 +94,24 @@ const Shops = () => {
     }
   ];
 
+  const handleToggleStatus = async (shopId, currentStatus) => {
+  setShops(prev =>
+    prev.map(shop =>
+      shop.id === shopId ? { ...shop, is_active: !currentStatus } : shop
+    )
+  );
+
+  try {
+    await blockUnblockShop(shopId, !currentStatus);
+  } catch (error) {
+    setShops(prev =>
+      prev.map(shop =>
+        shop.id === shopId ? { ...shop, is_active: currentStatus } : shop
+      )
+    );
+  }
+};
+
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="flex items-center justify-between mb-8">
@@ -137,6 +145,7 @@ const Shops = () => {
             onPreviousPage={() => setCurrentUrl(previous)}
             disableNext={!next}
             disablePrevious={!previous}
+             rowClickPath="shops"
           />
         )}
       </div>

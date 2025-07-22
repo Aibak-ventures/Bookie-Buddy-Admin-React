@@ -11,14 +11,18 @@ const DataTable = ({
   onPreviousPage,
   disableNext,
   disablePrevious,
+   rowClickPath = '',
 }) => {
   const navigate = useNavigate();
 
+
   const handleRowClick = (row) => {
-    if (row?.id) {
-      navigate(`/shops/${row.id}`);
+    if (row?.id && rowClickPath) {
+      navigate(`/${rowClickPath}/${row.id}`);
     }
-  };
+  }
+
+  
 
   return (
     <div className="overflow-x-auto">
@@ -41,8 +45,14 @@ const DataTable = ({
             >
               {columns.map((col) => (
                 <td key={col.accessor} className="py-4 px-4 text-gray-600">
-                  {col.cell ? col.cell(row) : row[col.accessor]}
-                </td>
+                    {col.cell ? (
+                      <div onClick={(e) => e.stopPropagation()}>
+                        {col.cell(row)}
+                      </div>
+                    ) : (
+                      row[col.accessor]
+                    )}
+                  </td>
               ))}
             </tr>
           ))}

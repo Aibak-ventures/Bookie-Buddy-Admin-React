@@ -1,14 +1,24 @@
-import React from 'react'
-import { refreshToken } from '../../api/AxiosConfig'
-// import AppSidebar from '../layout/AppSidebar'
+import React from 'react';
+import { refreshToken } from '../../api/AxiosConfig';
 
 function DashBoard() {
+  const handleRefresh = async () => {
+    try {
+      await refreshToken();
+      console.log("Token refreshed successfully");
+    } catch (err) {
+      console.error("Failed to refresh token:", err);
+    }
+  };
+
   return (
     <div>
       my DashBoard 
-      <button  className="bg-amber-700" onClick={refreshToken}>to refresh</button>
+      <button className="bg-amber-700 text-white px-4 py-2 rounded" onClick={handleRefresh}>
+        Refresh Token
+      </button>
     </div>
-  )
+  );
 }
 
-export default DashBoard
+export default DashBoard;

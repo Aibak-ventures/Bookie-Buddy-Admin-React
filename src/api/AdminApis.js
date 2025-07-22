@@ -1,7 +1,7 @@
 import API_URLS from './ApiUrl';
 import apiClient from './AxiosConfig';
 
-// Login Function
+////////////////////////////////////////////////////////////    AUTH RELATED FUNCTIONALITIES  /////////////////////////////////////
 export const loginUser = async ({ phone, password }) => {
   try {
     const response = await apiClient.post(API_URLS.LOGIN, {
@@ -25,27 +25,10 @@ export const logoutUser = () => {
   sessionStorage.removeItem('user');
 };
 
-// Fetch all shops
-export const fetchShops = async (url = API_URLS.SHOPS) => {
-  try {
-    const response = await apiClient.get(url);
-    return response.data;
-  } catch (error) {
-    console.error('Failed to fetch shops:', error);
-    throw error;
-  }
-};
 
-// Fetch a single shop
-export const fetchSingleShop = async (shopId) => {
-  try {
-    const response = await apiClient.get(API_URLS.SINGLE_SHOP(shopId));
-    return response.data;
-  } catch (error) {
-    console.error(`Failed to fetch shop with ID ${shopId}:`, error);
-    throw error;
-  }
-};
+
+
+///////////////////////////////////////////////////////////////   USER RELATED APIS  /////////////////////////////////////////////
 
 // Fetch users
 export const fetchUsers = async (url = API_URLS.USERS) => {
@@ -87,6 +70,90 @@ export const createUserForShop = async (userData, shopId) => {
 };
 
 
+// get user details 
+
+export const fetchUserDetails = async (userId) => {
+  try {
+    const response = await apiClient.get(`${API_URLS.USERS}${userId}/`);
+    
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// fetch shops related to the user
+export const fetchUserShops = async (userId) => {
+  try {
+    const response = await apiClient.get(`${API_URLS.SHOPS_OF_USER}?user_id=${userId}`);
+     
+    return response.data.shops; // assuming your response is { shops: [...] }
+    
+  } catch (error) {
+
+    console.error('Failed to fetch associated shops:', error);
+    throw error;
+  }
+};
+
+
+
+//Block/Unblock User
+export const blockUnblockUser = async (userId, isActive) => {
+  console.log("this is my input",userId,isActive);
+
+  try {
+    const response = await apiClient.patch(`${API_URLS.USERS}${userId}/`, {
+      is_active: isActive,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Failed to toggle user status:', error);
+    throw error;
+  }
+};
+
+
+
+
+///////////////////////////////////////////////////////////////   SHOP RELATED APIS  /////////////////////////////////////////////
+
+
+// Fetch all shops
+export const fetchShops = async (url = API_URLS.SHOPS) => {
+  try {
+    const response = await apiClient.get(url);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch shops:', error);
+    throw error;
+  }
+};
+
+// Fetch a single shop
+export const fetchSingleShop = async (shopId) => {
+  try {
+    const response = await apiClient.get(API_URLS.SINGLE_SHOP(shopId));
+    return response.data;
+  } catch (error) {
+    console.error(`Failed to fetch shop with ID ${shopId}:`, error);
+    throw error;
+  }
+};
+
+//Block/Unblock Shop
+export const blockUnblockShop = async (shopId, isActive) => {
+  
+  try {
+    const response = await apiClient.patch(API_URLS.SINGLE_SHOP(shopId), {
+      is_active: isActive,
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Failed to toggle shop status:', error);
+    throw error;
+  }
+};
 
 
 
@@ -146,8 +213,7 @@ export const registerShopWithUser = async (formData, logoFile) => {
 
 
 
-// service section apis
-
+///////////////////////////////////////////////////////////////////////// SERVICE RELATED APIS ///////////////////////////////////////
 
 // Fetch general services with pagination
 export const fetchGeneralServices = async () => {

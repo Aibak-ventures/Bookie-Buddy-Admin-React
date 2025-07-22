@@ -1,7 +1,9 @@
+// components/sections/Users.jsx
+
 import React, { useState, useEffect, useMemo } from 'react';
 import { Search } from 'lucide-react';
 import DataTable from '../ui components/DataTable';
-import { fetchUsers } from '../../api/AdminApis'; // make sure this function exists
+import { fetchUsers, blockUnblockUser } from '../../api/AdminApis';
 
 const Users = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -11,7 +13,6 @@ const Users = () => {
   const [previous, setPrevious] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
   const [currentUrl, setCurrentUrl] = useState('/api/v1/auth/admin/users/');
 
   useEffect(() => {
@@ -33,6 +34,24 @@ const Users = () => {
 
     loadUsers();
   }, [currentUrl]);
+
+  const handleToggleStatus = async (userId, currentStatus) => {
+    setUsers(prev =>
+      prev.map(user =>
+        user.id === userId ? { ...user, is_active: !currentStatus } : user
+      )
+    );
+
+    try {
+      await blockUnblockUser(userId, !currentStatus);
+    } catch (error) {
+      setUsers(prev =>
+        prev.map(user =>
+          user.id === userId ? { ...user, is_active: currentStatus } : user
+        )
+      );
+    }
+  };
 
   const filteredUsers = useMemo(() => {
     return users.filter(user =>
@@ -59,7 +78,26 @@ const Users = () => {
     },
     { header: 'Phone', accessor: 'phone' },
     { header: 'Email', accessor: 'email' },
-    { header: 'Role', accessor: 'role' }
+    { header: 'Role', accessor: 'role' },
+    {
+      header: 'Action',
+      accessor: 'action',
+      cell: (row) => (
+        <button
+          className={`px-3 py-1 rounded text-sm font-medium ${
+            row.is_active
+              ? 'bg-red-500 text-white hover:bg-red-600'
+              : 'bg-green-500 text-white hover:bg-green-600'
+          }`}
+          onClick={(e) => {
+            e.stopPropagation();
+            handleToggleStatus(row.id, row.is_active);
+          }}
+        >
+          {row.is_active ? 'Block' : 'Unblock'}
+        </button>
+      )
+    }
   ];
 
   return (
@@ -95,6 +133,7 @@ const Users = () => {
             onPreviousPage={() => setCurrentUrl(previous)}
             disableNext={!next}
             disablePrevious={!previous}
+            rowClickPath="users"
           />
         )}
       </div>

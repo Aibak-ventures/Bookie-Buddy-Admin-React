@@ -8,6 +8,8 @@ import AddShop from "../components/sections/AddShop";
 import SingleShop from "../components/sections/SingleShop";
 import RedirectIfAuth from "./route protection/RedirectIfAuth";
 import RequireAuth from "./route protection/RequireAuth";
+import SingleUser from "../components/sections/SingleUser";
+
 
 
 
@@ -29,6 +31,8 @@ const AdminRoutes = () => {
           <Route path="users" element={<Users />} />
           <Route path="add-shop" element={<AddShop />} />
           <Route path="shops/:shopId" element={<SingleShop />} />
+          <Route path="users/:userId" element={<SingleUser />} />
+
         </Route>
       </Route>
     </Routes>

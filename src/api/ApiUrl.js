@@ -11,7 +11,9 @@ const API_URLS = {
   GENERAL_SERVICES : '/api/v1/service/admin/general-services/',
   SERVICE_UNDER_SHOP:'/api/v1/service/admin/general-services/shop-services/',
   ASSIGN_SERVICES_TO_SHOP:"/api/v1/service/admin/general-services/assign-to-shop/",
-  ADD_USER_WITH_ROLE:'/api/v1/shop/admin/shop-with-user/create-with-role/'
+  ADD_USER_WITH_ROLE:'/api/v1/shop/admin/shop-with-user/create-with-role/',
+  SHOPS_OF_USER:'/api/v1/shop/admin/user-shops/'
+  
  
 
 };
