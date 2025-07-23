@@ -157,39 +157,36 @@ export const blockUnblockShop = async (shopId, isActive) => {
 
 
 
-
 // Register shop with user
 export const registerShopWithUser = async (formData, logoFile) => {
   try {
     const data = new FormData();
 
-    data.append('phone', formData.ownerPhone);
-    data.append('full_name', `${formData.firstName} ${formData.lastName}`);
-    data.append('email', formData.ownerEmail);
+    data.append('phone', formData.phone);                      // ownerPhone -> phone
+    data.append('full_name', formData.full_name);              // firstName + lastName -> full_name
+    data.append('email', formData.email);                      // ownerEmail -> email
     data.append('role', 'OWNER');
     data.append('password', formData.password);
-    data.append('secondary_password', formData.secretPassword);
-    data.append('name', formData.businessName);
+    data.append('secondary_password', formData.secondary_password);  // secretPassword -> secondary_password
+
+    data.append('name', formData.name);                         // businessName -> name
     data.append('place', formData.place);
-    data.append('shop_phone', formData.phone);
-    data.append('shop_address', formData.street);
-    data.append('shop_email', formData.email);
-    data.append('shop_gst_number', formData.gstNo);
-    data.append('shop_city', formData.city);
-    data.append('shop_state', formData.state);
-    data.append('shop_pincode', formData.postCode);
-    // data.append('subscription_plan', formData.subscriptionPlan);
-    // data.append('max_products', formData.maxProducts);
+    data.append('shop_phone', formData.shop_phone);             // phone -> shop_phone
+    data.append('shop_address', formData.shop_address);         // street -> shop_address
+    data.append('shop_email', formData.shop_email);             // email -> shop_email
+    data.append('shop_gst_number', formData.shop_gst_number);   // gstNo -> shop_gst_number
+    data.append('shop_city', formData.shop_city);               // city -> shop_city
+    data.append('shop_state', formData.shop_state);             // state -> shop_state
+    data.append('shop_pincode', formData.shop_pincode);         // postCode -> shop_pincode
 
     if (logoFile) {
       data.append('image', logoFile);
     }
-    
-    
+
     const response = await apiClient.post(API_URLS.SHOP_WITH_USER, data, {
       headers: {
         'Content-Type': 'multipart/form-data',
-      }
+      },
     });
 
     return response;
@@ -199,6 +196,21 @@ export const registerShopWithUser = async (formData, logoFile) => {
   }
 };
 
+
+
+// update shop details
+
+export const updateShopDetails = async (shopId, data) => {
+  console.log("this is my data",shopId,data);
+  
+  return await apiClient.patch(API_URLS.SINGLE_SHOP(shopId), data, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+    withCredentials: true, // if using cookies
+  });
+};
+  
 
 
 

@@ -1,55 +1,50 @@
-// validations/validateShopRegistrationForm.js
-
 export const validateShopRegistrationForm = (formData) => {
   const errors = {};
 
-  // Shop Details
-  if (!formData.businessName.trim()) {
-    errors.businessName = 'Business name is required';
+  // === 🏬 Shop Details ===
+  if (!formData.name?.trim()) {
+    errors.name = 'Shop name is required';
   }
 
-  if (!formData.place.trim()) {
+  if (!formData.place?.trim()) {
     errors.place = 'Place is required';
   }
 
-  if (!formData.phone.trim()) {
-    errors.phone = 'Phone is required';
+if (!/^\d{10}$/.test(formData.shop_phone)) {
+    errors.shop_phone = 'Phone number must be 10 digits';
+  }
+
+if (formData.shop_email && !/\S+@\S+\.\S+/.test(formData.shop_email)) {
+    errors.shop_email = 'Invalid email format';
+  }
+
+ 
+
+
+   if (!/^\d{6}$/.test(formData.shop_pincode)) {
+    errors.shop_pincode = 'Pincode must be 6 digits';
+  }
+
+
+  // === 👤 Owner Details ===
+  if (!formData.full_name?.trim()) {
+    errors.full_name = 'Owner full name is required';
+  }
+
+
+  if (!formData.phone?.trim()) {
+    errors.phone = 'Owner phone is required';
   } else if (!/^\d{10}$/.test(formData.phone)) {
-    errors.phone = 'Phone number must be 10 digits';
+    errors.phone = 'Owner phone must be 10 digits';
   }
 
-  if (!formData.email.trim()) {
-    errors.email = 'Email is required';
-  } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-    errors.email = 'Invalid email';
+
+if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
+    errors.email = 'Invalid owner email';
   }
 
-  if (!formData.state.trim()) {
-    errors.state = 'State is required';
-  }
-
-  // Owner Details
-  if (!formData.firstName.trim()) {
-    errors.firstName = 'First name is required';
-  }
-
-  if (!formData.lastName.trim()) {
-    errors.lastName = 'Last name is required';
-  }
-
-  if (!formData.ownerPhone.trim()) {
-    errors.ownerPhone = 'Owner phone is required';
-  } else if (!/^\d{10}$/.test(formData.ownerPhone)) {
-    errors.ownerPhone = 'Owner phone must be 10 digits';
-  }
-
-  if (!formData.ownerEmail.trim()) {
-    errors.ownerEmail = 'Owner email is required';
-  } else if (!/\S+@\S+\.\S+/.test(formData.ownerEmail)) {
-    errors.ownerEmail = 'Invalid owner email';
-  }
-
-  if (!formData.password) {
+  // === 🔒 Passwords ===
+  if (!formData.password?.trim()) {
     errors.password = 'Password is required';
   } else if (formData.password.length < 6) {
     errors.password = 'Password must be at least 6 characters';
@@ -59,13 +54,13 @@ export const validateShopRegistrationForm = (formData) => {
     errors.confirmPassword = 'Passwords do not match';
   }
 
-  if (!formData.secretPassword) {
-    errors.secretPassword = 'Secret password is required';
-  } else if (formData.secretPassword.length < 4) {
-    errors.secretPassword = 'Secret password must be at least 4 characters';
+  if (!formData.secondary_password?.trim()) {
+    errors.secondary_password = 'Secret password is required';
+  } else if (formData.secondary_password.length < 4) {
+    errors.secondary_password = 'Secret password must be at least 4 characters';
   }
 
-  if (formData.secretPassword !== formData.confirmSecretPassword) {
+  if (formData.secondary_password !== formData.confirmSecretPassword) {
     errors.confirmSecretPassword = 'Secret passwords do not match';
   }
 

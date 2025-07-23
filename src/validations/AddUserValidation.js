@@ -10,6 +10,10 @@ export const validateUserForm = (formData) => {
   if (!formData.last_name?.trim()) {
     errors.last_name = 'Last name is required';
   }
+    if (!formData.last_name?.trim()) {
+    errors.last_name = 'Last name is required';
+  }
+
 
   if (!formData.phone?.trim()) {
     errors.phone = 'Phone is required';
