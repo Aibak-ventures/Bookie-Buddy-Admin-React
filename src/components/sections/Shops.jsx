@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
 import DataTable from '../ui components/DataTable';
-import { fetchShops ,blockUnblockShop} from '../../api/AdminApis';
+import { fetchShops, blockUnblockShop } from '../../api/AdminApis';
+import ConfirmationModal from '../Modals/ConfirmationModal';
+
 
 const Shops = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -12,6 +14,7 @@ const Shops = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [currentUrl, setCurrentUrl] = useState('/api/v1/shop/admin/shops/');
+  const [modalState, setModalState] = useState({ isOpen: false, shopId: null, isActive: null });
 
   useEffect(() => {
     const loadShops = async () => {
@@ -33,13 +36,29 @@ const Shops = () => {
     loadShops();
   }, [currentUrl]);
 
+  const handleToggleStatus = async (shopId, currentStatus) => {
+    setShops(prev =>
+      prev.map(shop =>
+        shop.id === shopId ? { ...shop, is_active: !currentStatus } : shop
+      )
+    );
+
+    try {
+      await blockUnblockShop(shopId, !currentStatus);
+    } catch (error) {
+      setShops(prev =>
+        prev.map(shop =>
+          shop.id === shopId ? { ...shop, is_active: currentStatus } : shop
+        )
+      );
+    }
+  };
+
   const filteredShops = shops.filter(shop =>
     [shop.name, shop.place, shop.email]
       .filter(Boolean)
       .some(field => field.toLowerCase().includes(searchTerm.toLowerCase()))
   );
-
-
 
   const columns = [
     {
@@ -59,15 +78,6 @@ const Shops = () => {
     { header: 'Email', accessor: 'email' },
     { header: 'Phone', accessor: 'phone' },
     { header: 'Place', accessor: 'place' },
-    // {
-    //   header: 'Subscription',
-    //   accessor: 'subscription_status',
-    //   cell: (row) => (
-    //     <span className="text-sm font-medium text-gray-700">
-    //       {row.subscription_status || 'NONE'}
-    //     </span>
-    //   )
-    // },
     {
       header: 'Created At',
       accessor: 'created_at',
@@ -75,7 +85,6 @@ const Shops = () => {
         <span className="text-sm text-gray-500">{row.created_at}</span>
       )
     },
-    
     {
       header: 'Action',
       accessor: 'action',
@@ -86,31 +95,16 @@ const Shops = () => {
               ? 'bg-red-500 text-white hover:bg-red-600'
               : 'bg-green-500 text-white hover:bg-green-600'
           }`}
-          onClick={() => handleToggleStatus(row.id, row.is_active)}
+          onClick={(e) => {
+            e.stopPropagation();
+            setModalState({ isOpen: true, shopId: row.id, isActive: row.is_active });
+          }}
         >
           {row.is_active ? 'Block' : 'Unblock'}
         </button>
       )
     }
   ];
-
-  const handleToggleStatus = async (shopId, currentStatus) => {
-  setShops(prev =>
-    prev.map(shop =>
-      shop.id === shopId ? { ...shop, is_active: !currentStatus } : shop
-    )
-  );
-
-  try {
-    await blockUnblockShop(shopId, !currentStatus);
-  } catch (error) {
-    setShops(prev =>
-      prev.map(shop =>
-        shop.id === shopId ? { ...shop, is_active: currentStatus } : shop
-      )
-    );
-  }
-};
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
@@ -145,10 +139,18 @@ const Shops = () => {
             onPreviousPage={() => setCurrentUrl(previous)}
             disableNext={!next}
             disablePrevious={!previous}
-             rowClickPath="shops"
+            rowClickPath="shops"
           />
         )}
       </div>
+
+
+      <ConfirmationModal
+        isOpen={modalState.isOpen}
+        onClose={() => setModalState({ ...modalState, isOpen: false })}
+        onConfirm={() => handleToggleStatus(modalState.shopId, modalState.isActive)}
+        message={`Are you sure you want to ${modalState.isActive ? 'block' : 'unblock'} this shop?`}
+      />
     </div>
   );
 };

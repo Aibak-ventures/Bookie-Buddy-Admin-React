@@ -21,7 +21,7 @@ if (formData.shop_email && !/\S+@\S+\.\S+/.test(formData.shop_email)) {
  
 
 
-   if (!/^\d{6}$/.test(formData.shop_pincode)) {
+   if (formData.shop_pincode && !/^\d{6}$/.test(formData.shop_pincode)) {
     errors.shop_pincode = 'Pincode must be 6 digits';
   }
 

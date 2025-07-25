@@ -1,9 +1,8 @@
-// components/sections/Users.jsx
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { Search } from 'lucide-react';
 import DataTable from '../ui components/DataTable';
 import { fetchUsers, blockUnblockUser } from '../../api/AdminApis';
+import ConfirmationModal from '../Modals/ConfirmationModal';
 
 const Users = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -14,6 +13,7 @@ const Users = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [currentUrl, setCurrentUrl] = useState('/api/v1/auth/admin/users/');
+  const [modalState, setModalState] = useState({ isOpen: false, userId: null, isActive: null });
 
   useEffect(() => {
     const loadUsers = async () => {
@@ -91,7 +91,7 @@ const Users = () => {
           }`}
           onClick={(e) => {
             e.stopPropagation();
-            handleToggleStatus(row.id, row.is_active);
+            setModalState({ isOpen: true, userId: row.id, isActive: row.is_active });
           }}
         >
           {row.is_active ? 'Block' : 'Unblock'}
@@ -137,6 +137,16 @@ const Users = () => {
           />
         )}
       </div>
+
+      <ConfirmationModal
+        isOpen={modalState.isOpen}
+        onClose={() => setModalState({ ...modalState, isOpen: false })}
+        onConfirm={() => {
+          handleToggleStatus(modalState.userId, modalState.isActive);
+          setModalState({ ...modalState, isOpen: false });
+        }}
+        message={`Are you sure you want to ${modalState.isActive ? 'block' : 'unblock'} this user?`}
+      />
     </div>
   );
 };

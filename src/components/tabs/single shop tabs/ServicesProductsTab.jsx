@@ -28,11 +28,15 @@ const ServicesProductsTab = ({ shop_id }) => {
   // Handle modal submission
 const handleAddService = async (serviceIds) => {
   const payload = { shop_id, service_ids: serviceIds };
+  console.log("this is my payload",payload);
+  
   
   try {
-    await assignServicesToShop(payload);
+    const response = await assignServicesToShop(payload);
+    console.log("my reponse in service card",response);
+    
     const updated = await fetchShopServices(shop_id);
-    // setServices(updated?.assigned || []);
+    setServices(updated?.assigned || []);
     setReload(!reload)
   } catch (error) {
     console.error("Failed to assign services:", error);

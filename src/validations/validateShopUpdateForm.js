@@ -15,14 +15,14 @@ export const validateShopUpdateForm = (formData) => {
   }
 
   // Email validation
- if (!/\S+@\S+\.\S+/.test(formData.email)) {
+ if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
     errors.email = 'Invalid email format';
   }
 
 
 
   // Optional: You can validate other fields like pincode, gst_number, etc.
-  if (!/^\d{6}$/.test(formData.pincode)) {
+  if (formData.pincode &&  !/^\d{6}$/.test(formData.pincode)) {
     errors.pincode = 'Pincode must be 6 digits';
   }
 
