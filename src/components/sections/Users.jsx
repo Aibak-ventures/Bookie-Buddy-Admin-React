@@ -1,5 +1,3 @@
-// components/sections/Users.jsx
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { Search, Plus } from 'lucide-react';
 import DataTable from '../ui components/DataTable';

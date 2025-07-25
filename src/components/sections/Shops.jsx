@@ -90,24 +90,6 @@ const Shops = () => {
     }
   ];
 
-  const handleToggleStatus = async (shopId, currentStatus) => {
-  setShops(prev =>
-    prev.map(shop =>
-      shop.id === shopId ? { ...shop, is_active: !currentStatus } : shop
-    )
-  );
-
-  try {
-    await blockUnblockShop(shopId, !currentStatus);
-  } catch (error) {
-    setShops(prev =>
-      prev.map(shop =>
-        shop.id === shopId ? { ...shop, is_active: currentStatus } : shop
-      )
-    );
-  }
-};
-
   return (
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="flex items-center justify-between mb-8">
