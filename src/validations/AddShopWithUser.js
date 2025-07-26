@@ -46,8 +46,8 @@ if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
   // === 🔒 Passwords ===
   if (!formData.password?.trim()) {
     errors.password = 'Password is required';
-  } else if (formData.password.length < 6) {
-    errors.password = 'Password must be at least 6 characters';
+  } else if (formData.password.length < 8) {
+    errors.password = 'Password must be at least 8 characters';
   }
 
   if (formData.password !== formData.confirmPassword) {
@@ -56,8 +56,8 @@ if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
 
   if (!formData.secondary_password?.trim()) {
     errors.secondary_password = 'Secret password is required';
-  } else if (formData.secondary_password.length < 4) {
-    errors.secondary_password = 'Secret password must be at least 4 characters';
+  } else if (formData.secondary_password.length < 8) {
+    errors.secondary_password = 'Secret password must be at least 8 characters';
   }
 
   if (formData.secondary_password !== formData.confirmSecretPassword) {

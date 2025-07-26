@@ -29,6 +29,15 @@ const ServicesProductsTab = ({ shop_id }) => {
 const handleAddService = async (serviceIds) => {
   const payload = { shop_id, service_ids: serviceIds };
   console.log("this is my payload",payload);
+   const allAreIntegers = serviceIds.every(id => Number.isInteger(id));
+   console.log("all integers",allAreIntegers);
+   
+
+  if (!allAreIntegers) {
+    console.error("Service IDs must all be integers. Received:", serviceIds);
+    return;
+  }
+
   
   
   try {

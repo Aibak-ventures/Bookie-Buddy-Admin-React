@@ -8,16 +8,14 @@ const apiUrl = import.meta.env.VITE_API_BASE_URL;
 
 
 
-const apiClient = axios.create({
+export const apiClient = axios.create({
   baseURL: apiUrl,
   headers: {
     'Content-Type': 'application/json',
-     'Content-Type': 'multipart/form-data',
   },
   withCredentials: true,
 });
 
-export default apiClient;
 
 
 
@@ -34,6 +32,32 @@ apiClient.interceptors.request.use(
 );
 
 
+
+
+
+
+
+// for file data
+
+
+ const multipartClient = axios.create({
+  baseURL: apiUrl,
+  headers: {
+    'Content-Type': 'multipart/form-data',
+  },
+  withCredentials: true,
+});
+
+// Attach token
+multipartClient.interceptors.request.use((config) => {
+  const token = sessionStorage.getItem('access');
+  if (token) {
+    config.headers['Authorization'] = `Bearer ${token}`;
+  }
+  return config;
+});
+
+export default multipartClient
 
 
 

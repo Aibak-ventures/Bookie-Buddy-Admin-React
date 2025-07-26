@@ -1,4 +1,5 @@
 import API_URLS from './ApiUrl';
+import multipartClient from './AxiosConfig';
 import apiClient from './AxiosConfig';
 
 ////////////////////////////////////////////////////////////    AUTH RELATED FUNCTIONALITIES  /////////////////////////////////////
@@ -159,6 +160,8 @@ export const blockUnblockShop = async (shopId, isActive) => {
 
 // Register shop with user
 export const registerShopWithUser = async (formData, logoFile) => {
+  console.log("this is my user",formData);
+  
   try {
     const data = new FormData();
 
@@ -182,12 +185,11 @@ export const registerShopWithUser = async (formData, logoFile) => {
     if (logoFile) {
       data.append('image', logoFile);
     }
+    console.log("ssssssss",data);
+    
 
-    const response = await apiClient.post(API_URLS.SHOP_WITH_USER, data, {
-      headers: {
-        'Content-Type': 'multipart/form-data',
-      },
-    });
+    const response = await multipartClient.post(API_URLS.SHOP_WITH_USER, data);
+
 
     return response;
   } catch (error) {
@@ -203,12 +205,7 @@ export const registerShopWithUser = async (formData, logoFile) => {
 export const updateShopDetails = async (shopId, data) => {
   console.log("this is my data",shopId,data);
   
-  return await apiClient.patch(API_URLS.SINGLE_SHOP(shopId), data, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-    },
-    withCredentials: true, // if using cookies
-  });
+   return await multipartClient.patch(API_URLS.SINGLE_SHOP(shopId), data);
 };
   
 
