@@ -45,22 +45,27 @@ const AddServiceModal = ({ isOpen, onClose, onSubmit }) => {
     });
   };
 
-  const handleAddServices = () => {
-    if (selectedServices.size === 0) {
-      setFormError('Please select at least one service.');
-      return;
-    }
+const handleAddServices = (e) => {
+  console.log("button clicke");
+  
+  // e.preventDefault(); // ✅ Stop form submission if inside a <form>
 
-    setIsSubmitting(true);
+  if (selectedServices.size === 0) {
+    setFormError('Please select at least one service.');
+    return;
+  }
 
-    const serviceIds = Array.from(selectedServices);
-    onSubmit(serviceIds);
+  setIsSubmitting(true);
 
-    setSelectedServices(new Set());
-    setFormError('');
-    setIsSubmitting(false);
-    onClose();
-  };
+  const serviceIds = Array.from(selectedServices);
+  onSubmit(serviceIds);
+
+  // setSelectedServices(new Set());
+  // setFormError('');
+  // setIsSubmitting(false);
+  // onClose();
+};
+
 
   if (!isOpen) return null;
 
@@ -68,6 +73,7 @@ const AddServiceModal = ({ isOpen, onClose, onSubmit }) => {
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
       <div className="bg-white w-full max-w-md p-6 rounded-lg shadow-lg relative">
         <button
+          type="button"
           onClick={onClose}
           className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
         >
@@ -95,6 +101,7 @@ const AddServiceModal = ({ isOpen, onClose, onSubmit }) => {
 
         <div className="flex justify-between text-sm text-blue-600 mb-4">
           <button
+            type="button"
             disabled={!pagination.previous}
             onClick={() => setPagination(prev => ({
               ...prev,
@@ -105,6 +112,7 @@ const AddServiceModal = ({ isOpen, onClose, onSubmit }) => {
             ← Previous
           </button>
           <button
+            type="button"
             disabled={!pagination.next}
             onClick={() => setPagination(prev => ({
               ...prev,
@@ -118,12 +126,14 @@ const AddServiceModal = ({ isOpen, onClose, onSubmit }) => {
 
         <div className="flex justify-end gap-4">
           <button
+            type="button"
             onClick={onClose}
             className="px-4 py-2 border border-gray-300 rounded hover:bg-gray-100"
           >
             Cancel
           </button>
           <button
+            type="button"
             onClick={handleAddServices}
             disabled={isSubmitting}
             className={`px-4 py-2 text-white rounded ${

@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Search } from 'lucide-react';
 import DataTable from '../ui components/DataTable';
-import { fetchUsers } from '../../api/AdminApis'; // make sure this function exists
+import { fetchUsers, blockUnblockUser } from '../../api/AdminApis';
+import ConfirmationModal from '../Modals/ConfirmationModal';
 
 const Users = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -11,8 +12,8 @@ const Users = () => {
   const [previous, setPrevious] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
   const [currentUrl, setCurrentUrl] = useState('/api/v1/auth/admin/users/');
+  const [modalState, setModalState] = useState({ isOpen: false, userId: null, isActive: null });
 
   useEffect(() => {
     const loadUsers = async () => {
@@ -33,6 +34,24 @@ const Users = () => {
 
     loadUsers();
   }, [currentUrl]);
+
+  const handleToggleStatus = async (userId, currentStatus) => {
+    setUsers(prev =>
+      prev.map(user =>
+        user.id === userId ? { ...user, is_active: !currentStatus } : user
+      )
+    );
+
+    try {
+      await blockUnblockUser(userId, !currentStatus);
+    } catch (error) {
+      setUsers(prev =>
+        prev.map(user =>
+          user.id === userId ? { ...user, is_active: currentStatus } : user
+        )
+      );
+    }
+  };
 
   const filteredUsers = useMemo(() => {
     return users.filter(user =>
@@ -59,7 +78,26 @@ const Users = () => {
     },
     { header: 'Phone', accessor: 'phone' },
     { header: 'Email', accessor: 'email' },
-    { header: 'Role', accessor: 'role' }
+    { header: 'Role', accessor: 'role' },
+    {
+      header: 'Action',
+      accessor: 'action',
+      cell: (row) => (
+        <button
+          className={`px-3 py-1 rounded text-sm font-medium ${
+            row.is_active
+              ? 'bg-red-500 text-white hover:bg-red-600'
+              : 'bg-green-500 text-white hover:bg-green-600'
+          }`}
+          onClick={(e) => {
+            e.stopPropagation();
+            setModalState({ isOpen: true, userId: row.id, isActive: row.is_active });
+          }}
+        >
+          {row.is_active ? 'Block' : 'Unblock'}
+        </button>
+      )
+    }
   ];
 
   return (
@@ -95,9 +133,20 @@ const Users = () => {
             onPreviousPage={() => setCurrentUrl(previous)}
             disableNext={!next}
             disablePrevious={!previous}
+            rowClickPath="users"
           />
         )}
       </div>
+
+      <ConfirmationModal
+        isOpen={modalState.isOpen}
+        onClose={() => setModalState({ ...modalState, isOpen: false })}
+        onConfirm={() => {
+          handleToggleStatus(modalState.userId, modalState.isActive);
+          setModalState({ ...modalState, isOpen: false });
+        }}
+        message={`Are you sure you want to ${modalState.isActive ? 'block' : 'unblock'} this user?`}
+      />
     </div>
   );
 };

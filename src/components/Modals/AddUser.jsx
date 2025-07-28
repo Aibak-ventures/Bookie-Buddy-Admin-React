@@ -11,12 +11,12 @@ const AddUserModal = ({ isOpen, onClose, shopId, shopName }) => {
   const roleOptions = [
     { label: 'Admin', value: 'ADMIN' },
     { label: 'Staff', value: 'STAFF' },
-  ];
+  ]
 
   const shopRoleOptions = [
-    { label: 'Manager', value: 'MANAGER' },
-    { label: 'Cashier', value: 'CASHIER' },
-    { label: 'Support', value: 'SUPPORT' },
+    { label: 'OWNER', value: 'OWNER' },
+    { label: 'MANAGER', value: 'MANAGER' },
+    { label: 'STAFF', value: 'STAFF' },
   ];
 
   const [formData, setFormData] = useState({
