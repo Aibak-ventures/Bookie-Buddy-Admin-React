@@ -45,8 +45,7 @@ const AddServiceModal = ({ isOpen, onClose, onSubmit }) => {
     });
   };
 
-const handleAddServices = (e) => {
-  console.log("button clicke");
+const handleAddServices = () => {
   
   // e.preventDefault(); // ✅ Stop form submission if inside a <form>
 
@@ -54,10 +53,13 @@ const handleAddServices = (e) => {
     setFormError('Please select at least one service.');
     return;
   }
+  setFormError('')
 
   setIsSubmitting(true);
 
   const serviceIds = Array.from(selectedServices);
+  console.log("working",serviceIds);
+  
   onSubmit(serviceIds);
 
   // setSelectedServices(new Set());

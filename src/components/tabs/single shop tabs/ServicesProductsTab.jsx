@@ -27,6 +27,8 @@ const ServicesProductsTab = ({ shop_id }) => {
 
   // Handle modal submission
 const handleAddService = async (serviceIds) => {
+  console.log("this is  my service");
+  
   const payload = { shop_id, service_ids: serviceIds };
   console.log("this is my payload",payload);
    const allAreIntegers = serviceIds.every(id => Number.isInteger(id));
