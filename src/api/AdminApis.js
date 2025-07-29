@@ -1,6 +1,5 @@
 import API_URLS from './ApiUrl';
-import multipartClient from './AxiosConfig';
-import apiClient from './AxiosConfig';
+import {multipartClient,apiClient} from './AxiosConfig';
 
 ////////////////////////////////////////////////////////////    AUTH RELATED FUNCTIONALITIES  /////////////////////////////////////
 export const loginUser = async ({ phone, password }) => {
@@ -251,10 +250,13 @@ export const fetchShopServices = async (shopId) => {
 
 // assign service to shop
 export const assignServicesToShop = async ({ shop_id, service_ids }) => {
+  const payload = {"shop_id":parseInt(shop_id),"service_ids":service_ids}
+  console.log("this is my payload",payload);
+  
   try {
     const response = await apiClient.post(
       API_URLS.ASSIGN_SERVICES_TO_SHOP,
-      { shop_id, service_ids }
+      payload
     );
     return response.data;
   } catch (error) {
