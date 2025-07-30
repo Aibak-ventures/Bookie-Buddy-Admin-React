@@ -28,6 +28,11 @@ const AssociateUsersTab = ({ shopId ,shopName }) => {
     loadUsers();
   }, [shopId]);
 
+  // Add this function to handle new user addition
+  const handleUserAdded = (newUser) => {
+    setUsers((prevUsers) => [newUser, ...prevUsers]); 
+  };
+
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
@@ -91,7 +96,7 @@ const AssociateUsersTab = ({ shopId ,shopName }) => {
         </div>
       )}
 
-      <AddUserModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}   shopId={shopId}  shopName={shopName} />
+      <AddUserModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}   shopId={shopId}  shopName={shopName}  onUserAdded={handleUserAdded} />
     </div>
   );
 };

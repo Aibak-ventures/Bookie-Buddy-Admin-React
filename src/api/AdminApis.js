@@ -61,8 +61,9 @@ export const createUserForShop = async (userData, shopId) => {
       shop: shopId, // ensure the backend expects this field
     };
     const response = await apiClient.post(API_URLS.ADD_USER_WITH_ROLE, payload);
-    
-    return response.data;
+    console.log("thsi is my response",response);
+        
+    return response;
   } catch (error) {
     console.error('Failed to create user:', error);
     throw error;
