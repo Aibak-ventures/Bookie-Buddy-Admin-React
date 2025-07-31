@@ -1,17 +1,17 @@
 import React, { useState } from 'react';
-import { X } from 'lucide-react';
+import { X, Eye, EyeOff } from 'lucide-react';
 import FormInput from '../ui components/FormInput';
 import FormSelect from '../ui components/FormSelect';
 import { createUserForShop } from '../../api/AdminApis';
 import { validateUserForm } from '../../validations/AddUserValidation';
 
-const AddUserModal = ({ isOpen, onClose, shopId, shopName }) => {
+const AddUserModal = ({ isOpen, onClose, shopId, shopName, onUserAdded }) => {
   if (!isOpen) return null;
 
   const roleOptions = [
     { label: 'Admin', value: 'ADMIN' },
     { label: 'Staff', value: 'STAFF' },
-  ]
+  ];
 
   const shopRoleOptions = [
     { label: 'OWNER', value: 'OWNER' },
@@ -25,13 +25,21 @@ const AddUserModal = ({ isOpen, onClose, shopId, shopName }) => {
     full_name: '',
     last_name: '',
     password: '',
+    confirm_password: '',
     secondary_password: '',
+    confirm_secondary_password: '',
     role: '',
     shop_role: '',
   });
 
   const [formErrors, setFormErrors] = useState({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Password visibility states
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [showSecondaryPassword, setShowSecondaryPassword] = useState(false);
+  const [showConfirmSecondaryPassword, setShowConfirmSecondaryPassword] = useState(false);
 
   const handleChange = (key, value) => {
     setFormData(prev => ({ ...prev, [key]: value }));
@@ -49,12 +57,38 @@ const AddUserModal = ({ isOpen, onClose, shopId, shopName }) => {
 
     setIsSubmitting(true);
     try {
-      await createUserForShop(payload, shopId);
+      const response = await createUserForShop(payload, shopId);
+      console.log("response", response);
+
+      const newUser = response.data.user;
+      const linkedOn = new Date().toLocaleDateString('en-GB'); // e.g. "30/07/2025"
+      const newUserWithDate = { ...newUser, linked_on: linkedOn };
+
       alert('User assigned successfully');
+
+      if (onUserAdded) {
+        onUserAdded(newUserWithDate);
+      }
+
       onClose();
     } catch (err) {
       console.error('Failed to assign user:', err);
-      alert('Failed to assign user');
+
+      let backendMessage = '';
+
+      if (err.response?.data?.errors) {
+        const errorsObj = err.response.data.errors;
+        const firstKey = Object.keys(errorsObj)[0];
+        if (firstKey && errorsObj[firstKey].length > 0) {
+          backendMessage = errorsObj[firstKey][0];
+        }
+      }
+
+      if (!backendMessage) {
+        backendMessage = err.response?.data?.message || err.message || 'Failed to assign user';
+      }
+
+      alert(`Failed to assign user: ${backendMessage}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -117,29 +151,93 @@ const AddUserModal = ({ isOpen, onClose, shopId, shopName }) => {
             {formErrors.email && <p className="text-sm text-red-500">{formErrors.email}</p>}
           </div>
 
-          <div>
+          {/* Password with eye toggle */}
+          <div className="relative">
             <FormInput
               label="Password"
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               placeholder="Password"
               required
               value={formData.password}
               onChange={(e) => handleChange('password', e.target.value)}
             />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-[38px] text-gray-500 hover:text-gray-700"
+              tabIndex={-1}
+            >
+              {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
             {formErrors.password && <p className="text-sm text-red-500">{formErrors.password}</p>}
           </div>
 
-          <div>
+          {/* Confirm Password with eye toggle */}
+          <div className="relative">
+            <FormInput
+              label="Confirm Password"
+              type={showConfirmPassword ? 'text' : 'password'}
+              placeholder="Re-enter Password"
+              required
+              value={formData.confirm_password}
+              onChange={(e) => handleChange('confirm_password', e.target.value)}
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute right-3 top-[38px] text-gray-500 hover:text-gray-700"
+              tabIndex={-1}
+            >
+              {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+            {formErrors.confirm_password && (
+              <p className="text-sm text-red-500">{formErrors.confirm_password}</p>
+            )}
+          </div>
+
+          {/* Secret Password with eye toggle */}
+          <div className="relative">
             <FormInput
               label="Secret Password"
-              type="password"
+              type={showSecondaryPassword ? 'text' : 'password'}
               placeholder="Secret Password"
               required
               value={formData.secondary_password}
               onChange={(e) => handleChange('secondary_password', e.target.value)}
             />
+            <button
+              type="button"
+              onClick={() => setShowSecondaryPassword(!showSecondaryPassword)}
+              className="absolute right-3 top-[38px] text-gray-500 hover:text-gray-700"
+              tabIndex={-1}
+            >
+              {showSecondaryPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
             {formErrors.secondary_password && (
               <p className="text-sm text-red-500">{formErrors.secondary_password}</p>
+            )}
+          </div>
+
+          {/* Confirm Secret Password with eye toggle */}
+          <div className="relative">
+            <FormInput
+              label="Confirm Secret Password"
+              type={showConfirmSecondaryPassword ? 'text' : 'password'}
+              placeholder="Re-enter Secret Password"
+              required
+              value={formData.confirm_secondary_password}
+              onChange={(e) => handleChange('confirm_secondary_password', e.target.value)}
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmSecondaryPassword(!showConfirmSecondaryPassword)}
+              className="absolute right-3 top-[38px] text-gray-500 hover:text-gray-700"
+              tabIndex={-1}
+            >
+              {showConfirmSecondaryPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+            {formErrors.confirm_secondary_password && (
+              <p className="text-sm text-red-500">{formErrors.confirm_secondary_password}</p>
             )}
           </div>
 
