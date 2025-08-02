@@ -19,6 +19,8 @@ const AddServiceModal = ({ isOpen, onClose, onSubmit }) => {
     const loadServices = async () => {
       try {
         const data = await fetchGeneralServices(pagination.currentUrl);
+        console.log("my services",data);
+        
         setServices(data.results || []);
         setPagination(prev => ({
           ...prev,

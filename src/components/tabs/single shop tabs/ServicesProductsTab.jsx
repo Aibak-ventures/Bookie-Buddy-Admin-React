@@ -1,5 +1,7 @@
-import React from "react";
-import {  Settings, Plus } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { Settings, Plus } from 'lucide-react';
+import AddServiceModal from "../../Modals/AddServiceModal";
+import { assignServicesToShop, fetchShopServices,toggleShopServiceStatus  } from "../../../api/AdminApis"; 
 
 const ServicesProductsTab = ({ shop_id }) => {
   const [services, setServices] = useState([]);
@@ -13,6 +15,8 @@ const ServicesProductsTab = ({ shop_id }) => {
     const loadServices = async () => {
       try {
         const data = await fetchShopServices(shop_id);
+        console.log("data",data);
+        
         
         setServices(data?.services || []);
       } catch (error) {
@@ -23,14 +27,32 @@ const ServicesProductsTab = ({ shop_id }) => {
     loadServices();
   }, [shop_id,reload]);
 
+
+  // function to change the status
+
+  const handleToggleStatus = async (shopServiceId, currentStatus) => {
+    
+  const payload = {
+      shop_service_id: shopServiceId,
+      is_active: !currentStatus
+    }
+    
+  try {
+    await toggleShopServiceStatus({
+      shop_service_id: shopServiceId,
+      is_active: !currentStatus
+    });
+    setReload(prev => !prev); // trigger re-fetch
+  } catch (error) {
+    console.error("Failed to toggle service status:", error);
+  }
+};
+
   // Handle modal submission
 const handleAddService = async (serviceIds) => {
-  console.log("this is  my service");
   
   const payload = { shop_id, service_ids: serviceIds };
-  console.log("this is my payload",payload);
    const allAreIntegers = serviceIds.every(id => Number.isInteger(id));
-   console.log("all integers",allAreIntegers);
    
 
   if (!allAreIntegers) {
@@ -81,6 +103,7 @@ const handleAddService = async (serviceIds) => {
                 <h4 className="font-medium">{service.name}</h4>
                 <p className="text-sm text-gray-500">{service.main_service}</p>
               </div>
+
               {/* Status badge */}
               <span
                 className={`px-2 py-1 rounded-full text-xs ${
@@ -103,11 +126,22 @@ const handleAddService = async (serviceIds) => {
               <button className="flex-1 px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700">
                 Manage
               </button>
-              
+
+              <button
+                className={`flex-1 px-3 py-1 text-sm rounded ${
+                  service.is_active
+                    ? 'bg-red-600 hover:bg-red-700 text-white'
+                    : 'bg-green-600 hover:bg-green-700 text-white'
+                }`}
+                onClick={() => handleToggleStatus(service.id, service.is_active)}
+              >
+                {service.is_active ? 'Deactivate' : 'Activate'}
+              </button>
             </div>
           </div>
         ))}
       </div>
+
 
 
       <AddServiceModal

@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Search } from 'lucide-react';
+import { Search, Plus } from 'lucide-react';
 import DataTable from '../ui components/DataTable';
-import { fetchUsers, blockUnblockUser } from '../../api/AdminApis';
 import ConfirmationModal from '../Modals/ConfirmationModal';
+import { fetchUsers, blockUnblockUser, createUser } from '../../api/AdminApis';
+import AddUserOnly from '../Modals/AddUserOnly';
+
 
 const Users = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -14,7 +16,9 @@ const Users = () => {
   const [error, setError] = useState(null);
   const [currentUrl, setCurrentUrl] = useState('/api/v1/auth/admin/users/');
   const [modalState, setModalState] = useState({ isOpen: false, userId: null, isActive: null });
+  const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
 
+  // Fetch users on mount and on pagination URL change
   useEffect(() => {
     const loadUsers = async () => {
       setLoading(true);
@@ -35,6 +39,7 @@ const Users = () => {
     loadUsers();
   }, [currentUrl]);
 
+  // Handle block/unblock
   const handleToggleStatus = async (userId, currentStatus) => {
     setUsers(prev =>
       prev.map(user =>
@@ -53,6 +58,22 @@ const Users = () => {
     }
   };
 
+  // Handle user add
+  const handleAddUser = async (userData) => {
+    try {
+      const response = await createUser(userData);
+      if (response?.id) {
+        alert('User added successfully!');
+        setIsAddUserModalOpen(false);
+        // Refresh users
+        setCurrentUrl('/api/v1/auth/admin/users/');
+      }
+    } catch (error) {
+      alert('Failed to create user');
+    }
+  };
+
+  // Filter users based on search
   const filteredUsers = useMemo(() => {
     return users.filter(user =>
       [user.full_name, user.email, user.phone]
@@ -104,6 +125,13 @@ const Users = () => {
     <div className="min-h-screen bg-gray-50 p-8">
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold text-gray-800">Users</h1>
+        <button
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
+          onClick={() => setIsAddUserModalOpen(true)}
+        >
+          <Plus size={16} />
+          Add User
+        </button>
       </div>
 
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
@@ -138,6 +166,7 @@ const Users = () => {
         )}
       </div>
 
+      {/* Confirmation Modal */}
       <ConfirmationModal
         isOpen={modalState.isOpen}
         onClose={() => setModalState({ ...modalState, isOpen: false })}
@@ -146,6 +175,13 @@ const Users = () => {
           setModalState({ ...modalState, isOpen: false });
         }}
         message={`Are you sure you want to ${modalState.isActive ? 'block' : 'unblock'} this user?`}
+      />
+
+      {/* Add User Modal */}
+      <AddUserOnly
+        isOpen={isAddUserModalOpen}
+        onClose={() => setIsAddUserModalOpen(false)}
+        onSubmit={handleAddUser}
       />
     </div>
   );
