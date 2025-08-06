@@ -10,27 +10,22 @@ export const validateShopRegistrationForm = (formData) => {
     errors.place = 'Place is required';
   }
 
-if (!/^\d{10}$/.test(formData.shop_phone)) {
+  if (!/^\d{10}$/.test(formData.shop_phone)) {
     errors.shop_phone = 'Phone number must be 10 digits';
   }
 
-if (formData.shop_email && !/\S+@\S+\.\S+/.test(formData.shop_email)) {
+  if (formData.shop_email && !/\S+@\S+\.\S+/.test(formData.shop_email)) {
     errors.shop_email = 'Invalid email format';
   }
 
- 
-
-
-   if (formData.shop_pincode && !/^\d{6}$/.test(formData.shop_pincode)) {
+  if (formData.shop_pincode && !/^\d{6}$/.test(formData.shop_pincode)) {
     errors.shop_pincode = 'Pincode must be 6 digits';
   }
-
 
   // === 👤 Owner Details ===
   if (!formData.full_name?.trim()) {
     errors.full_name = 'Owner full name is required';
   }
-
 
   if (!formData.phone?.trim()) {
     errors.phone = 'Owner phone is required';
@@ -38,16 +33,13 @@ if (formData.shop_email && !/\S+@\S+\.\S+/.test(formData.shop_email)) {
     errors.phone = 'Owner phone must be 10 digits';
   }
 
-
-if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
+  if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
     errors.email = 'Invalid owner email';
   }
 
   // === 🔒 Passwords ===
   if (!formData.password?.trim()) {
     errors.password = 'Password is required';
-  } else if (formData.password.length < 8) {
-    errors.password = 'Password must be at least 8 characters';
   }
 
   if (formData.password !== formData.confirmPassword) {
@@ -56,8 +48,6 @@ if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
 
   if (!formData.secondary_password?.trim()) {
     errors.secondary_password = 'Secret password is required';
-  } else if (formData.secondary_password.length < 8) {
-    errors.secondary_password = 'Secret password must be at least 8 characters';
   }
 
   if (formData.secondary_password !== formData.confirmSecretPassword) {

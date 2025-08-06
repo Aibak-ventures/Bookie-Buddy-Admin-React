@@ -115,6 +115,20 @@ export const blockUnblockUser = async (userId, isActive) => {
 };
 
 
+// add user only
+export const createUser = async (userData) => {
+  try {
+    const response = await apiClient.post(API_URLS.USERS, userData);
+    console.log("my response",response);
+    
+    return response.data;
+  } catch (error) {
+    console.error("Failed to create user:", error);
+    throw error;
+  }
+};
+
+
 
 
 ///////////////////////////////////////////////////////////////   SHOP RELATED APIS  /////////////////////////////////////////////
@@ -210,8 +224,24 @@ export const updateShopDetails = async (shopId, data) => {
   
 
 
+// Toggle service status (activate/deactivate) for a shop
+export const toggleShopServiceStatus = async ({ shop_service_id, is_active }) => {
+  try {
+    const payload = {
+      shop_service_id,
+      is_active,
+    };
 
-
+    const response = await apiClient.post(
+      API_URLS.CHANGE_SHOP_SERVICE_STATUS,
+      payload
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Failed to change shop service status:", error);
+    throw error;
+  }
+};
 
 
 
