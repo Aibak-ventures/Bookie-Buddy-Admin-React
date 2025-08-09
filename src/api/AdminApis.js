@@ -118,18 +118,54 @@ export const blockUnblockUser = async (userId, isActive) => {
 // add user only
 export const createUser = async (userData) => {
   try {
+    console.log("this is my data", userData);
+
     const response = await apiClient.post(API_URLS.USERS, userData);
-    console.log("my response",response);
-    
+    console.log("my response", response);
+
     return response.data;
   } catch (error) {
-    console.error("Failed to create user:", error);
+    // Show specific validation error if available
+    const apiErrors = error?.response?.data?.errors;
+    if (apiErrors) {
+      const firstKey = Object.keys(apiErrors)[0];
+      const firstMessage = apiErrors[firstKey];
+      alert(`${firstMessage}`);
+    } else {
+      // Generic fallback error
+      alert("Failed to create user. Please try again.");
+    }
+
+    throw error; // still throw if you want caller to handle it too
+  }
+};
+
+
+// update user
+export const updateUserDetails = async (userId, userData) => {
+  try {
+    const response = await apiClient.patch(`${API_URLS.USERS}${userId}/`, userData);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to update user details:', error);
     throw error;
   }
 };
 
 
-
+// link user with the shop
+export const linkUserToShop = async (shopId, userId, role) => {
+  const payload = {
+    shop: shopId,
+    user: userId,
+    role,
+  };
+  console.log("mhy paload",payload);
+  const response = await apiClient.post(API_URLS.LINK_USER_TO_SHOP, payload);
+  console.log("ppppp",response);
+  
+  return response.data;
+};
 
 ///////////////////////////////////////////////////////////////   SHOP RELATED APIS  /////////////////////////////////////////////
 
@@ -254,12 +290,14 @@ export const toggleShopServiceStatus = async ({ shop_service_id, is_active }) =>
 ///////////////////////////////////////////////////////////////////////// SERVICE RELATED APIS ///////////////////////////////////////
 
 // Fetch general services with pagination
-export const fetchGeneralServices = async () => {
+// api/AdminApis.js
+
+export const fetchGeneralServices = async (url = '/api/v1/service/admin/general-services/') => {
   try {
-    const response = await apiClient.get(API_URLS.GENERAL_SERVICES);
-    return response.data; // includes count, next, previous, results
+    const response = await apiClient.get(url); // Should be relative
+    return response.data;
   } catch (error) {
-    console.error('Failed to fetch services:', error);
+    console.error('Failed to fetch general services:', error);
     throw error;
   }
 };

@@ -60,7 +60,6 @@ const DataTable = ({
       </table>
 
       <div className="flex items-center justify-between mt-6 pt-6 border-t border-gray-200">
-        <span className="text-gray-600">Total entries: {totalEntries}</span>
         <div className="flex items-center space-x-2">
           <button
             onClick={onPreviousPage}

@@ -7,12 +7,7 @@ export const validateUserForm = (formData) => {
     errors.full_name = 'Full name is required';
   }
 
-  if (!formData.last_name?.trim()) {
-    errors.last_name = 'Last name is required';
-  }
-    if (!formData.last_name?.trim()) {
-    errors.last_name = 'Last name is required';
-  }
+
 
 
   if (!formData.phone?.trim()) {
@@ -21,9 +16,7 @@ export const validateUserForm = (formData) => {
     errors.phone = 'Invalid phone number';
   }
 
-  if (!formData.email?.trim()) {
-    errors.email = 'Email is required';
-  } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+ if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
     errors.email = 'Invalid email address';
   }
 

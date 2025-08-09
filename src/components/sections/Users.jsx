@@ -60,17 +60,16 @@ const Users = () => {
 
   // Handle user add
   const handleAddUser = async (userData) => {
-    try {
       const response = await createUser(userData);
+      console.log("cadfa",response);
+      
       if (response?.id) {
         alert('User added successfully!');
         setIsAddUserModalOpen(false);
         // Refresh users
         setCurrentUrl('/api/v1/auth/admin/users/');
       }
-    } catch (error) {
-      alert('Failed to create user');
-    }
+  
   };
 
   // Filter users based on search
