@@ -2,6 +2,18 @@ import React, { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
 import { fetchGeneralServices } from '../../api/AdminApis';
 
+// Utility to extract relative path from full URL
+const getRelativeUrl = (url) => {
+  if (!url) return null;
+  try {
+    const parsedUrl = new URL(url);
+    return parsedUrl.pathname + parsedUrl.search;
+  } catch (error) {
+    // If already a relative URL
+    return url;
+  }
+};
+
 const AddServiceModal = ({ isOpen, onClose, onSubmit }) => {
   const [services, setServices] = useState([]);
   const [selectedServices, setSelectedServices] = useState(new Set());
@@ -19,13 +31,11 @@ const AddServiceModal = ({ isOpen, onClose, onSubmit }) => {
     const loadServices = async () => {
       try {
         const data = await fetchGeneralServices(pagination.currentUrl);
-        console.log("my services",data);
-        
         setServices(data.results || []);
         setPagination(prev => ({
           ...prev,
-          next: data.next,
-          previous: data.previous,
+          next: getRelativeUrl(data.next),
+          previous: getRelativeUrl(data.previous),
         }));
       } catch (err) {
         console.error('Error fetching services', err);
@@ -47,29 +57,17 @@ const AddServiceModal = ({ isOpen, onClose, onSubmit }) => {
     });
   };
 
-const handleAddServices = () => {
-  
-  // e.preventDefault(); // ✅ Stop form submission if inside a <form>
+  const handleAddServices = () => {
+    if (selectedServices.size === 0) {
+      setFormError('Please select at least one service.');
+      return;
+    }
+    setFormError('');
+    setIsSubmitting(true);
 
-  if (selectedServices.size === 0) {
-    setFormError('Please select at least one service.');
-    return;
-  }
-  setFormError('')
-
-  setIsSubmitting(true);
-
-  const serviceIds = Array.from(selectedServices);
-  console.log("working",serviceIds);
-  
-  onSubmit(serviceIds);
-
-  // setSelectedServices(new Set());
-  // setFormError('');
-  // setIsSubmitting(false);
-  // onClose();
-};
-
+    const serviceIds = Array.from(selectedServices);
+    onSubmit(serviceIds);
+  };
 
   if (!isOpen) return null;
 
@@ -107,21 +105,26 @@ const handleAddServices = () => {
           <button
             type="button"
             disabled={!pagination.previous}
-            onClick={() => setPagination(prev => ({
-              ...prev,
-              currentUrl: pagination.previous,
-            }))}
+            onClick={() =>
+              setPagination(prev => ({
+                ...prev,
+                currentUrl: getRelativeUrl(pagination.previous),
+              }))
+            }
             className="disabled:text-gray-400"
           >
             ← Previous
           </button>
+
           <button
             type="button"
             disabled={!pagination.next}
-            onClick={() => setPagination(prev => ({
-              ...prev,
-              currentUrl: pagination.next,
-            }))}
+            onClick={() =>
+              setPagination(prev => ({
+                ...prev,
+                currentUrl: getRelativeUrl(pagination.next),
+              }))
+            }
             className="disabled:text-gray-400"
           >
             Next →
@@ -141,7 +144,9 @@ const handleAddServices = () => {
             onClick={handleAddServices}
             disabled={isSubmitting}
             className={`px-4 py-2 text-white rounded ${
-              isSubmitting ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+              isSubmitting
+                ? 'bg-blue-400 cursor-not-allowed'
+                : 'bg-blue-600 hover:bg-blue-700'
             }`}
           >
             {isSubmitting ? 'Assigning...' : 'Assign'}

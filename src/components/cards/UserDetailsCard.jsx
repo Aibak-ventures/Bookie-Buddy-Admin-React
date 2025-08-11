@@ -1,18 +1,41 @@
 // components/cards/UserDetailsCard.jsx
-import React from 'react';
-import { Phone, Mail, User, Shield, CheckCircle, XCircle, Ban, Unlock } from 'lucide-react';
+import React, { useState } from 'react';
+import {
+  Phone, Mail, User, Shield,
+  CheckCircle, XCircle, Ban, Unlock, Pencil
+} from 'lucide-react';
+import ConfirmationModal from '../Modals/ConfirmationModal';
+import { blockUnblockUser } from '../../api/AdminApis';
 
-const UserDetailsCard = ({ userData, onToggleStatus }) => {
+const UserDetailsCard = ({ userData, onToggleStatus, onEdit }) => {
+  const [modalState, setModalState] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+
   const getRoleColor = (role) => {
     switch (role) {
       case 'OWNER':
         return 'bg-red-100 text-red-800 border-red-200';
-      case 'Admin':
+      case 'ADMIN':
         return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'Staff':
+      case 'STAFF':
         return 'bg-yellow-100 text-yellow-800 border-yellow-200';
       default:
         return 'bg-gray-100 text-gray-800 border-gray-200';
+    }
+  };
+
+  const handleConfirmToggle = async () => {
+    setIsProcessing(true);
+    try {
+      await blockUnblockUser(userData.id, !userData.is_active);
+      if (onToggleStatus) {
+        onToggleStatus(userData.id, userData.is_active);
+      }
+    } catch (error) {
+      console.error('Failed to toggle status:', error);
+    } finally {
+      setIsProcessing(false);
+      setModalState(false);
     }
   };
 
@@ -49,12 +72,7 @@ const UserDetailsCard = ({ userData, onToggleStatus }) => {
           <Mail className="w-4 h-4 text-gray-400" />
           <span className="text-gray-700">{userData.email}</span>
         </div>
-        <div className="text-gray-700">
-          Password: <span className="font-medium">{userData.password || 'Not specified'}</span>
-        </div>
-        <div className="text-gray-700">
-          Secondary Password: <span className="font-medium">{userData.secondary_password || 'Not specified'}</span>
-        </div>
+       
         <div className="text-gray-700">
           Status:{' '}
           {userData.is_active ? (
@@ -66,13 +84,17 @@ const UserDetailsCard = ({ userData, onToggleStatus }) => {
       </div>
 
       <div className="mt-6 flex space-x-2">
-        <button className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors">
-          Edit User
+        <button
+          onClick={onEdit}
+          className="flex items-center justify-center space-x-1 bg-blue-600 text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
+        >
+          <Pencil className="w-4 h-4" />
+          <span>Edit</span>
         </button>
 
         {userData.is_active ? (
           <button
-            onClick={onToggleStatus}
+            onClick={() => setModalState(true)}
             className="flex items-center justify-center space-x-1 bg-red-600 text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-red-700 transition-colors"
           >
             <Ban className="w-4 h-4" />
@@ -80,7 +102,7 @@ const UserDetailsCard = ({ userData, onToggleStatus }) => {
           </button>
         ) : (
           <button
-            onClick={onToggleStatus}
+            onClick={() => setModalState(true)}
             className="flex items-center justify-center space-x-1 bg-green-600 text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-green-700 transition-colors"
           >
             <Unlock className="w-4 h-4" />
@@ -88,6 +110,15 @@ const UserDetailsCard = ({ userData, onToggleStatus }) => {
           </button>
         )}
       </div>
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={modalState}
+        onClose={() => setModalState(false)}
+        onConfirm={handleConfirmToggle}
+        message={`Are you sure you want to ${userData.is_active ? 'block' : 'unblock'} this user?`}
+        loading={isProcessing}
+      />
     </div>
   );
 };

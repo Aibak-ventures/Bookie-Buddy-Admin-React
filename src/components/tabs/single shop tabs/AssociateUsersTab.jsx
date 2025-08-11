@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Edit, Trash2 } from 'lucide-react';
 import AddUserModal from '../../Modals/AddUser';
 import { fetchLinkedUsers } from '../../../api/AdminApis';
+import AssignExistingUserModal from '../../Modals/AssignExistingUserModal';
 
 const AssociateUsersTab = ({ shopId ,shopName }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [isAssignExistingModalOpen, setIsAssignExistingModalOpen] = useState(false);
 
   useEffect(() => {
     if (!shopId) return;
@@ -37,13 +39,23 @@ const AssociateUsersTab = ({ shopId ,shopName }) => {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-lg font-semibold">Associate Users</h3>
+
+         <button
+            onClick={() => setIsAssignExistingModalOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+          >
+           + Assign Existing User
+          </button>
+
         <button
           onClick={() => setIsModalOpen(true)}
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
         >
           <Plus size={16} />
-          Assign user
+          Assign new user
         </button>
+
+       
       </div>
 
       {loading ? (
@@ -59,7 +71,7 @@ const AssociateUsersTab = ({ shopId ,shopName }) => {
                 <th className="text-left py-3 px-4 font-medium text-gray-700">Role</th>
                 <th className="text-left py-3 px-4 font-medium text-gray-700">Phone</th>
                 <th className="text-left py-3 px-4 font-medium text-gray-700">Linked On</th>
-                <th className="text-left py-3 px-4 font-medium text-gray-700">Actions</th>
+                {/* <th className="text-left py-3 px-4 font-medium text-gray-700">Actions</th> */}
               </tr>
             </thead>
             <tbody>
@@ -80,14 +92,14 @@ const AssociateUsersTab = ({ shopId ,shopName }) => {
                   <td className="py-3 px-4">{user.phone || 'N/A'}</td>
                   <td className="py-3 px-4">{user.linked_on}</td>
                   <td className="py-3 px-4">
-                    <div className="flex gap-2">
+                    {/* <div className="flex gap-2">
                       <button className="p-1 text-blue-600 hover:bg-blue-50 rounded">
                         <Edit size={16} />
                       </button>
                       <button className="p-1 text-red-600 hover:bg-red-50 rounded">
                         <Trash2 size={16} />
                       </button>
-                    </div>
+                    </div> */}
                   </td>
                 </tr>
               ))}
@@ -97,6 +109,13 @@ const AssociateUsersTab = ({ shopId ,shopName }) => {
       )}
 
       <AddUserModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)}   shopId={shopId}  shopName={shopName}  onUserAdded={handleUserAdded} />
+        <AssignExistingUserModal
+        isOpen={isAssignExistingModalOpen}
+        onClose={() => setIsAssignExistingModalOpen(false)}
+        shopId={shopId}
+        onUserAssigned={(newUser) => setUsers((prev) => [newUser, ...prev])}
+      />
+
     </div>
   );
 };
