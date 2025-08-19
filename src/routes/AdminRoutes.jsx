@@ -9,6 +9,8 @@ import SingleShop from "../components/sections/SingleShop";
 import RedirectIfAuth from "./route protection/RedirectIfAuth";
 import RequireAuth from "./route protection/RequireAuth";
 import SingleUser from "../components/sections/SingleUser";
+import MainServices from "../components/sections/MainServices";
+import GeneralServices from "../components/sections/GeneralServices";
 
 
 
@@ -30,6 +32,9 @@ const AdminRoutes = () => {
           <Route index element={<DashBoard />} />
           <Route path="shops" element={<Shops />} />
           <Route path="users" element={<Users />} />
+          <Route path="main-services" element={<MainServices />} />
+          <Route path="general-services" element={<GeneralServices />} />
+
           <Route path="add-shop" element={<AddShop />} />
           <Route path="shops/:shopId" element={<SingleShop />} />
           <Route path="users/:userId" element={<SingleUser />} />
@@ -37,6 +42,7 @@ const AdminRoutes = () => {
         </Route>
       </Route>
     </Routes>
+    
   );
 };
 

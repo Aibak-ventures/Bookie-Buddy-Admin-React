@@ -49,30 +49,6 @@ const ServicesProductsTab = ({ shop_id }) => {
 };
 
   // Handle modal submission
-const handleAddService = async (serviceIds) => {
-  
-  const payload = { shop_id, service_ids: serviceIds };
-   const allAreIntegers = serviceIds.every(id => Number.isInteger(id));
-   
-
-  if (!allAreIntegers) {
-    console.error("Service IDs must all be integers. Received:", serviceIds);
-    return;
-  }
-
-  
-  
-  try {
-    const response = await assignServicesToShop(payload);
-    console.log("my reponse in service card",response);
-    
-    const updated = await fetchShopServices(shop_id);
-    setServices(updated?.assigned || []);
-    setReload(!reload)
-  } catch (error) {
-    console.error("Failed to assign services:", error);
-  }
-};
 
   return (
     <div>
@@ -147,7 +123,8 @@ const handleAddService = async (serviceIds) => {
       <AddServiceModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSubmit={handleAddService}
+        shop_id={shop_id}
+        onSuccess={() => setReload((prev) => !prev)}  // ✅ reload parent services
       />
     </div>
   );

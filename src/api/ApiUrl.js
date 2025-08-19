@@ -14,7 +14,8 @@ const API_URLS = {
   ADD_USER_WITH_ROLE:'/api/v1/shop/admin/shop-with-user/create-with-role/',
   SHOPS_OF_USER:'/api/v1/shop/admin/user-shops/',
   CHANGE_SHOP_SERVICE_STATUS:"/api/v1/service/admin/general-services/shop/change-service-status/",
-  LINK_USER_TO_SHOP:'/api/v1/shop/admin/link-user/'
+  LINK_USER_TO_SHOP:'/api/v1/shop/admin/link-user/',
+  DETATCH_USER_LINK:'/api/v1/shop/admin/link-user/'
   
  
 

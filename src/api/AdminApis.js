@@ -1,3 +1,4 @@
+import MainServices from '../components/sections/MainServices';
 import API_URLS from './ApiUrl';
 import {multipartClient,apiClient} from './AxiosConfig';
 
@@ -167,6 +168,20 @@ export const linkUserToShop = async (shopId, userId, role) => {
   return response.data;
 };
 
+
+// detatch user
+export const detachUserFromShop = async (id) => {
+  try {
+    const response = await apiClient.delete(
+      `${API_URLS.DETATCH_USER_LINK}${id}/`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Failed to detach user:", error);
+    throw error;
+  }
+};
+
 ///////////////////////////////////////////////////////////////   SHOP RELATED APIS  /////////////////////////////////////////////
 
 
@@ -292,15 +307,6 @@ export const toggleShopServiceStatus = async ({ shop_service_id, is_active }) =>
 // Fetch general services with pagination
 // api/AdminApis.js
 
-export const fetchGeneralServices = async (url = '/api/v1/service/admin/general-services/') => {
-  try {
-    const response = await apiClient.get(url); // Should be relative
-    return response.data;
-  } catch (error) {
-    console.error('Failed to fetch general services:', error);
-    throw error;
-  }
-};
 
 
 
@@ -329,6 +335,168 @@ export const assignServicesToShop = async ({ shop_id, service_ids }) => {
     return response.data;
   } catch (error) {
     console.error("Failed to assign services to shop:", error);
+    throw error;
+  }
+};
+
+
+
+
+/////////////////////////////////////////////////////////// main service section ////////////////////////////////////
+export const fetchMainServices = async (url) => {
+  const res = await apiClient.get(url);
+  console.log("all main services",res);
+  
+  return res.data;
+};
+
+export const toggleMainServiceStatus = async (id, isActive) => {
+ console.log("my data",id,isActive);
+ 
+  const response =  await multipartClient.patch(`/api/v1/service/admin/main-services/${id}/`, {
+    is_active: isActive
+  });
+  console.log("my response",response);
+  
+};
+
+
+
+export const addMainService = async (serviceData) => {
+  const formData = new FormData();
+  formData.append("name", serviceData.name);
+  formData.append("description", serviceData.description);
+  if (serviceData.icon) {
+    formData.append("icon", serviceData.icon);
+  }
+
+  const res = await multipartClient.post("/api/v1/service/admin/main-services/", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return res.data;
+};
+
+
+
+
+export const updateMainService = async (id, serviceData) => {
+  try {
+    const formData = new FormData();
+    formData.append("name", serviceData.name);
+    formData.append("description", serviceData.description);
+    console.log("my form data",formData);
+    
+
+    // If the icon is a file, append it
+    if (serviceData.icon && serviceData.icon instanceof File) {
+      formData.append("icon", serviceData.icon);
+    }
+
+    const response = await multipartClient.patch(
+      `/api/v1/service/admin/main-services/${id}/`,
+      formData,
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Failed to update main service:", error);
+    throw error;
+  }
+};
+
+
+
+export const deleteMainService = async (id) => {
+  try {
+    const response = await apiClient.delete(
+      `/api/v1/service/admin/main-services/${id}/`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Failed to delete main service:", error);
+    throw error;
+  }
+};
+
+
+
+
+
+/////////////////////////////////////////////////////////// general service section ////////////////////////////////////
+
+export const fetchGeneralServices = async (url) => {
+  const res = await apiClient.get(url);
+  console.log("all general services", res);
+  return res.data;
+};
+
+export const toggleGeneralServiceStatus = async (id, isActive) => {
+  console.log("my data", id, isActive);
+
+  const response = await multipartClient.patch(
+    `/api/v1/service/admin/general-services/${id}/`,
+    {
+      is_active: isActive,
+    }
+  );
+  console.log("my response", response);
+};
+
+export const addGeneralService = async (serviceData) => {
+  const formData = new FormData();
+  formData.append("name", serviceData.name);
+  formData.append("description", serviceData.description);
+  formData.append("main_category", serviceData.main_category);
+
+  if (serviceData.icon) {
+    formData.append("icon", serviceData.icon);
+  }
+
+  const res = await multipartClient.post(
+    "/api/v1/service/admin/general-services/",
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+  return res.data;
+};
+
+export const updateGeneralService = async (id, serviceData) => {
+  try {
+    const formData = new FormData();
+    formData.append("name", serviceData.name);
+    formData.append("description", serviceData.description);
+    formData.append("main_category", serviceData.main_category);
+
+    console.log("my form data", formData);
+
+    if (serviceData.icon && serviceData.icon instanceof File) {
+      formData.append("icon", serviceData.icon);
+    }
+
+    const response = await multipartClient.patch(
+      `/api/v1/service/admin/general-services/${id}/`,
+      formData
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Failed to update general service:", error);
+    throw error;
+  }
+};
+
+export const deleteGeneralService = async (id) => {
+  try {
+    const response = await apiClient.delete(
+      `/api/v1/service/admin/general-services/${id}/`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Failed to delete general service:", error);
     throw error;
   }
 };

@@ -8,6 +8,7 @@ import {
   Edit,
   Calendar,
   ListOrdered,
+  ProjectorIcon
 } from 'lucide-react';
 import ShopDetailItem from './ShopDetailItem';
 import UpdateShopModal from '../Modals/UpdateShopModal';
@@ -21,7 +22,10 @@ const ShopDetailsCard = ({ shopData }) => {
     return words.length > 1
       ? words[0][0].toUpperCase() + words[1][0].toUpperCase()
       : name.slice(0, 2).toUpperCase();
+
   };
+  console.log("shop data",shopData);
+  
 
   return (
     <>
@@ -60,6 +64,7 @@ const ShopDetailsCard = ({ shopData }) => {
           {shopData.email && <ShopDetailItem icon={Mail} text={shopData.email} />}
           {shopData.gst_number && <ShopDetailItem icon={CreditCard} text={shopData.gst_number} />}
 
+
           <ShopDetailItem
             icon={MapPin}
             text={
@@ -72,7 +77,12 @@ const ShopDetailsCard = ({ shopData }) => {
           {/* )} */}
           {shopData.created_at && (
             <ShopDetailItem icon={Calendar} text={`Created: ${shopData.created_at}`} />
+
           )}
+          
+          <ShopDetailItem icon={ProjectorIcon} text={`Total products: ${shopData.total_product_count}`} />
+
+
 
           {Array.isArray(shopData.terms_and_conditions) && shopData.terms_and_conditions.length > 0 && (
             <div className="flex items-start gap-2 text-gray-700">
@@ -84,6 +94,8 @@ const ShopDetailsCard = ({ shopData }) => {
               </ul>
             </div>
           )}
+
+
         </div>
 
         {/* Edit Button */}
