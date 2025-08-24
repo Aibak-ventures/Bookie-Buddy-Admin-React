@@ -4,6 +4,7 @@ import {multipartClient,apiClient} from './AxiosConfig';
 
 ////////////////////////////////////////////////////////////    AUTH RELATED FUNCTIONALITIES  /////////////////////////////////////
 export const loginUser = async ({ phone, password }) => {
+
   try {
     const response = await apiClient.post(API_URLS.LOGIN, {
       phone,
@@ -16,9 +17,11 @@ export const loginUser = async ({ phone, password }) => {
 
     return user;
   } catch (error) {
+    
     throw error;
   }
 };
+
 
 // Logout
 export const logoutUser = () => {
@@ -62,7 +65,6 @@ export const createUserForShop = async (userData, shopId) => {
       shop: shopId, // ensure the backend expects this field
     };
     const response = await apiClient.post(API_URLS.ADD_USER_WITH_ROLE, payload);
-    console.log("thsi is my response",response);
         
     return response;
   } catch (error) {
@@ -102,7 +104,8 @@ export const fetchUserShops = async (userId) => {
 
 //Block/Unblock User
 export const blockUnblockUser = async (userId, isActive) => {
-  console.log("this is my input",userId,isActive);
+  console.log("this is my action ",userId,isActive);
+  
 
   try {
     const response = await apiClient.patch(`${API_URLS.USERS}${userId}/`, {
@@ -119,10 +122,8 @@ export const blockUnblockUser = async (userId, isActive) => {
 // add user only
 export const createUser = async (userData) => {
   try {
-    console.log("this is my data", userData);
 
     const response = await apiClient.post(API_URLS.USERS, userData);
-    console.log("my response", response);
 
     return response.data;
   } catch (error) {
@@ -161,9 +162,7 @@ export const linkUserToShop = async (shopId, userId, role) => {
     user: userId,
     role,
   };
-  console.log("mhy paload",payload);
   const response = await apiClient.post(API_URLS.LINK_USER_TO_SHOP, payload);
-  console.log("ppppp",response);
   
   return response.data;
 };
@@ -173,7 +172,7 @@ export const linkUserToShop = async (shopId, userId, role) => {
 export const detachUserFromShop = async (id) => {
   try {
     const response = await apiClient.delete(
-      `${API_URLS.DETATCH_USER_LINK}${id}/`
+      `${API_URLS.DETACH_USER_LINK }${id}/`
     );
     return response.data;
   } catch (error) {
@@ -225,7 +224,6 @@ export const blockUnblockShop = async (shopId, isActive) => {
 
 // Register shop with user
 export const registerShopWithUser = async (formData, logoFile) => {
-  console.log("this is my user",formData);
   
   try {
     const data = new FormData();
@@ -250,7 +248,6 @@ export const registerShopWithUser = async (formData, logoFile) => {
     if (logoFile) {
       data.append('image', logoFile);
     }
-    console.log("ssssssss",data);
     
 
     const response = await multipartClient.post(API_URLS.SHOP_WITH_USER, data);
@@ -268,7 +265,6 @@ export const registerShopWithUser = async (formData, logoFile) => {
 // update shop details
 
 export const updateShopDetails = async (shopId, data) => {
-  console.log("this is my data",shopId,data);
   
    return await multipartClient.patch(API_URLS.SINGLE_SHOP(shopId), data);
 };
@@ -325,7 +321,6 @@ export const fetchShopServices = async (shopId) => {
 // assign service to shop
 export const assignServicesToShop = async ({ shop_id, service_ids }) => {
   const payload = {"shop_id":parseInt(shop_id),"service_ids":service_ids}
-  console.log("this is my payload",payload);
   
   try {
     const response = await apiClient.post(
@@ -345,18 +340,16 @@ export const assignServicesToShop = async ({ shop_id, service_ids }) => {
 /////////////////////////////////////////////////////////// main service section ////////////////////////////////////
 export const fetchMainServices = async (url) => {
   const res = await apiClient.get(url);
-  console.log("all main services",res);
   
   return res.data;
 };
 
 export const toggleMainServiceStatus = async (id, isActive) => {
- console.log("my data",id,isActive);
  
   const response =  await multipartClient.patch(`/api/v1/service/admin/main-services/${id}/`, {
     is_active: isActive
   });
-  console.log("my response",response);
+  return response
   
 };
 
@@ -386,12 +379,14 @@ export const updateMainService = async (id, serviceData) => {
     const formData = new FormData();
     formData.append("name", serviceData.name);
     formData.append("description", serviceData.description);
-    console.log("my form data",formData);
     
 
     // If the icon is a file, append it
-    if (serviceData.icon && serviceData.icon instanceof File) {
-      formData.append("icon", serviceData.icon);
+    if (serviceData.icon) {
+      if (typeof serviceData.icon === "object" && "name" in serviceData.icon && "size" in serviceData.icon) {
+        formData.append("icon", serviceData.icon); // only append if it's really a File
+      }
+      // if it's a string (URL), don't append → backend keeps existing icon
     }
 
     const response = await multipartClient.patch(
@@ -427,12 +422,10 @@ export const deleteMainService = async (id) => {
 
 export const fetchGeneralServices = async (url) => {
   const res = await apiClient.get(url);
-  console.log("all general services", res);
   return res.data;
 };
 
 export const toggleGeneralServiceStatus = async (id, isActive) => {
-  console.log("my data", id, isActive);
 
   const response = await multipartClient.patch(
     `/api/v1/service/admin/general-services/${id}/`,
@@ -440,7 +433,7 @@ export const toggleGeneralServiceStatus = async (id, isActive) => {
       is_active: isActive,
     }
   );
-  console.log("my response", response);
+  return response
 };
 
 export const addGeneralService = async (serviceData) => {
@@ -472,12 +465,12 @@ export const updateGeneralService = async (id, serviceData) => {
     formData.append("description", serviceData.description);
     formData.append("main_category", serviceData.main_category);
 
-    console.log("my form data", formData);
 
-    if (serviceData.icon && serviceData.icon instanceof File) {
-      formData.append("icon", serviceData.icon);
+   if (serviceData.icon) {
+      if (typeof serviceData.icon === "object" && "name" in serviceData.icon && "size" in serviceData.icon) {
+        formData.append("icon", serviceData.icon);
+      }
     }
-
     const response = await multipartClient.patch(
       `/api/v1/service/admin/general-services/${id}/`,
       formData

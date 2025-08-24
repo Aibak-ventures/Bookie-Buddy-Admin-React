@@ -8,10 +8,24 @@ const FileUpload = ({
   multiple = false,
   required = false,
   className = "",
+  initialFiles = [],   // NEW PROP
   ...props 
 }) => {
   const [dragOver, setDragOver] = useState(false);
   const [selectedFiles, setSelectedFiles] = useState([]);
+
+  // --- handle both File objects and URLs ---
+  useEffect(() => {
+    if (initialFiles && initialFiles.length > 0) {
+      const prepared = initialFiles.map((item) => {
+        if (typeof item === "string") {
+          return { file: null, preview: item, isUrl: true }; // URL case
+        }
+        return { file: item, preview: URL.createObjectURL(item), isUrl: false }; // File case
+      });
+      setSelectedFiles(prepared);
+    }
+  }, [initialFiles]);
 
   const handleDragOver = (e) => {
     e.preventDefault();
@@ -39,20 +53,23 @@ const FileUpload = ({
     const withPreview = files.map(file => ({
       file,
       preview: URL.createObjectURL(file),
+      isUrl: false,
     }));
     setSelectedFiles(withPreview);
-    onFileChange(withPreview.map(f => f.file)); // Send only file objects
+    onFileChange(withPreview.map(f => f.file)); // send only file objects
   };
 
   const removeFile = (indexToRemove) => {
     const updated = selectedFiles.filter((_, index) => index !== indexToRemove);
     setSelectedFiles(updated);
-    onFileChange(updated.map(f => f.file));
+    onFileChange(updated.filter(f => !f.isUrl).map(f => f.file)); // only keep real files
   };
 
   useEffect(() => {
     return () => {
-      selectedFiles.forEach(f => URL.revokeObjectURL(f.preview));
+      selectedFiles.forEach(f => {
+        if (!f.isUrl) URL.revokeObjectURL(f.preview);
+      });
     };
   }, [selectedFiles]);
 
@@ -102,10 +119,12 @@ const FileUpload = ({
           {selectedFiles.map((f, i) => (
             <div key={i} className="flex items-center justify-between p-2 bg-gray-100 rounded shadow-sm">
               <div className="flex items-center gap-3">
-                {f.file.type.startsWith('image/') && (
+                {f.preview && (
                   <img src={f.preview} alt="preview" className="w-16 h-16 object-cover rounded" />
                 )}
-                <span className="text-sm text-gray-700">{f.file.name}</span>
+                <span className="text-sm text-gray-700">
+                  {f.isUrl ? "Existing File" : f.file?.name}
+                </span>
               </div>
               <button
                 onClick={() => removeFile(i)}

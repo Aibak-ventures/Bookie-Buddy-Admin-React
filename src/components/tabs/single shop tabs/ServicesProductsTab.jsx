@@ -15,7 +15,6 @@ const ServicesProductsTab = ({ shop_id }) => {
     const loadServices = async () => {
       try {
         const data = await fetchShopServices(shop_id);
-        console.log("data",data);
         
         
         setServices(data?.services || []);

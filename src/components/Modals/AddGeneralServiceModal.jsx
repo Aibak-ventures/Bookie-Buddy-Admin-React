@@ -152,22 +152,23 @@ const AddGeneralServiceModal = ({ isOpen, onClose, onAdd, onUpdate, serviceData 
                   error={formErrors.main_category}
                 />
 
-            {formErrors.main_category && (
+            {/* {formErrors.main_category && (
               <p className="text-sm text-red-500">{formErrors.main_category}</p>
-            )}
+            )} */}
           </div>
 
 
           {/* File Upload */}
           <div>
-            <label className="block text-sm font-medium mb-1">
-              Service Icon
-            </label>
+        
             <FileUpload
+              label="Service Icon"
               onFileChange={setIconFiles}
               accept="image/*"
               multiple={false}
+              initialFiles={iconFiles}   // ✅ now supports URLs or Files
             />
+
           </div>
 
           {/* Action Buttons */}

@@ -61,7 +61,6 @@ const Users = () => {
   // Handle user add
   const handleAddUser = async (userData) => {
       const response = await createUser(userData);
-      console.log("cadfa",response);
       
       if (response?.id) {
         alert('User added successfully!');

@@ -24,7 +24,6 @@ const ShopDetailsCard = ({ shopData }) => {
       : name.slice(0, 2).toUpperCase();
 
   };
-  console.log("shop data",shopData);
   
 
   return (

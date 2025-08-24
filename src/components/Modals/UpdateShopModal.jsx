@@ -55,7 +55,6 @@ const UpdateShopModal = ({ shopData, onClose, onSuccess }) => {
   };
 const handleSubmit = async () => {
   const validationErrors = validateShopUpdateForm(formData);
-  console.log("some error", validationErrors);
 
   setFormErrors(validationErrors);
   if (Object.keys(validationErrors).length > 0) return;
@@ -93,10 +92,6 @@ const handleSubmit = async () => {
 
   if (imageFile) {
     patchData.append('img', imageFile);
-  }
-
-  for (let [key, value] of patchData.entries()) {
-    console.log(`${key}:`, value);
   }
 
   setSubmitting(true);

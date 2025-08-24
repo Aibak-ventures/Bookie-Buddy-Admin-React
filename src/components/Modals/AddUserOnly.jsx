@@ -47,7 +47,7 @@ const AddUserOnly = ({ isOpen, onClose, onSubmit }) => {
       await onSubmit(formData);
       onClose();
     } catch (error) {
-      console.log('this is my api error');
+      console.log(error);
     } finally {
       setSubmitting(false);
     }

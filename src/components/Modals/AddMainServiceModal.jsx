@@ -101,10 +101,11 @@ const handleSubmit = async (e) => {
             <label className="block text-sm font-medium mb-1">
               Service Icon
             </label>
-            <FileUpload
+             <FileUpload
               onFileChange={setIconFiles}
               accept="image/*"
               multiple={false}
+              initialFiles={iconFiles}   // ✅ now supports URLs or Files
             />
           </div>
 

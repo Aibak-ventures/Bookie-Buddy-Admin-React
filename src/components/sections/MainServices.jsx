@@ -62,7 +62,6 @@ const MainServices = () => {
   const handleAddService = async (serviceData) => {
     try {
       
-      console.log("my service data",serviceData);
       
       await addMainService(serviceData);
       await loadServices();
@@ -111,7 +110,6 @@ const MainServices = () => {
         )
       );
     } catch (err) {
-      console.log(err);
       alert("Failed to update status");
     }
   };

@@ -57,7 +57,6 @@ const AddUserModal = ({ isOpen, onClose, shopId, shopName, onUserAdded }) => {
     setIsSubmitting(true);
     try {
       const response = await createUserForShop(payload, shopId);
-      console.log("response", response);
 
       const newUser = response.data.user;
       const linkedOn = new Date().toLocaleDateString('en-GB'); // e.g. "30/07/2025"
