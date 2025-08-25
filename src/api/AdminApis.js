@@ -1,8 +1,10 @@
+import MainServices from '../components/sections/MainServices';
 import API_URLS from './ApiUrl';
 import {multipartClient,apiClient} from './AxiosConfig';
 
 ////////////////////////////////////////////////////////////    AUTH RELATED FUNCTIONALITIES  /////////////////////////////////////
 export const loginUser = async ({ phone, password }) => {
+
   try {
     const response = await apiClient.post(API_URLS.LOGIN, {
       phone,
@@ -15,9 +17,11 @@ export const loginUser = async ({ phone, password }) => {
 
     return user;
   } catch (error) {
+    
     throw error;
   }
 };
+
 
 // Logout
 export const logoutUser = () => {
@@ -61,7 +65,6 @@ export const createUserForShop = async (userData, shopId) => {
       shop: shopId, // ensure the backend expects this field
     };
     const response = await apiClient.post(API_URLS.ADD_USER_WITH_ROLE, payload);
-    console.log("thsi is my response",response);
         
     return response;
   } catch (error) {
@@ -101,7 +104,8 @@ export const fetchUserShops = async (userId) => {
 
 //Block/Unblock User
 export const blockUnblockUser = async (userId, isActive) => {
-  console.log("this is my input",userId,isActive);
+  console.log("this is my action ",userId,isActive);
+  
 
   try {
     const response = await apiClient.patch(`${API_URLS.USERS}${userId}/`, {
@@ -118,10 +122,8 @@ export const blockUnblockUser = async (userId, isActive) => {
 // add user only
 export const createUser = async (userData) => {
   try {
-    console.log("this is my data", userData);
 
     const response = await apiClient.post(API_URLS.USERS, userData);
-    console.log("my response", response);
 
     return response.data;
   } catch (error) {
@@ -160,11 +162,23 @@ export const linkUserToShop = async (shopId, userId, role) => {
     user: userId,
     role,
   };
-  console.log("mhy paload",payload);
   const response = await apiClient.post(API_URLS.LINK_USER_TO_SHOP, payload);
-  console.log("ppppp",response);
   
   return response.data;
+};
+
+
+// detatch user
+export const detachUserFromShop = async (id) => {
+  try {
+    const response = await apiClient.delete(
+      `${API_URLS.DETACH_USER_LINK }${id}/`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Failed to detach user:", error);
+    throw error;
+  }
 };
 
 ///////////////////////////////////////////////////////////////   SHOP RELATED APIS  /////////////////////////////////////////////
@@ -210,7 +224,6 @@ export const blockUnblockShop = async (shopId, isActive) => {
 
 // Register shop with user
 export const registerShopWithUser = async (formData, logoFile) => {
-  console.log("this is my user",formData);
   
   try {
     const data = new FormData();
@@ -235,7 +248,6 @@ export const registerShopWithUser = async (formData, logoFile) => {
     if (logoFile) {
       data.append('image', logoFile);
     }
-    console.log("ssssssss",data);
     
 
     const response = await multipartClient.post(API_URLS.SHOP_WITH_USER, data);
@@ -253,7 +265,6 @@ export const registerShopWithUser = async (formData, logoFile) => {
 // update shop details
 
 export const updateShopDetails = async (shopId, data) => {
-  console.log("this is my data",shopId,data);
   
    return await multipartClient.patch(API_URLS.SINGLE_SHOP(shopId), data);
 };
@@ -292,15 +303,6 @@ export const toggleShopServiceStatus = async ({ shop_service_id, is_active }) =>
 // Fetch general services with pagination
 // api/AdminApis.js
 
-export const fetchGeneralServices = async (url = '/api/v1/service/admin/general-services/') => {
-  try {
-    const response = await apiClient.get(url); // Should be relative
-    return response.data;
-  } catch (error) {
-    console.error('Failed to fetch general services:', error);
-    throw error;
-  }
-};
 
 
 
@@ -319,7 +321,6 @@ export const fetchShopServices = async (shopId) => {
 // assign service to shop
 export const assignServicesToShop = async ({ shop_id, service_ids }) => {
   const payload = {"shop_id":parseInt(shop_id),"service_ids":service_ids}
-  console.log("this is my payload",payload);
   
   try {
     const response = await apiClient.post(
@@ -329,6 +330,166 @@ export const assignServicesToShop = async ({ shop_id, service_ids }) => {
     return response.data;
   } catch (error) {
     console.error("Failed to assign services to shop:", error);
+    throw error;
+  }
+};
+
+
+
+
+/////////////////////////////////////////////////////////// main service section ////////////////////////////////////
+export const fetchMainServices = async (url) => {
+  const res = await apiClient.get(url);
+  
+  return res.data;
+};
+
+export const toggleMainServiceStatus = async (id, isActive) => {
+ 
+  const response =  await multipartClient.patch(`/api/v1/service/admin/main-services/${id}/`, {
+    is_active: isActive
+  });
+  return response
+  
+};
+
+
+
+export const addMainService = async (serviceData) => {
+  const formData = new FormData();
+  formData.append("name", serviceData.name);
+  formData.append("description", serviceData.description);
+  if (serviceData.icon) {
+    formData.append("icon", serviceData.icon);
+  }
+
+  const res = await multipartClient.post("/api/v1/service/admin/main-services/", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+  return res.data;
+};
+
+
+
+
+export const updateMainService = async (id, serviceData) => {
+  try {
+    const formData = new FormData();
+    formData.append("name", serviceData.name);
+    formData.append("description", serviceData.description);
+    
+
+    // If the icon is a file, append it
+    if (serviceData.icon) {
+      if (typeof serviceData.icon === "object" && "name" in serviceData.icon && "size" in serviceData.icon) {
+        formData.append("icon", serviceData.icon); // only append if it's really a File
+      }
+      // if it's a string (URL), don't append → backend keeps existing icon
+    }
+
+    const response = await multipartClient.patch(
+      `/api/v1/service/admin/main-services/${id}/`,
+      formData,
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Failed to update main service:", error);
+    throw error;
+  }
+};
+
+
+
+export const deleteMainService = async (id) => {
+  try {
+    const response = await apiClient.delete(
+      `/api/v1/service/admin/main-services/${id}/`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Failed to delete main service:", error);
+    throw error;
+  }
+};
+
+
+
+
+
+/////////////////////////////////////////////////////////// general service section ////////////////////////////////////
+
+export const fetchGeneralServices = async (url) => {
+  const res = await apiClient.get(url);
+  return res.data;
+};
+
+export const toggleGeneralServiceStatus = async (id, isActive) => {
+
+  const response = await multipartClient.patch(
+    `/api/v1/service/admin/general-services/${id}/`,
+    {
+      is_active: isActive,
+    }
+  );
+  return response
+};
+
+export const addGeneralService = async (serviceData) => {
+  const formData = new FormData();
+  formData.append("name", serviceData.name);
+  formData.append("description", serviceData.description);
+  formData.append("main_category", serviceData.main_category);
+
+  if (serviceData.icon) {
+    formData.append("icon", serviceData.icon);
+  }
+
+  const res = await multipartClient.post(
+    "/api/v1/service/admin/general-services/",
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }
+  );
+  return res.data;
+};
+
+export const updateGeneralService = async (id, serviceData) => {
+  try {
+    const formData = new FormData();
+    formData.append("name", serviceData.name);
+    formData.append("description", serviceData.description);
+    formData.append("main_category", serviceData.main_category);
+
+
+   if (serviceData.icon) {
+      if (typeof serviceData.icon === "object" && "name" in serviceData.icon && "size" in serviceData.icon) {
+        formData.append("icon", serviceData.icon);
+      }
+    }
+    const response = await multipartClient.patch(
+      `/api/v1/service/admin/general-services/${id}/`,
+      formData
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Failed to update general service:", error);
+    throw error;
+  }
+};
+
+export const deleteGeneralService = async (id) => {
+  try {
+    const response = await apiClient.delete(
+      `/api/v1/service/admin/general-services/${id}/`
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Failed to delete general service:", error);
     throw error;
   }
 };

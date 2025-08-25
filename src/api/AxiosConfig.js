@@ -103,7 +103,6 @@ apiClient.interceptors.response.use(
 
 export const refreshToken = async () => {
   try {
-    console.log("Trying to refresh token...");
 
     const refreshResponse = await axios.post(
   'http://dev.bookiebuddy.in/api/admin-token/refresh/',
@@ -111,10 +110,8 @@ export const refreshToken = async () => {
   { withCredentials: true } // ✅ correct placement
 );
 
-    console.log("Refresh Response:", refreshResponse);
 
     const newAccessToken = refreshResponse.data.access;
-    console.log("New Access Token:", newAccessToken);
 
     sessionStorage.setItem('access', newAccessToken);
   } catch (err) {

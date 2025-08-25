@@ -5,7 +5,6 @@ function DashBoard() {
   const handleRefresh = async () => {
     try {
       await refreshToken();
-      console.log("Token refreshed successfully");
     } catch (err) {
       console.error("Failed to refresh token:", err);
     }

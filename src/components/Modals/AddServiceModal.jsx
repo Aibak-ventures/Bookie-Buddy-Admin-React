@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { X } from 'lucide-react';
-import { fetchGeneralServices } from '../../api/AdminApis';
+import { assignServicesToShop, fetchGeneralServices } from '../../api/AdminApis';
 
 // Utility to extract relative path from full URL
 const getRelativeUrl = (url) => {
@@ -9,12 +9,11 @@ const getRelativeUrl = (url) => {
     const parsedUrl = new URL(url);
     return parsedUrl.pathname + parsedUrl.search;
   } catch (error) {
-    // If already a relative URL
-    return url;
+    return url; // Already relative
   }
 };
 
-const AddServiceModal = ({ isOpen, onClose, onSubmit }) => {
+const AddServiceModal = ({ isOpen, onClose, shop_id, onSuccess }) => {
   const [services, setServices] = useState([]);
   const [selectedServices, setSelectedServices] = useState(new Set());
   const [pagination, setPagination] = useState({
@@ -32,7 +31,7 @@ const AddServiceModal = ({ isOpen, onClose, onSubmit }) => {
       try {
         const data = await fetchGeneralServices(pagination.currentUrl);
         setServices(data.results || []);
-        setPagination(prev => ({
+        setPagination((prev) => ({
           ...prev,
           next: getRelativeUrl(data.next),
           previous: getRelativeUrl(data.previous),
@@ -46,7 +45,7 @@ const AddServiceModal = ({ isOpen, onClose, onSubmit }) => {
   }, [pagination.currentUrl, isOpen]);
 
   const toggleService = (id) => {
-    setSelectedServices(prev => {
+    setSelectedServices((prev) => {
       const updated = new Set(prev);
       if (updated.has(id)) {
         updated.delete(id);
@@ -57,7 +56,7 @@ const AddServiceModal = ({ isOpen, onClose, onSubmit }) => {
     });
   };
 
-  const handleAddServices = () => {
+  const handleAddServices = async () => {
     if (selectedServices.size === 0) {
       setFormError('Please select at least one service.');
       return;
@@ -65,8 +64,25 @@ const AddServiceModal = ({ isOpen, onClose, onSubmit }) => {
     setFormError('');
     setIsSubmitting(true);
 
-    const serviceIds = Array.from(selectedServices);
-    onSubmit(serviceIds);
+    try {
+      const payload = { shop_id, service_ids: Array.from(selectedServices) };
+      const response = await assignServicesToShop(payload);
+
+      alert(response.message || "Services assigned successfully!");
+      setSelectedServices(new Set())
+
+      // ✅ Tell parent to reload
+      if (onSuccess) onSuccess();
+
+
+      // ✅ Close modal
+      onClose();
+    } catch (error) {
+      console.error("Failed to assign services:", error);
+      alert("Failed to assign services.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (!isOpen) return null;
@@ -85,7 +101,7 @@ const AddServiceModal = ({ isOpen, onClose, onSubmit }) => {
         <h2 className="text-lg font-semibold mb-4">Assign Services to Shop</h2>
 
         <div className="mb-4 max-h-60 overflow-y-auto border rounded p-2">
-          {services.map(service => (
+          {services.map((service) => (
             <label key={service.id} className="flex items-center gap-2 mb-2">
               <input
                 type="checkbox"
@@ -97,16 +113,14 @@ const AddServiceModal = ({ isOpen, onClose, onSubmit }) => {
           ))}
         </div>
 
-        {formError && (
-          <p className="text-sm text-red-500 mb-2">{formError}</p>
-        )}
+        {formError && <p className="text-sm text-red-500 mb-2">{formError}</p>}
 
         <div className="flex justify-between text-sm text-blue-600 mb-4">
           <button
             type="button"
             disabled={!pagination.previous}
             onClick={() =>
-              setPagination(prev => ({
+              setPagination((prev) => ({
                 ...prev,
                 currentUrl: getRelativeUrl(pagination.previous),
               }))
@@ -120,7 +134,7 @@ const AddServiceModal = ({ isOpen, onClose, onSubmit }) => {
             type="button"
             disabled={!pagination.next}
             onClick={() =>
-              setPagination(prev => ({
+              setPagination((prev) => ({
                 ...prev,
                 currentUrl: getRelativeUrl(pagination.next),
               }))
