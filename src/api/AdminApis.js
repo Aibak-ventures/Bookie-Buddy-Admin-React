@@ -181,6 +181,20 @@ export const detachUserFromShop = async (id) => {
   }
 };
 
+
+
+// change role of the user
+export const changeUserRole = async (shopId, userId, newRole) => {
+  const response = await apiClient.patch(
+    `/api/v1/shop/admin/link-user/${shopId}/`,
+    {
+      user_id: userId,
+      role: newRole,
+    }
+  );
+  return response.data;
+};
+
 ///////////////////////////////////////////////////////////////   SHOP RELATED APIS  /////////////////////////////////////////////
 
 
@@ -338,22 +352,17 @@ export const assignServicesToShop = async ({ shop_id, service_ids }) => {
 
 
 /////////////////////////////////////////////////////////// main service section ////////////////////////////////////
-export const fetchMainServices = async (url) => {
+export const fetchMainServices = async (url = API_URLS.MAIN_SERVICES) => {
   const res = await apiClient.get(url);
-  
   return res.data;
 };
 
 export const toggleMainServiceStatus = async (id, isActive) => {
- 
-  const response =  await multipartClient.patch(`/api/v1/service/admin/main-services/${id}/`, {
+  const response = await multipartClient.patch(API_URLS.MAIN_SERVICE(id), {
     is_active: isActive
   });
-  return response
-  
+  return response;
 };
-
-
 
 export const addMainService = async (serviceData) => {
   const formData = new FormData();
@@ -363,55 +372,28 @@ export const addMainService = async (serviceData) => {
     formData.append("icon", serviceData.icon);
   }
 
-  const res = await multipartClient.post("/api/v1/service/admin/main-services/", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
+  const res = await multipartClient.post(API_URLS.MAIN_SERVICES, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
   });
   return res.data;
 };
 
-
-
-
 export const updateMainService = async (id, serviceData) => {
-  try {
-    const formData = new FormData();
-    formData.append("name", serviceData.name);
-    formData.append("description", serviceData.description);
-    
+  const formData = new FormData();
+  formData.append("name", serviceData.name);
+  formData.append("description", serviceData.description);
 
-    // If the icon is a file, append it
-    if (serviceData.icon) {
-      if (typeof serviceData.icon === "object" && "name" in serviceData.icon && "size" in serviceData.icon) {
-        formData.append("icon", serviceData.icon); // only append if it's really a File
-      }
-      // if it's a string (URL), don't append → backend keeps existing icon
-    }
-
-    const response = await multipartClient.patch(
-      `/api/v1/service/admin/main-services/${id}/`,
-      formData,
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Failed to update main service:", error);
-    throw error;
+  if (serviceData.icon && typeof serviceData.icon === "object") {
+    formData.append("icon", serviceData.icon);
   }
+
+  const response = await multipartClient.patch(API_URLS.MAIN_SERVICE(id), formData);
+  return response.data;
 };
 
-
-
 export const deleteMainService = async (id) => {
-  try {
-    const response = await apiClient.delete(
-      `/api/v1/service/admin/main-services/${id}/`
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Failed to delete main service:", error);
-    throw error;
-  }
+  const response = await apiClient.delete(API_URLS.MAIN_SERVICE(id));
+  return response.data;
 };
 
 
@@ -420,20 +402,16 @@ export const deleteMainService = async (id) => {
 
 /////////////////////////////////////////////////////////// general service section ////////////////////////////////////
 
-export const fetchGeneralServices = async (url) => {
+export const fetchGeneralServices = async (url = API_URLS.GENERAL_SERVICES) => {
   const res = await apiClient.get(url);
   return res.data;
 };
 
 export const toggleGeneralServiceStatus = async (id, isActive) => {
-
-  const response = await multipartClient.patch(
-    `/api/v1/service/admin/general-services/${id}/`,
-    {
-      is_active: isActive,
-    }
-  );
-  return response
+  const response = await multipartClient.patch(API_URLS.GENERAL_SERVICE(id), {
+    is_active: isActive,
+  });
+  return response;
 };
 
 export const addGeneralService = async (serviceData) => {
@@ -446,50 +424,83 @@ export const addGeneralService = async (serviceData) => {
     formData.append("icon", serviceData.icon);
   }
 
-  const res = await multipartClient.post(
-    "/api/v1/service/admin/general-services/",
-    formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    }
-  );
+  const res = await multipartClient.post(API_URLS.GENERAL_SERVICES, formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
   return res.data;
 };
 
 export const updateGeneralService = async (id, serviceData) => {
-  try {
-    const formData = new FormData();
-    formData.append("name", serviceData.name);
-    formData.append("description", serviceData.description);
-    formData.append("main_category", serviceData.main_category);
+  const formData = new FormData();
+  formData.append("name", serviceData.name);
+  formData.append("description", serviceData.description);
+  formData.append("main_category", serviceData.main_category);
 
-
-   if (serviceData.icon) {
-      if (typeof serviceData.icon === "object" && "name" in serviceData.icon && "size" in serviceData.icon) {
-        formData.append("icon", serviceData.icon);
-      }
-    }
-    const response = await multipartClient.patch(
-      `/api/v1/service/admin/general-services/${id}/`,
-      formData
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Failed to update general service:", error);
-    throw error;
+  if (serviceData.icon && typeof serviceData.icon === "object") {
+    formData.append("icon", serviceData.icon);
   }
+
+  const response = await multipartClient.patch(API_URLS.GENERAL_SERVICE(id), formData);
+  return response.data;
 };
 
 export const deleteGeneralService = async (id) => {
-  try {
-    const response = await apiClient.delete(
-      `/api/v1/service/admin/general-services/${id}/`
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Failed to delete general service:", error);
-    throw error;
-  }
+  const response = await apiClient.delete(API_URLS.GENERAL_SERVICE(id));
+  return response.data;
+};
+
+
+
+
+///////////////////////////////////////////////////////////// features section ///////////////////////////////////////////
+
+// Fetch Features
+export const fetchFeatures = async () => {
+  const response = await apiClient.get(API_URLS.FEATURES_URL);
+  console.log("data",response);
+  
+  return response.data;
+};
+
+// Add Feature
+export const addFeature = async (featureData) => {
+  const { data } = await apiClient.post(API_URLS.FEATURES_URL, featureData);
+  return data;
+};
+
+// Update Feature
+export const updateFeature = async (id, featureData) => {
+  const { data } = await apiClient.patch(`${API_URLS.FEATURES_URL}${id}/`, featureData);
+  return data;
+};
+
+// Delete Feature
+export const deleteFeature = async (id) => {
+  await apiClient.delete(`${API_URLS.FEATURES_URL}${id}/`);
+};
+
+
+
+
+
+
+/////////////////////////////////////////////// Subscriptions ///////////////////////////////////////////////////////////////
+export const fetchSubscriptions = async (url = API_URLS.SUBSCRIPTIONS) => {
+  const response = await apiClient.get(url);
+  return response.data;
+};
+
+export const addSubscription = async (data) => {
+  const response = await apiClient.post(API_URLS.SUBSCRIPTIONS, data);
+  return response.data;
+};
+
+export const updateSubscription = async (id, data) => {
+  const response = await apiClient.patch(API_URLS.SUBSCRIPTION(id), data);
+  return response.data;
+};
+
+export const deleteSubscription = async (id) => {
+  const response = await apiClient.delete(API_URLS.SUBSCRIPTION(id));
+  return response.data;
 };

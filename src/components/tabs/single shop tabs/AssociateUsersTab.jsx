@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Lock, Unlock } from 'lucide-react';
 import AddUserModal from '../../Modals/AddUser';
-import { fetchLinkedUsers, detachUserFromShop, blockUnblockUser } from '../../../api/AdminApis';
+import { fetchLinkedUsers, detachUserFromShop, blockUnblockUser, changeUserRole } from '../../../api/AdminApis';
 import AssignExistingUserModal from '../../Modals/AssignExistingUserModal';
 import ConfirmationModal from '../../Modals/ConfirmationModal';
+
+const shopRoleOptions = [
+  { label: 'OWNER', value: 'OWNER' },
+  { label: 'MANAGER', value: 'MANAGER' },
+  { label: 'STAFF', value: 'STAFF' },
+];
 
 const AssociateUsersTab = ({ shopId, shopName }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -14,7 +20,7 @@ const AssociateUsersTab = ({ shopId, shopName }) => {
 
   // confirmation modal state
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
-  const [selectedAction, setSelectedAction] = useState(null); // "detach" | "block"
+  const [selectedAction, setSelectedAction] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
 
   useEffect(() => {
@@ -25,8 +31,6 @@ const AssociateUsersTab = ({ shopId, shopName }) => {
       setError(null);
       try {
         const data = await fetchLinkedUsers(shopId);
-        console.log("users of the shop",data);
-        
         setUsers(data);
       } catch (err) {
         setError('Failed to load associated users.');
@@ -49,7 +53,7 @@ const AssociateUsersTab = ({ shopId, shopName }) => {
     setConfirmModalOpen(true);
   };
 
-  // confirm action (detach or block/unblock)
+  // confirm action
   const handleConfirmAction = async () => {
     if (!selectedUser || !selectedAction) return;
 
@@ -71,7 +75,6 @@ const AssociateUsersTab = ({ shopId, shopName }) => {
     } catch (err) {
       alert("Action failed");
       console.error(err);
-      // rollback block/unblock if failed
       if (selectedAction === 'block') {
         setUsers((prev) =>
           prev.map((u) =>
@@ -82,6 +85,22 @@ const AssociateUsersTab = ({ shopId, shopName }) => {
     } finally {
       setSelectedUser(null);
       setSelectedAction(null);
+    }
+  };
+
+  // handle role change
+  const handleRoleChange = async (userId, newRole) => {
+    try {
+      await changeUserRole(shopId, userId, newRole);
+      setUsers((prev) =>
+        prev.map((u) =>
+          u.user_id === userId ? { ...u, role: newRole } : u
+        )
+      );
+      alert("Role updated successfully");
+    } catch (err) {
+      console.error("Failed to update role:", err);
+      alert("Failed to update role");
     }
   };
 
@@ -126,17 +145,22 @@ const AssociateUsersTab = ({ shopId, shopName }) => {
               {users.map((user) => (
                 <tr key={user.user_id} className="border-b">
                   <td className="py-3 px-4">{user.full_name || 'N/A'}</td>
+
+                  {/* Role Dropdown */}
                   <td className="py-3 px-4">
-                    <span
-                      className={`px-2 py-1 rounded-full text-xs ${
-                        user.role === 'ADMIN'
-                          ? 'bg-blue-100 text-blue-800'
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}
+                    <select
+                      value={user.role}
+                      onChange={(e) => handleRoleChange(user.user_id, e.target.value)}
+                      className="border rounded px-2 py-1 text-sm"
                     >
-                      {user.role}
-                    </span>
+                      {shopRoleOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
                   </td>
+
                   <td className="py-3 px-4">{user.phone || 'N/A'}</td>
                   <td className="py-3 px-4">{user.linked_on}</td>
                   <td className="py-3 px-4 flex gap-2">

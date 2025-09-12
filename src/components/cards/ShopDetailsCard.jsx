@@ -60,6 +60,8 @@ const ShopDetailsCard = ({ shopData }) => {
         {/* Shop Details */}
         <div className="space-y-4">
           {shopData.phone && <ShopDetailItem icon={Phone} text={shopData.phone} />}
+          {shopData.phone2 && <ShopDetailItem icon={Phone} text={shopData.phone2} />}
+
           {shopData.email && <ShopDetailItem icon={Mail} text={shopData.email} />}
           {shopData.gst_number && <ShopDetailItem icon={CreditCard} text={shopData.gst_number} />}
 
@@ -72,7 +74,7 @@ const ShopDetailsCard = ({ shopData }) => {
           />
 
           {/* {shopData.extra_stock_limit && ( */}
-            <ShopDetailItem icon={Package} text={`Stock Limit: ${shopData.extra_stock_limit}`} />
+            <ShopDetailItem icon={Package} text={`Extra stock limit: ${shopData.extra_stock_limit}`} />
           {/* )} */}
           {shopData.created_at && (
             <ShopDetailItem icon={Calendar} text={`Created: ${shopData.created_at}`} />

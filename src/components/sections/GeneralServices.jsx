@@ -43,6 +43,8 @@ const GeneralServices = () => {
     setError(null);
     try {
       const data = await fetchGeneralServices(currentUrl);
+      console.log("data",data);
+      
       setServices(data.results);
       setCount(data.count);
       setNext(data.next);
@@ -140,7 +142,7 @@ const GeneralServices = () => {
       ),
     },
     { header: "Description", accessor: "description" },
-    { header: "Main service", accessor: "main_category" },
+    { header: "Main service", accessor: "main_category_name" },
 
     {
       header: "Created At",

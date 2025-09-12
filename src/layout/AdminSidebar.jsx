@@ -2,7 +2,7 @@
 import React from 'react';
 import {
   LayoutDashboard, Plus, Store, Users,
-  FolderOpen, DollarSign, Settings, LogOut,PercentDiamond
+  FolderOpen, DollarSign, Settings, LogOut,PercentDiamond,FileCode
 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { logoutUser } from '../api/AdminApis';
@@ -16,6 +16,10 @@ const menuItems = [
   { name: 'Users', icon: Users, path: '/users' },
   { name: 'Main services', icon: PercentDiamond, path: '/main-services' },
   { name: 'General services', icon: FolderOpen, path: '/general-services' },
+  { name: 'Feature management', icon: FileCode, path: '/feature-management' },
+  { name: 'Subscritpions', icon: Settings, path: '/subscription-management' },
+
+
 
 
   
