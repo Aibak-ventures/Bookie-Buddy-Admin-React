@@ -17,7 +17,7 @@ const AssociatedShopsCard = () => {
         
         setShops(data);
       } catch (err) {
-        setError('Failed to load associated shops');
+        setError(`Failed:${err?.response?.data?.error}`);
       } finally {
         setLoading(false);
       }

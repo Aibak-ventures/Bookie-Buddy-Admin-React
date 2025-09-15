@@ -28,7 +28,9 @@ const AddGeneralServiceModal = ({ isOpen, onClose, onAdd, onUpdate, serviceData 
         const data = await fetchMainServices("/api/v1/service/admin/main-services/");
         setMainCategories(data.results || data); // depends on API pagination
       } catch (err) {
-        console.error("Failed to load main categories:", err);
+    alert(`Failed :${err?.response?.data?.error}`)
+
+
       } finally {
         setLoadingCategories(false);
       }
@@ -88,8 +90,9 @@ const AddGeneralServiceModal = ({ isOpen, onClose, onAdd, onUpdate, serviceData 
       }
       onClose();
     } catch (err) {
-      console.error("Failed to save service:", err);
-      alert("Failed to save service");
+        alert(`Failed :${err?.response?.data?.error}`)
+
+
     } finally {
       setSubmitting(false);
     }

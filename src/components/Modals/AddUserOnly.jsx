@@ -47,7 +47,9 @@ const AddUserOnly = ({ isOpen, onClose, onSubmit }) => {
       await onSubmit(formData);
       onClose();
     } catch (error) {
-      console.log(error);
+    alert(`Failed :${err?.response?.data?.error}`)
+
+
     } finally {
       setSubmitting(false);
     }

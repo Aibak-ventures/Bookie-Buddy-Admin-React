@@ -41,7 +41,9 @@ const AssignExistingUserModal = ({ isOpen, onClose, shopId, onUserAssigned }) =>
 
       onClose();
     } catch (err) {
-      alert("Failed to assign user");
+    alert(`Failed :${err?.response?.data?.error}`)
+
+
     } finally {
       setIsSubmitting(false);
     }

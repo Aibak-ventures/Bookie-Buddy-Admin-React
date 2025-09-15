@@ -10,6 +10,7 @@ const UpdateShopModal = ({ shopData, onClose, onSuccess }) => {
   const initialForm = {
     name: shopData.name || '',
     phone: shopData.phone || '',
+    phone2:shopData.phone2 || '',
     email: shopData.email || '',
     gst_number: shopData.gst_number || '',
     address: shopData.address || '',
@@ -100,10 +101,13 @@ const handleSubmit = async () => {
     const res = await updateShopDetails(shopData.id, patchData);
     if (res.status === 200 || res.status === 204) {
       onSuccess?.();
+      alert("updated successfully")
       onClose?.();
     }
-  } catch (error) {
-    console.error('Update failed:', error);
+  } catch (err) {
+    alert(`Failed :${err?.response?.data?.error}`)
+
+
   } finally {
     setSubmitting(false);
   }
@@ -139,6 +143,10 @@ const handleSubmit = async () => {
           <div>
           <FormInput label="Phone" value={formData.phone} onChange={handleChange('phone')} />
           {formErrors.phone && <p className="text-sm text-red-500">{formErrors.phone}</p>}
+          </div>
+          <div>
+          <FormInput label="Phone 2" value={formData.phone2} onChange={handleChange('phone2')} />
+          {formErrors.phone2 && <p className="text-sm text-red-500">{formErrors.phone2}</p>}
           </div>
           <div>
           <FormInput label="Email" value={formData.email} onChange={handleChange('email')} />
@@ -177,11 +185,13 @@ const handleSubmit = async () => {
             </div>
 
           <FormInput
-            label="Extra Stock Limit"
-            type="number"
-            value={formData.extra_stock_limit}
-            onChange={handleChange('extra_stock_limit')}
-          />
+          label="Extra Stock Limit"
+          type="number"
+          value={formData.extra_stock_limit}
+          onChange={handleChange('extra_stock_limit')}
+          onWheel={(e) => e.target.blur()}   // 👈 prevents scroll changing value
+        />
+
         </div>
 
         {/* ✅ Terms and Conditions Section */}

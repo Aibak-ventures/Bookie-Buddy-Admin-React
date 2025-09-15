@@ -70,7 +70,9 @@ const AddUserModal = ({ isOpen, onClose, shopId, shopName, onUserAdded }) => {
 
       onClose();
     } catch (err) {
-      console.error('Failed to assign user:', err);
+      alert(`Failed :${err?.response?.data?.error}`)
+
+
 
       let backendMessage = '';
 

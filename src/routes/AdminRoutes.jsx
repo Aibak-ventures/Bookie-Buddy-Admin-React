@@ -11,6 +11,8 @@ import RequireAuth from "./route protection/RequireAuth";
 import SingleUser from "../components/sections/SingleUser";
 import MainServices from "../components/sections/MainServices";
 import GeneralServices from "../components/sections/GeneralServices";
+import Features from "../components/sections/Features";
+import Subscription from "../components/sections/Subscription";
 
 
 
@@ -34,6 +36,8 @@ const AdminRoutes = () => {
           <Route path="users" element={<Users />} />
           <Route path="main-services" element={<MainServices />} />
           <Route path="general-services" element={<GeneralServices />} />
+          <Route path="feature-management" element={<Features />} />
+          <Route path="subscription-management" element={<Subscription />} />
 
           <Route path="add-shop" element={<AddShop />} />
           <Route path="shops/:shopId" element={<SingleShop />} />

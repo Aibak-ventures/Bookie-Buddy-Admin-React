@@ -50,13 +50,39 @@ const FileUpload = ({
   };
 
   const handleFiles = (files) => {
-    const withPreview = files.map(file => ({
-      file,
-      preview: URL.createObjectURL(file),
-      isUrl: false,
-    }));
-    setSelectedFiles(withPreview);
-    onFileChange(withPreview.map(f => f.file)); // send only file objects
+    const validTypes = ["image/png", "image/jpeg", "image/jpg", "image/webp"];
+    const maxSize = 1 * 1024 * 1024; // 1MB
+    const validFiles = [];
+    const errors = [];
+
+    files.forEach((file) => {
+      if (!validTypes.includes(file.type)) {
+        errors.push(`${file.name} has an invalid type. Allowed: PNG, JPG, JPEG, WEBP.`);
+        return;
+      }
+      if (file.size > maxSize) {
+        errors.push(`${file.name} exceeds the 1MB size limit.`);
+        return;
+      }
+      validFiles.push({
+        file,
+        preview: URL.createObjectURL(file),
+        isUrl: false,
+      });
+    });
+
+    if (errors.length > 0) {
+      alert(errors.join("\n")); // 🔴 Replace with toast/inline error if needed
+    }
+
+    if (multiple) {
+      const updated = [...selectedFiles, ...validFiles];
+      setSelectedFiles(updated);
+      onFileChange(updated.map(f => f.file).filter(Boolean));
+    } else {
+      setSelectedFiles(validFiles);
+      onFileChange(validFiles.map(f => f.file));
+    }
   };
 
   const removeFile = (indexToRemove) => {
@@ -95,7 +121,7 @@ const FileUpload = ({
         <p className="text-sm text-gray-600 mb-2">
           <span className="font-medium">Drag & Drop image here</span>
         </p>
-        <p className="text-xs text-gray-500 mb-4">Accepted: .JPG, .PNG, etc.</p>
+        <p className="text-xs text-gray-500 mb-4">Accepted: PNG, JPG, JPEG, WEBP (Max: 1MB)</p>
         <input
           type="file"
           accept={accept}

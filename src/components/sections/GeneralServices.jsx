@@ -43,6 +43,7 @@ const GeneralServices = () => {
     setError(null);
     try {
       const data = await fetchGeneralServices(currentUrl);
+      
       setServices(data.results);
       setCount(data.count);
       setNext(data.next);
@@ -67,8 +68,9 @@ const GeneralServices = () => {
       setIsAddModalOpen(false);
       alert("General service added successfully");
     } catch (err) {
-      console.error(err);
-      alert("Failed to add general service");
+     alert(`Failed :${err?.response?.data?.error}`)
+
+      
     }
   };
 
@@ -81,8 +83,9 @@ const GeneralServices = () => {
       setEditingService(null);
       await loadServices();
     } catch (err) {
-      console.error(err);
-      alert("Failed to update general service");
+      alert(`Failed :${err?.response?.data?.error}`)
+
+      
     }
   };
 
@@ -94,8 +97,9 @@ const GeneralServices = () => {
       setDeleteModal({ isOpen: false, serviceId: null });
       await loadServices();
     } catch (err) {
-      console.error(err);
-      alert("Failed to delete general service");
+      alert(`Failed :${err?.response?.data?.error}`)
+
+      
     }
   };
 
@@ -109,7 +113,9 @@ const GeneralServices = () => {
         )
       );
     } catch (err) {
-      alert("Failed to update status");
+    alert(`Failed :${err?.response?.data?.error}`)
+
+
     }
   };
 
@@ -140,7 +146,7 @@ const GeneralServices = () => {
       ),
     },
     { header: "Description", accessor: "description" },
-    { header: "Main service", accessor: "main_category" },
+    { header: "Main service", accessor: "main_category_name" },
 
     {
       header: "Created At",

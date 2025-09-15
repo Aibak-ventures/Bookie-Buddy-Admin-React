@@ -7,6 +7,8 @@ function DashBoard() {
       await refreshToken();
     } catch (err) {
       console.error("Failed to refresh token:", err);
+      alert(`Failed :${err?.response?.data?.error}`)
+
     }
   };
 

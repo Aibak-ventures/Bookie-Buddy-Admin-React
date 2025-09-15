@@ -13,6 +13,7 @@ const SingleShop = () => {
   const [activeTab, setActiveTab] = useState('associate-users');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
 
   const tabs = [
     { id: 'associate-users', label: 'Associate users', icon: Users },

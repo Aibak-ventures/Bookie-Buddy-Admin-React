@@ -33,6 +33,10 @@ export const validateShopRegistrationForm = (formData) => {
     errors.phone = 'Owner phone must be 10 digits';
   }
 
+   if (formData.phone2 && !/^\d{10}$/.test(formData.phone2)) {
+    errors.phone2 = 'Phone number must be 10 digits';
+  }
+
   if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
     errors.email = 'Invalid owner email';
   }

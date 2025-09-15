@@ -22,6 +22,8 @@ const ShopRegistrationForm = () => {
     name: '', // businessName
     place: '',
     shop_phone: '',
+    phone2: '', // ✅ second phone
+
     shop_email: '',
     shop_gst_number: '',
     shop_state: '',
@@ -63,8 +65,10 @@ const ShopRegistrationForm = () => {
         alert('Shop registered!');
         navigate('/shops');
       }
-    } catch (error) {
-      console.error('Shop registration failed:', error);
+    } catch (err) {
+      alert(`Failed :${err?.response?.data?.error}`)
+
+
     } finally {
       setSubmitting(false);
     }
@@ -98,11 +102,19 @@ const ShopRegistrationForm = () => {
               </div>
               <div>
                 <FormInput
-                  label="Shop Phone"
+                  label="Shop Phone 1"
                   value={formData.shop_phone}
                   onChange={handleInputChange('shop_phone')}
                 />
                 {formErrors.shop_phone && <p className="text-sm text-red-500">{formErrors.shop_phone}</p>}
+              </div>
+              <div>
+                <FormInput
+                  label="Shop Phone 2"
+                  value={formData.phone2}
+                  onChange={handleInputChange('phone2')}
+                />
+                {formErrors.phone2 && <p className="text-sm text-red-500">{formErrors.phone2}</p>}
               </div>
               <div>
                 <FormInput
@@ -175,6 +187,8 @@ const ShopRegistrationForm = () => {
                 />
                 {formErrors.phone && <p className="text-sm text-red-500">{formErrors.phone}</p>}
               </div>
+
+              
 
               <div>
                 <FormInput
