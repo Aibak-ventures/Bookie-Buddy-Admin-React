@@ -202,13 +202,13 @@ import axios from "axios";
 
 export const resetUserPassword = async (userId, password) => {
   try {
-    const response = await apiClient.post(`${BASE_URL}/api/v1/auth/admin/users/reset-password/`, {
+    const response = await apiClient.post(API_URLS.RESET_PASSWORD, {
       user_id: userId,
       password,
     });
     return response.data;
-  } catch (err) {
-    throw err.response?.data || { error: "Failed to reset password" };
+  } catch (error) {
+    throw error
   }
 };
 

@@ -31,7 +31,11 @@ const API_URLS = {
 
   // SUBSCRIPTIONS
   SUBSCRIPTIONS: "/api/v3/subscriptions/admin/subscription-plans/",
-  SUBSCRIPTION: (id) => `/api/v3/subscriptions/admin/subscription-plans/${id}/`
+  SUBSCRIPTION: (id) => `/api/v3/subscriptions/admin/subscription-plans/${id}/`,
+
+
+  // RESET PASSWORD
+  RESET_PASSWORD: '/api/v1/auth/admin/users/reset-password/',
 };
 
 export default API_URLS;

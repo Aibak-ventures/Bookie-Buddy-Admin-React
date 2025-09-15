@@ -19,9 +19,11 @@ const ResetPasswordModal = ({ isOpen, onClose, onReset, userId }) => {
     try {
       setLoading(true);
       const response = await onReset(userId, password);
-      alert("Password reset successfully");
+      
+      alert(response?.message || "Password reset successfully");
       onClose();
     } catch (err) {
+      
       alert(err?.error || err?.response?.data?.error || "Failed to reset password");
     } finally {
       setLoading(false);

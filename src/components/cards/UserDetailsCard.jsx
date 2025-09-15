@@ -86,19 +86,22 @@ const UserDetailsCard = ({ userData, onToggleStatus, onEdit }) => {
       </div>
 
       {/* Actions */}
-      <div className="mt-6 flex space-x-2 flex-wrap">
+     {/* Actions */}
+      <div className="mt-6 grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {/* Edit */}
         <button
           onClick={onEdit}
-          className="flex items-center justify-center space-x-1 bg-blue-600 text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
+          className="flex items-center justify-center space-x-1 bg-blue-600 text-white py-1 px-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors w-full"
         >
           <Pencil className="w-4 h-4" />
           <span>Edit</span>
         </button>
 
+        {/* Block / Unblock */}
         {userData.is_active ? (
           <button
             onClick={() => setModalState(true)}
-            className="flex items-center justify-center space-x-1 bg-red-600 text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-red-700 transition-colors"
+            className="flex items-center justify-center space-x-1 bg-red-600 text-white py-1 px-2 rounded-md text-sm font-medium hover:bg-red-700 transition-colors w-full"
           >
             <Ban className="w-4 h-4" />
             <span>Block</span>
@@ -106,7 +109,7 @@ const UserDetailsCard = ({ userData, onToggleStatus, onEdit }) => {
         ) : (
           <button
             onClick={() => setModalState(true)}
-            className="flex items-center justify-center space-x-1 bg-green-600 text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-green-700 transition-colors"
+            className="flex items-center justify-center space-x-1 bg-green-600 text-white py-1 px-2 rounded-md text-sm font-medium hover:bg-green-700 transition-colors w-full"
           >
             <Unlock className="w-4 h-4" />
             <span>Unblock</span>
@@ -116,12 +119,12 @@ const UserDetailsCard = ({ userData, onToggleStatus, onEdit }) => {
         {/* Reset Password */}
         <button
           onClick={() => setShowResetModal(true)}
-          className="flex items-center justify-center space-x-1 bg-purple-600 text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors"
+          className="flex items-center justify-center space-x-1 bg-purple-600 text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors w-full"
         >
-          <Key className="w-4 h-4" />
           <span>Reset Password</span>
         </button>
       </div>
+
 
       {/* Confirmation Modal for block/unblock */}
       <ConfirmationModal
