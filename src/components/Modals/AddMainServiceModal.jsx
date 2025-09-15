@@ -55,8 +55,9 @@ const handleSubmit = async (e) => {
     }
     onClose();
   } catch (err) {
-    console.error("Failed to save service:", err);
-    alert("Failed to save service");
+    alert(`Failed :${err?.response?.data?.error}`)
+
+
   } finally {
     setSubmitting(false);
   }

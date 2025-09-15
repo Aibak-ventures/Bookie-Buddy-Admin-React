@@ -61,8 +61,8 @@ const Subscriptions = () => {
       setIsAddModalOpen(false);
       alert("Subscription plan added successfully");
     } catch (err) {
-      console.error(err);
-      alert("Failed to add subscription plan");
+      alert(`Failed :${err?.response?.data?.error}`)
+
     }
   };
 
@@ -75,8 +75,8 @@ const Subscriptions = () => {
       setEditingSubscription(null);
       await loadSubscriptions();
     } catch (err) {
-      console.error(err);
-      alert("Failed to update subscription plan");
+        alert(`Failed :${err?.response?.data?.error}`)
+
     }
   };
 
@@ -88,8 +88,8 @@ const Subscriptions = () => {
       setDeleteModal({ isOpen: false, subscriptionId: null });
       await loadSubscriptions();
     } catch (err) {
-      console.error(err);
-      alert("Failed to delete subscription plan");
+      alert(`Failed :${err?.response?.data?.error}`)
+
     }
   };
 

@@ -42,7 +42,9 @@ const AddSubscriptionModal = ({
         const data = await fetchFeatures();
         setAvailableFeatures(data.results || []);
       } catch (err) {
-        console.error("Failed to load features:", err);
+        alert(`Failed :${err?.response?.data?.error}`)
+
+
       }
     };
     loadFeatures();

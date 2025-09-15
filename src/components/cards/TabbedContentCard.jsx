@@ -1,8 +1,6 @@
 import React from 'react';
 import AssociateUsersTab from '../tabs/single shop tabs/AssociateUsersTab';
-import SubscriptionTab from '../tabs/single shop tabs/SubscriptionTab';
 import ServicesProductsTab from '../tabs/single shop tabs/ServicesProductsTab';
-import ActivitiesContent from '../tabs/single shop tabs/ActivitiesContent';
 
 
 const TabbedContentCard = ({ tabs, activeTab, setActiveTab,shopId ,shopName }) => {

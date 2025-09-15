@@ -60,6 +60,7 @@ const Users = () => {
 
   // Handle user add
   const handleAddUser = async (userData) => {
+    try{
       const response = await createUser(userData);
       
       if (response?.id) {
@@ -68,6 +69,14 @@ const Users = () => {
         // Refresh users
         setCurrentUrl('/api/v1/auth/admin/users/');
       }
+
+    }
+    catch(err){
+     alert(`Failed :${err?.response?.data?.error}`)
+
+    }
+      
+      
   
   };
 

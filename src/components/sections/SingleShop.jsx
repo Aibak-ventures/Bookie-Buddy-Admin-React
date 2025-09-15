@@ -13,7 +13,6 @@ const SingleShop = () => {
   const [activeTab, setActiveTab] = useState('associate-users');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  console.log("shop data",shopData);
   
 
   const tabs = [

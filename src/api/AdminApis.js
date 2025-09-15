@@ -184,16 +184,34 @@ export const detachUserFromShop = async (id) => {
 
 
 // change role of the user
-export const changeUserRole = async (shopId, userId, newRole) => {
+export const changeUserRole = async (shopId, object_id, newRole) => {
   const response = await apiClient.patch(
-    `/api/v1/shop/admin/link-user/${shopId}/`,
+    `/api/v1/shop/admin/link-user/${object_id}/`,
     {
-      user_id: userId,
       role: newRole,
     }
   );
   return response.data;
 };
+
+
+// reset password
+// AdminApis.js
+import axios from "axios";
+
+
+export const resetUserPassword = async (userId, password) => {
+  try {
+    const response = await apiClient.post(`${BASE_URL}/api/v1/auth/admin/users/reset-password/`, {
+      user_id: userId,
+      password,
+    });
+    return response.data;
+  } catch (err) {
+    throw err.response?.data || { error: "Failed to reset password" };
+  }
+};
+
 
 ///////////////////////////////////////////////////////////////   SHOP RELATED APIS  /////////////////////////////////////////////
 
@@ -476,7 +494,8 @@ export const updateFeature = async (id, featureData) => {
 
 // Delete Feature
 export const deleteFeature = async (id) => {
-  await apiClient.delete(`${API_URLS.FEATURES_URL}${id}/`);
+  const response =  await apiClient.delete(`${API_URLS.FEATURES_URL}${id}/`);
+  return response
 };
 
 

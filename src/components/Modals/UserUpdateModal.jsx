@@ -72,8 +72,10 @@ const UserUpdateModal = ({ isOpen, onClose, user, onUpdate }) => {
       await updateUserDetails(user.id, dataToSend);
       onUpdate();
       onClose();
-    } catch (error) {
-      alert('Failed to update user');
+    } catch (err) {
+         alert(`Failed :${err?.response?.data?.error}`)
+
+
     } finally {
       setIsSubmitting(false);
     }

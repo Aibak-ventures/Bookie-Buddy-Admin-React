@@ -1,26 +1,27 @@
-// components/cards/UserDetailsCard.jsx
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
   Phone, Mail, User, Shield,
-  CheckCircle, XCircle, Ban, Unlock, Pencil
-} from 'lucide-react';
-import ConfirmationModal from '../Modals/ConfirmationModal';
-import { blockUnblockUser } from '../../api/AdminApis';
+  CheckCircle, XCircle, Ban, Unlock, Pencil, Key
+} from "lucide-react";
+import ConfirmationModal from "../Modals/ConfirmationModal";
+import { blockUnblockUser, resetUserPassword } from "../../api/AdminApis";
+import ResetPasswordModal from "../Modals/ResetPasswordModal";
 
 const UserDetailsCard = ({ userData, onToggleStatus, onEdit }) => {
   const [modalState, setModalState] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [showResetModal, setShowResetModal] = useState(false);
 
   const getRoleColor = (role) => {
     switch (role) {
-      case 'OWNER':
-        return 'bg-red-100 text-red-800 border-red-200';
-      case 'ADMIN':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'STAFF':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case "OWNER":
+        return "bg-red-100 text-red-800 border-red-200";
+      case "ADMIN":
+        return "bg-blue-100 text-blue-800 border-blue-200";
+      case "STAFF":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
       default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return "bg-gray-100 text-gray-800 border-gray-200";
     }
   };
 
@@ -31,8 +32,8 @@ const UserDetailsCard = ({ userData, onToggleStatus, onEdit }) => {
       if (onToggleStatus) {
         onToggleStatus(userData.id, userData.is_active);
       }
-    } catch (error) {
-      console.error('Failed to toggle status:', error);
+    } catch (err) {
+      alert(`Failed: ${err?.error || "Unable to update status"}`);
     } finally {
       setIsProcessing(false);
       setModalState(false);
@@ -41,6 +42,7 @@ const UserDetailsCard = ({ userData, onToggleStatus, onEdit }) => {
 
   return (
     <div className="bg-white rounded-lg border border-gray-200 shadow-sm p-6">
+      {/* Top User Info */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center space-x-3">
           <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
@@ -63,6 +65,7 @@ const UserDetailsCard = ({ userData, onToggleStatus, onEdit }) => {
         </div>
       </div>
 
+      {/* Contact Info */}
       <div className="space-y-3">
         <div className="flex items-center space-x-3">
           <Phone className="w-4 h-4 text-gray-400" />
@@ -72,9 +75,8 @@ const UserDetailsCard = ({ userData, onToggleStatus, onEdit }) => {
           <Mail className="w-4 h-4 text-gray-400" />
           <span className="text-gray-700">{userData.email}</span>
         </div>
-       
         <div className="text-gray-700">
-          Status:{' '}
+          Status:{" "}
           {userData.is_active ? (
             <span className="text-green-600 font-medium">Active</span>
           ) : (
@@ -83,7 +85,8 @@ const UserDetailsCard = ({ userData, onToggleStatus, onEdit }) => {
         </div>
       </div>
 
-      <div className="mt-6 flex space-x-2">
+      {/* Actions */}
+      <div className="mt-6 flex space-x-2 flex-wrap">
         <button
           onClick={onEdit}
           className="flex items-center justify-center space-x-1 bg-blue-600 text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors"
@@ -109,15 +112,32 @@ const UserDetailsCard = ({ userData, onToggleStatus, onEdit }) => {
             <span>Unblock</span>
           </button>
         )}
+
+        {/* Reset Password */}
+        <button
+          onClick={() => setShowResetModal(true)}
+          className="flex items-center justify-center space-x-1 bg-purple-600 text-white py-2 px-4 rounded-md text-sm font-medium hover:bg-purple-700 transition-colors"
+        >
+          <Key className="w-4 h-4" />
+          <span>Reset Password</span>
+        </button>
       </div>
 
-      {/* Confirmation Modal */}
+      {/* Confirmation Modal for block/unblock */}
       <ConfirmationModal
         isOpen={modalState}
         onClose={() => setModalState(false)}
         onConfirm={handleConfirmToggle}
-        message={`Are you sure you want to ${userData.is_active ? 'block' : 'unblock'} this user?`}
+        message={`Are you sure you want to ${userData.is_active ? "block" : "unblock"} this user?`}
         loading={isProcessing}
+      />
+
+      {/* Reset Password Modal */}
+      <ResetPasswordModal
+        isOpen={showResetModal}
+        onClose={() => setShowResetModal(false)}
+        userId={userData.id}
+        onReset={resetUserPassword}
       />
     </div>
   );

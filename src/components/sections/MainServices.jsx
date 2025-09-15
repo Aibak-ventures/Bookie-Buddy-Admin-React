@@ -68,8 +68,8 @@ const MainServices = () => {
       setIsAddModalOpen(false);
       alert("Main service added successfully");
     } catch (err) {
-      console.error(err);
-      alert("Failed to add main service");
+      alert(`Failed :${err?.response?.data?.error}`)
+
     }
   };
 
@@ -82,8 +82,8 @@ const MainServices = () => {
       setEditingService(null);
       await loadServices();
     } catch (err) {
-      console.error(err);
-      alert("Failed to update service");
+      alert(`Failed :${err?.response?.data?.error}`)
+
     }
   };
 
@@ -95,8 +95,8 @@ const MainServices = () => {
       setDeleteModal({ isOpen: false, serviceId: null });
       await loadServices();
     } catch (err) {
-      console.error(err);
-      alert("Failed to delete service");
+    alert(`Failed :${err?.response?.data?.error}`)
+
     }
   };
 
@@ -110,7 +110,8 @@ const MainServices = () => {
         )
       );
     } catch (err) {
-      alert("Failed to update status");
+     alert(`Failed :${err?.response?.data?.error}`)
+
     }
   };
 

@@ -38,6 +38,9 @@ const AddServiceModal = ({ isOpen, onClose, shop_id, onSuccess }) => {
         }));
       } catch (err) {
         console.error('Error fetching services', err);
+      alert(`Failed :${err?.response?.data?.error}`)
+
+
       }
     };
 
@@ -78,8 +81,9 @@ const AddServiceModal = ({ isOpen, onClose, shop_id, onSuccess }) => {
       // ✅ Close modal
       onClose();
     } catch (error) {
-      console.error("Failed to assign services:", error);
-      alert("Failed to assign services.");
+      alert(`Failed :${err?.response?.data?.error}`)
+
+
     } finally {
       setIsSubmitting(false);
     }

@@ -26,7 +26,9 @@ const AddFeatureModal = ({ isOpen, onClose, onAdd, onUpdate, featureData }) => {
         const data = await fetchFeatures();
         setAvailableFeatures(data.results || []);
       } catch (err) {
-        console.error("Failed to fetch features", err);
+        alert(`Failed :${err?.response?.data?.error}`)
+
+        
       }
     };
     loadFeatures();

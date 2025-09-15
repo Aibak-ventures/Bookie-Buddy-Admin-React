@@ -42,8 +42,9 @@ const ServicesProductsTab = ({ shop_id }) => {
       is_active: !currentStatus
     });
     setReload(prev => !prev); // trigger re-fetch
-  } catch (error) {
-    console.error("Failed to toggle service status:", error);
+  } catch (err) {
+      alert(`Failed :${err?.response?.data?.error}`)
+
   }
 };
 

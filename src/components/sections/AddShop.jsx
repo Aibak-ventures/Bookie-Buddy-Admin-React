@@ -65,8 +65,10 @@ const ShopRegistrationForm = () => {
         alert('Shop registered!');
         navigate('/shops');
       }
-    } catch (error) {
-      console.error('Shop registration failed:', error);
+    } catch (err) {
+      alert(`Failed :${err?.response?.data?.error}`)
+
+
     } finally {
       setSubmitting(false);
     }

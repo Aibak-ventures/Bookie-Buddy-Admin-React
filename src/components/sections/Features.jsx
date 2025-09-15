@@ -64,7 +64,8 @@ const Features = () => {
       alert("Feature added successfully");
     } catch (err) {
       console.error(err);
-      alert("Failed to add feature");
+      alert(`Failed ${err}`);
+
     }
   };
 
@@ -90,8 +91,7 @@ const Features = () => {
       setDeleteModal({ isOpen: false, featureId: null });
       await loadFeatures();
     } catch (err) {
-      console.error(err);
-      alert("Failed to delete feature");
+      alert(`Failed :${err?.response?.data?.error}`);
     }
   };
 

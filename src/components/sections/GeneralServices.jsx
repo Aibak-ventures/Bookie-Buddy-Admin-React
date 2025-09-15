@@ -43,7 +43,6 @@ const GeneralServices = () => {
     setError(null);
     try {
       const data = await fetchGeneralServices(currentUrl);
-      console.log("data",data);
       
       setServices(data.results);
       setCount(data.count);
@@ -69,8 +68,9 @@ const GeneralServices = () => {
       setIsAddModalOpen(false);
       alert("General service added successfully");
     } catch (err) {
-      console.error(err);
-      alert("Failed to add general service");
+     alert(`Failed :${err?.response?.data?.error}`)
+
+      
     }
   };
 
@@ -83,8 +83,9 @@ const GeneralServices = () => {
       setEditingService(null);
       await loadServices();
     } catch (err) {
-      console.error(err);
-      alert("Failed to update general service");
+      alert(`Failed :${err?.response?.data?.error}`)
+
+      
     }
   };
 
@@ -96,8 +97,9 @@ const GeneralServices = () => {
       setDeleteModal({ isOpen: false, serviceId: null });
       await loadServices();
     } catch (err) {
-      console.error(err);
-      alert("Failed to delete general service");
+      alert(`Failed :${err?.response?.data?.error}`)
+
+      
     }
   };
 
@@ -111,7 +113,9 @@ const GeneralServices = () => {
         )
       );
     } catch (err) {
-      alert("Failed to update status");
+    alert(`Failed :${err?.response?.data?.error}`)
+
+
     }
   };
 

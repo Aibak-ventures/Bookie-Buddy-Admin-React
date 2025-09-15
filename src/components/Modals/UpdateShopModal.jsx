@@ -104,8 +104,10 @@ const handleSubmit = async () => {
       alert("updated successfully")
       onClose?.();
     }
-  } catch (error) {
-    console.error('Update failed:', error);
+  } catch (err) {
+    alert(`Failed :${err?.response?.data?.error}`)
+
+
   } finally {
     setSubmitting(false);
   }
