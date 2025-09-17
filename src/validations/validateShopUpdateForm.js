@@ -13,7 +13,9 @@ export const validateShopUpdateForm = (formData) => {
  if (!/^\d{10}$/.test(formData.phone)) {
     errors.phone = 'Phone must be 10 digits';
   }
+
  if (formData.phone2 && !/^\d{10}$/.test(formData.phone2)) {
+
     errors.phone2 = 'Phone must be 10 digits';
   }
   // Email validation
