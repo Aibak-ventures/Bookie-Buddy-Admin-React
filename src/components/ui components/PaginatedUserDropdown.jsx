@@ -4,11 +4,13 @@ import { fetchUsers } from "../../api/AdminApis";
 
 const PaginatedUserDropdown = ({ value, onChange, error, disabled }) => {
   const [fullUsers, setFullUsers] = useState([]);
+  const [filteredUsers, setFilteredUsers] = useState([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [nextPageUrl, setNextPageUrl] = useState(null);
   const [prevPageUrl, setPrevPageUrl] = useState(null);
   const [currentPageUrl, setCurrentPageUrl] = useState("/api/v1/auth/admin/users/");
+  const [searchTerm, setSearchTerm] = useState("");
 
   const dropdownRef = useRef(null);
 
@@ -34,6 +36,18 @@ const PaginatedUserDropdown = ({ value, onChange, error, disabled }) => {
     loadUsers();
   }, [currentPageUrl, dropdownOpen]);
 
+  // Filter users when search term changes
+  useEffect(() => {
+    const term = searchTerm.toLowerCase();
+    setFilteredUsers(
+      fullUsers.filter(
+        (u) =>
+          u.full_name?.toLowerCase().includes(term) ||
+          u.phone?.toLowerCase().includes(term)
+      )
+    );
+  }, [searchTerm, fullUsers]);
+
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -50,7 +64,6 @@ const PaginatedUserDropdown = ({ value, onChange, error, disabled }) => {
     };
   }, [dropdownOpen]);
 
-  // Get label for selected user (using value as user.id)
   const selectedUserLabel = (() => {
     const selectedUser = fullUsers.find((u) => u.id === value?.id);
     return selectedUser
@@ -73,18 +86,30 @@ const PaginatedUserDropdown = ({ value, onChange, error, disabled }) => {
       {error && <p className="text-red-600 text-sm mt-1 ml-1">{error}</p>}
 
       {dropdownOpen && (
-        <div className="absolute z-50 mt-1 max-h-60 w-full overflow-auto rounded border border-gray-300 bg-white shadow-lg">
+        <div className="absolute z-50 mt-1 max-h-80 w-full overflow-auto rounded border border-gray-300 bg-white shadow-lg">
+          {/* Search Input */}
+          <div className="p-2 border-b border-gray-200">
+            <input
+              type="text"
+              placeholder="Search by name or phone..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+            />
+          </div>
+
           {loading ? (
             <p className="p-2 text-center text-blue-500">Loading...</p>
-          ) : fullUsers.length === 0 ? (
+          ) : filteredUsers.length === 0 ? (
             <p className="p-2 text-center text-gray-500">No users found</p>
           ) : (
-            fullUsers.map((user) => (
+            filteredUsers.map((user) => (
               <div
                 key={user.id}
                 onClick={() => {
                   onChange(user);
                   setDropdownOpen(false);
+                  setSearchTerm("");
                 }}
                 className={`cursor-pointer px-3 py-2 hover:bg-blue-100 ${
                   value?.id === user.id ? "bg-blue-200 font-semibold" : ""
@@ -94,6 +119,8 @@ const PaginatedUserDropdown = ({ value, onChange, error, disabled }) => {
               </div>
             ))
           )}
+
+          {/* Pagination */}
           <div className="flex justify-between border-t border-gray-300 px-3 py-1 bg-gray-50">
             <button
               disabled={!prevPageUrl || disabled}

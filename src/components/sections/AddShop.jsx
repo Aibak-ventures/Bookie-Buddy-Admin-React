@@ -30,6 +30,7 @@ const ShopRegistrationForm = () => {
     shop_address: '',
     shop_city: '',
     shop_pincode: '',
+     invoice_start_from: '',
   });
 
   const [formErrors, setFormErrors] = useState({});
@@ -124,6 +125,16 @@ const ShopRegistrationForm = () => {
                 />
                 {formErrors.shop_email && <p className="text-sm text-red-500">{formErrors.shop_email}</p>}
               </div>
+              <div>
+                  <FormInput
+                    label="Invoice Start From"
+                    type="date"
+                    value={formData.invoice_start_from}
+                    onChange={handleInputChange('invoice_start_from')}
+                  />
+                  {formErrors.invoice_start_from && <p className="text-sm text-red-500">{formErrors.invoice_start_from}</p>}
+                </div>
+
               <FormInput
                 label="GST Number"
                 value={formData.shop_gst_number}

@@ -82,6 +82,8 @@ const ShopDetailsCard = ({ shopData }) => {
           )}
           
           <ShopDetailItem icon={ProjectorIcon} text={`Total products: ${shopData.total_product_count}`} />
+          <ShopDetailItem icon={ProjectorIcon} text={`Invoice start from : ${shopData.invoice_start_from || 'N/A'}`} />
+
 
 
 

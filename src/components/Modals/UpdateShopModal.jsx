@@ -7,6 +7,7 @@ import { validateShopUpdateForm } from '../../validations/validateShopUpdateForm
 import FormSelect from '../ui components/FormSelect';
 
 const UpdateShopModal = ({ shopData, onClose, onSuccess }) => {
+  
   const initialForm = {
     name: shopData.name || '',
     phone: shopData.phone || '',
@@ -19,6 +20,7 @@ const UpdateShopModal = ({ shopData, onClose, onSuccess }) => {
     pincode: shopData.pincode || '',
     place: shopData.place || '',
     extra_stock_limit: shopData.extra_stock_limit || '',
+    invoice_start_from: shopData.invoice_start_from || '',
     terms_and_conditions: Array.isArray(shopData.terms_and_conditions)
       ? shopData.terms_and_conditions
       : [''],
@@ -30,6 +32,7 @@ const UpdateShopModal = ({ shopData, onClose, onSuccess }) => {
   const [submitting, setSubmitting] = useState(false);
 
   const handleChange = (field) => (e) => {
+    
     setFormData((prev) => ({ ...prev, [field]: e.target.value }));
     if (formErrors[field]) {
       setFormErrors((prev) => ({ ...prev, [field]: '' }));
@@ -97,8 +100,10 @@ const handleSubmit = async () => {
 
   setSubmitting(true);
 
+
   try {
     const res = await updateShopDetails(shopData.id, patchData);
+    
     if (res.status === 200 || res.status === 204) {
       onSuccess?.();
       alert("updated successfully")
@@ -191,6 +196,12 @@ const handleSubmit = async () => {
           onChange={handleChange('extra_stock_limit')}
           onWheel={(e) => e.target.blur()}   // 👈 prevents scroll changing value
         />
+        <FormInput
+  label="Invoice Start From"
+  type="date"
+  value={formData.invoice_start_from}
+  onChange={handleChange('invoice_start_from')}
+/>
 
         </div>
 

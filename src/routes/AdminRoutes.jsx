@@ -13,6 +13,7 @@ import MainServices from "../components/sections/MainServices";
 import GeneralServices from "../components/sections/GeneralServices";
 import Features from "../components/sections/Features";
 import Subscription from "../components/sections/Subscription";
+import PushNotifications from "../components/sections/PushNotifications";
 
 
 
@@ -38,6 +39,8 @@ const AdminRoutes = () => {
           <Route path="general-services" element={<GeneralServices />} />
           <Route path="feature-management" element={<Features />} />
           <Route path="subscription-management" element={<Subscription />} />
+          <Route path="push-notifications" element={<PushNotifications />} />
+          
 
           <Route path="add-shop" element={<AddShop />} />
           <Route path="shops/:shopId" element={<SingleShop />} />

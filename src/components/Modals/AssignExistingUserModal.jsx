@@ -36,7 +36,7 @@ const AssignExistingUserModal = ({ isOpen, onClose, shopId, onUserAssigned }) =>
       await linkUserToShop(shopId, selectedUser.id, role);
       alert("User assigned successfully");
 
-      const linkedOn = new Date().toLocaleDateString("en-GB");
+      const linkedOn = new Date().toLocaleDateString("en-GB").replace(/\//g, "-");
       onUserAssigned({ ...selectedUser, role, linked_on: linkedOn });
 
       onClose();

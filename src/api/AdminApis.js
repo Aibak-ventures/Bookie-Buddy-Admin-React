@@ -277,6 +277,11 @@ export const registerShopWithUser = async (formData, logoFile) => {
     data.append('shop_state', formData.shop_state);             // state -> shop_state
     data.append('shop_pincode', formData.shop_pincode);         // postCode -> shop_pincode
 
+     // Optional invoice_start_from
+    if (formData.invoice_start_from) {
+      data.append('invoice_start_from', formData.invoice_start_from);
+    }
+
     if (logoFile) {
       data.append('image', logoFile);
     }
@@ -291,6 +296,41 @@ export const registerShopWithUser = async (formData, logoFile) => {
     throw error;
   }
 };
+
+
+
+// Create shop only
+export const createShop = async (formData, logoFile) => {
+  try {
+    const data = new FormData();
+
+    data.append('name', formData.name);
+    data.append('place', formData.place);
+    data.append('phone', formData.phone);                
+    data.append('phone2', formData.phone2 || '');
+    data.append('email', formData.email);                
+    data.append('address', formData.address);            
+    data.append('city', formData.city);                  
+    data.append('state', formData.state);                
+    data.append('pincode', formData.pincode);            
+    data.append('gst_number', formData.gst_number);
+
+     if (formData.invoice_start_from) {
+      data.append('invoice_start_from', formData.invoice_start_from);
+    }
+
+    if (logoFile) {
+      data.append('img', logoFile);                      
+    }
+
+    const response = await multipartClient.post(API_URLS.SHOPS, data);
+    return response;
+  } catch (error) {
+    console.error('Error creating shop:', error);
+    throw error;
+  }
+};
+
 
 
 
