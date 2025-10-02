@@ -36,6 +36,9 @@ const API_URLS = {
 
   // RESET PASSWORD
   RESET_PASSWORD: '/api/v1/auth/admin/users/reset-password/',
+
+  // PUSH NOTIFICATIONS
+  PUSH_NOTIFICATION:'/api/v3/notifications/admin/notifications/send/'
 };
 
 export default API_URLS;

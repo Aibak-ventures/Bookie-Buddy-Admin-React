@@ -220,6 +220,7 @@ export const resetUserPassword = async (userId, password) => {
 export const fetchShops = async (url = API_URLS.SHOPS) => {
   try {
     const response = await apiClient.get(url);
+    console.log('Fetched shops response:', response);
     return response.data;
   } catch (error) {
     console.error('Failed to fetch shops:', error);
@@ -562,4 +563,19 @@ export const updateSubscription = async (id, data) => {
 export const deleteSubscription = async (id) => {
   const response = await apiClient.delete(API_URLS.SUBSCRIPTION(id));
   return response.data;
+};
+
+
+
+// #############################################  Push Notifications  ##############################################
+export const sendPushNotification = async (data) => {
+  console.log("Sending push notification with data:", data);
+  
+  try {
+    const response = await multipartClient.post(API_URLS.PUSH_NOTIFICATION, data);
+    return response.data;
+  } catch (error) {
+    console.error("Push Notification API Error:", error);
+    throw error;
+  }
 };

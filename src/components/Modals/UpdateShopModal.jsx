@@ -198,7 +198,7 @@ const handleSubmit = async () => {
         />
         <FormInput
   label="Invoice Start From"
-  type="date"
+  type="number"
   value={formData.invoice_start_from}
   onChange={handleChange('invoice_start_from')}
 />

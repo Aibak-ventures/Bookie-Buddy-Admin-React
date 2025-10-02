@@ -145,7 +145,7 @@ const CreateShopModal = ({ isOpen, onClose, onCreated }) => {
              <div>
               <FormInput
                 label="Invoice Start From"
-                type="date"
+                type="number"
                 value={formData.invoice_start_from}
                 onChange={handleInputChange('invoice_start_from')}
               />

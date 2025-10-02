@@ -5,9 +5,10 @@ import FormSelect from "../ui components/FormSelect";
 import PaginatedUserDropdown from "../ui components/PaginatedUserDropdown";
 
 const roleOptions = [
-  { value: "OWNER", label: "Owner" },
-  { value: "STAFF", label: "Staff" },
-];
+    { label: 'OWNER', value: 'OWNER' },
+    { label: 'MANAGER', value: 'MANAGER' },
+    { label: 'STAFF', value: 'STAFF' },
+  ];
 
 const AssignExistingUserModal = ({ isOpen, onClose, shopId, onUserAssigned }) => {
   // Now store full selected user object
