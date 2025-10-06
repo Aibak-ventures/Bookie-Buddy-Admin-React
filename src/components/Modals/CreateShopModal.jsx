@@ -19,7 +19,8 @@ const CreateShopModal = ({ isOpen, onClose, onCreated }) => {
     address: '',
     city: '',
     pincode: '',
-    invoice_start_from: '',
+    sale_start_id: '',
+    booking_start_id: '',
     
   });
 
@@ -144,15 +145,27 @@ const CreateShopModal = ({ isOpen, onClose, onCreated }) => {
             </div>
              <div>
               <FormInput
-                label="Invoice Start From"
+                label="Invoice Start For Booking"
                 type="number"
-                value={formData.invoice_start_from}
-                onChange={handleInputChange('invoice_start_from')}
+                value={formData.booking_start_id}
+                onChange={handleInputChange('booking_start_id')}
               />
-              {errors.invoice_start_from && (
-                <p className="text-sm text-red-500">{errors.invoice_start_from}</p>
+              {errors.booking_start_id && (
+                <p className="text-sm text-red-500">{errors.booking_start_id}</p>
               )}
             </div>
+            <div>
+              <FormInput
+                label="Invoice Start For Sales"
+                type="number"
+                value={formData.sale_start_id}
+                onChange={handleInputChange('sale_start_id')}
+              />
+              {errors.sale_start_id && (
+                <p className="text-sm text-red-500">{errors.sale_start_id}</p>
+              )}
+            </div>
+
 
 
             <div>

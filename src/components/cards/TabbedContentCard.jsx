@@ -1,6 +1,7 @@
 import React from 'react';
 import AssociateUsersTab from '../tabs/single shop tabs/AssociateUsersTab';
 import ServicesProductsTab from '../tabs/single shop tabs/ServicesProductsTab';
+import EngagmentChart from '../tabs/single shop tabs/EngagmentChart';
 
 
 const TabbedContentCard = ({ tabs, activeTab, setActiveTab,shopId ,shopName }) => {
@@ -27,9 +28,8 @@ const TabbedContentCard = ({ tabs, activeTab, setActiveTab,shopId ,shopName }) =
 
       <div className="p-6">
         {activeTab === 'associate-users' && <AssociateUsersTab shopId={shopId} shopName={shopName}/>}
-        {/* {activeTab === 'subscription' && <SubscriptionTab />} */}
         {activeTab === 'services-products' && <ServicesProductsTab shop_id={shopId} />}
-        {/* {activeTab === 'activities' && <ActivitiesContent />} */}
+        {activeTab === 'engagement' && <EngagmentChart shop_id={shopId} />}
         
       </div>
     </div>

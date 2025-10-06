@@ -19,7 +19,7 @@ const SingleShop = () => {
     { id: 'associate-users', label: 'Associate users', icon: Users },
     // { id: 'subscription', label: 'Subscription', icon: CreditCard },
     { id: 'services-products', label: 'Services & products', icon: Package },
-    // { id: 'activities', label: 'Activities', icon: BarChart3 }
+    { id: 'engagement', label: 'Engagement', icon: BarChart3 }
   ];
 
   useEffect(() => {

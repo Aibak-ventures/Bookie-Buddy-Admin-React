@@ -104,7 +104,6 @@ export const fetchUserShops = async (userId) => {
 
 //Block/Unblock User
 export const blockUnblockUser = async (userId, isActive) => {
-  console.log("this is my action ",userId,isActive);
   
 
   try {
@@ -220,7 +219,6 @@ export const resetUserPassword = async (userId, password) => {
 export const fetchShops = async (url = API_URLS.SHOPS) => {
   try {
     const response = await apiClient.get(url);
-    console.log('Fetched shops response:', response);
     return response.data;
   } catch (error) {
     console.error('Failed to fetch shops:', error);
@@ -277,10 +275,12 @@ export const registerShopWithUser = async (formData, logoFile) => {
     data.append('shop_city', formData.shop_city);               // city -> shop_city
     data.append('shop_state', formData.shop_state);             // state -> shop_state
     data.append('shop_pincode', formData.shop_pincode);         // postCode -> shop_pincode
-
      // Optional invoice_start_from
-    if (formData.invoice_start_from) {
-      data.append('invoice_start_from', formData.invoice_start_from);
+    if (formData.booking_start_id) {
+      data.append('booking_start_id', formData.booking_start_id);
+    }
+     if (formData.sale_start_id) {
+      data.append('sale_start_id', formData.sale_start_id);
     }
 
     if (logoFile) {
@@ -316,8 +316,11 @@ export const createShop = async (formData, logoFile) => {
     data.append('pincode', formData.pincode);            
     data.append('gst_number', formData.gst_number);
 
-     if (formData.invoice_start_from) {
-      data.append('invoice_start_from', formData.invoice_start_from);
+     if (formData.booking_start_id) {
+      data.append('booking_start_id', formData.booking_start_id);
+    }
+     if (formData.sale_start_id) {
+      data.append('sale_start_id', formData.sale_start_id);
     }
 
     if (logoFile) {
@@ -338,6 +341,7 @@ export const createShop = async (formData, logoFile) => {
 // update shop details
 
 export const updateShopDetails = async (shopId, data) => {
+  
   
    return await multipartClient.patch(API_URLS.SINGLE_SHOP(shopId), data);
 };
@@ -364,6 +368,17 @@ export const toggleShopServiceStatus = async ({ shop_service_id, is_active }) =>
 };
 
 
+
+// shop report
+export const getShopReport = async (data) => {
+  try {
+    const response = await apiClient.post(API_URLS.SHOP_REPORT, data);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching report:", error);
+    throw error;
+  }
+};
 
 
 
@@ -516,7 +531,6 @@ export const deleteGeneralService = async (id) => {
 // Fetch Features
 export const fetchFeatures = async () => {
   const response = await apiClient.get(API_URLS.FEATURES_URL);
-  console.log("data",response);
   
   return response.data;
 };
@@ -569,7 +583,6 @@ export const deleteSubscription = async (id) => {
 
 // #############################################  Push Notifications  ##############################################
 export const sendPushNotification = async (data) => {
-  console.log("Sending push notification with data:", data);
   
   try {
     const response = await multipartClient.post(API_URLS.PUSH_NOTIFICATION, data);

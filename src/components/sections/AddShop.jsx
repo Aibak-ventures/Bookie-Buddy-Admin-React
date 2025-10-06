@@ -30,7 +30,9 @@ const ShopRegistrationForm = () => {
     shop_address: '',
     shop_city: '',
     shop_pincode: '',
-     invoice_start_from: '',
+     booking_start_id: '',
+     sale_start_id: '',
+
   });
 
   const [formErrors, setFormErrors] = useState({});
@@ -129,10 +131,19 @@ const ShopRegistrationForm = () => {
                   <FormInput
                     label="Invoice Start From"
                     type="number"
-                    value={formData.invoice_start_from}
-                    onChange={handleInputChange('invoice_start_from')}
+                    value={formData.booking_start_id}
+                    onChange={handleInputChange('booking_start_id')}
                   />
-                  {formErrors.invoice_start_from && <p className="text-sm text-red-500">{formErrors.invoice_start_from}</p>}
+                  {formErrors.booking_start_id && <p className="text-sm text-red-500">{formErrors.booking_start_id}</p>}
+                </div>
+                <div>
+                  <FormInput
+                    label="Invoice Start For Sales"
+                    type="number"
+                    value={formData.sale_start_id}
+                    onChange={handleInputChange('sale_start_id')}
+                  />
+                  {formErrors.sale_start_id && <p className="text-sm text-red-500">{formErrors.sale_start_id}</p>}
                 </div>
 
               <FormInput
