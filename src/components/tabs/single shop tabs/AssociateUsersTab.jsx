@@ -17,6 +17,7 @@ const AssociateUsersTab = ({ shopId, shopName }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isAssignExistingModalOpen, setIsAssignExistingModalOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
 
   // confirmation modal state
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
@@ -125,21 +126,56 @@ const AssociateUsersTab = ({ shopId, shopName }) => {
       <div className="flex justify-between items-center mb-6">
         <h3 className="text-lg font-semibold">Associate Users</h3>
 
-        <button
-          onClick={() => setIsAssignExistingModalOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
-        >
-          + Assign Existing User
-        </button>
+        {/* Single Button with Dropdown */}
+        <div className="relative inline-block text-left">
+          <button
+            onClick={() => setDropdownOpen((prev) => !prev)}
+            className="inline-flex justify-center w-full gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none"
+          >
+            Assign User
+            <svg
+              className="-mr-1 ml-2 h-5 w-5"
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              aria-hidden="true"
+            >
+              <path
+                fillRule="evenodd"
+                d="M5.23 7.21a.75.75 0 011.06.02L10 11.585l3.71-4.355a.75.75 0 011.14.976l-4.25 5a.75.75 0 01-1.14 0l-4.25-5a.75.75 0 01.02-1.06z"
+                clipRule="evenodd"
+              />
+            </svg>
+          </button>
 
-        <button
-          onClick={() => setIsModalOpen(true)}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
-        >
-          <Plus size={16} />
-          Assign new user
-        </button>
+          {/* Dropdown options */}
+          {dropdownOpen && (
+            <div className="absolute right-0 mt-2 w-56 origin-top-right bg-white border border-gray-200 divide-y divide-gray-100 rounded-md shadow-lg z-50">
+              <div className="py-1">
+                <button
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  onClick={() => {
+                    setIsAssignExistingModalOpen(true);
+                    setDropdownOpen(false);
+                  }}
+                >
+                  Assign Existing User
+                </button>
+                <button
+                  className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  onClick={() => {
+                    setIsModalOpen(true);
+                    setDropdownOpen(false);
+                  }}
+                >
+                  Add New User
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
+
 
       {loading ? (
         <p className="text-blue-500">Loading users...</p>

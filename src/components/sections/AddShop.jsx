@@ -30,6 +30,9 @@ const ShopRegistrationForm = () => {
     shop_address: '',
     shop_city: '',
     shop_pincode: '',
+     booking_start_id: '',
+     sale_start_id: '',
+
   });
 
   const [formErrors, setFormErrors] = useState({});
@@ -124,6 +127,25 @@ const ShopRegistrationForm = () => {
                 />
                 {formErrors.shop_email && <p className="text-sm text-red-500">{formErrors.shop_email}</p>}
               </div>
+              <div>
+                  <FormInput
+                    label="Invoice Start From"
+                    type="number"
+                    value={formData.booking_start_id}
+                    onChange={handleInputChange('booking_start_id')}
+                  />
+                  {formErrors.booking_start_id && <p className="text-sm text-red-500">{formErrors.booking_start_id}</p>}
+                </div>
+                <div>
+                  <FormInput
+                    label="Invoice Start For Sales"
+                    type="number"
+                    value={formData.sale_start_id}
+                    onChange={handleInputChange('sale_start_id')}
+                  />
+                  {formErrors.sale_start_id && <p className="text-sm text-red-500">{formErrors.sale_start_id}</p>}
+                </div>
+
               <FormInput
                 label="GST Number"
                 value={formData.shop_gst_number}

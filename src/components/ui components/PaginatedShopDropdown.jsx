@@ -1,31 +1,33 @@
 import React, { useState, useEffect, useRef } from "react";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import { fetchUsers } from "../../api/AdminApis";
+import { fetchShops } from "../../api/AdminApis";
 
-const PaginatedUserDropdown = ({ value, onChange, error, disabled }) => {
-  const [fullUsers, setFullUsers] = useState([]);
-  const [filteredUsers, setFilteredUsers] = useState([]);
+const PaginatedShopDropdown = ({ value, onChange, error, disabled }) => {
+  const [shops, setShops] = useState([]);
+  const [filteredShops, setFilteredShops] = useState([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [nextPageUrl, setNextPageUrl] = useState(null);
   const [prevPageUrl, setPrevPageUrl] = useState(null);
-  const [currentPageUrl, setCurrentPageUrl] = useState("/api/v1/auth/admin/users/");
+  const [currentPageUrl, setCurrentPageUrl] = useState("/api/v1/shop/admin/shops/"); // adjust to your API
   const [searchTerm, setSearchTerm] = useState("");
 
   const dropdownRef = useRef(null);
 
+  // Fetch shops when dropdown opens or page changes
   useEffect(() => {
     if (!dropdownOpen) return;
 
-    const loadUsers = async () => {
+    const loadShops = async () => {
       setLoading(true);
       try {
-        const data = await fetchUsers(currentPageUrl);
-        setFullUsers(data.results);
+        const data = await fetchShops(currentPageUrl);
+        
+        setShops(data.results);
         setNextPageUrl(data.next);
         setPrevPageUrl(data.previous);
       } catch (err) {
-        setFullUsers([]);
+        setShops([]);
         setNextPageUrl(null);
         setPrevPageUrl(null);
       } finally {
@@ -33,21 +35,23 @@ const PaginatedUserDropdown = ({ value, onChange, error, disabled }) => {
       }
     };
 
-    loadUsers();
+    loadShops();
   }, [currentPageUrl, dropdownOpen]);
 
-  // Filter users when search term changes
+  // Filter shops by search term
   useEffect(() => {
     const term = searchTerm.toLowerCase();
-    setFilteredUsers(
-      fullUsers.filter(
-        (u) =>
-          u.full_name?.toLowerCase().includes(term) ||
-          u.phone?.toLowerCase().includes(term)
+    setFilteredShops(
+      shops.filter(
+        (s) =>
+          s.name?.toLowerCase().includes(term) ||
+          s.owner_name?.toLowerCase().includes(term) ||
+          s.phone?.toLowerCase().includes(term)
       )
     );
-  }, [searchTerm, fullUsers]);
+  }, [searchTerm, shops]);
 
+  // Close dropdown when clicked outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
@@ -64,23 +68,23 @@ const PaginatedUserDropdown = ({ value, onChange, error, disabled }) => {
     };
   }, [dropdownOpen]);
 
-  const selectedUserLabel = (() => {
-    const selectedUser = fullUsers.find((u) => u.id === value?.id);
-    return selectedUser
-      ? `${selectedUser.full_name || "(No Name)"} - ${selectedUser.phone || "No phone"}`
-      : "Select a user";
+  const selectedShopLabel = (() => {
+    const selectedShop = shops.find((s) => s.id === value?.id);
+    return selectedShop
+      ? `${selectedShop.name || "(No Name)"} - ${selectedShop.phone || "No phone"}`
+      : "Select a shop";
   })();
 
   return (
     <div className="relative" ref={dropdownRef}>
-      <label className="block mb-1 font-medium text-gray-700">User</label>
+      <label className="block mb-1 font-medium text-gray-700">Shop</label>
       <button
         type="button"
         disabled={disabled}
         onClick={() => setDropdownOpen((o) => !o)}
         className="w-full border border-gray-300 rounded px-3 py-2 text-left flex justify-between items-center"
       >
-        {selectedUserLabel}
+        {selectedShopLabel}
         {dropdownOpen ? <ChevronUp size={18} /> : <ChevronDown size={18} />}
       </button>
       {error && <p className="text-red-600 text-sm mt-1 ml-1">{error}</p>}
@@ -91,7 +95,7 @@ const PaginatedUserDropdown = ({ value, onChange, error, disabled }) => {
           <div className="p-2 border-b border-gray-200">
             <input
               type="text"
-              placeholder="Search by name or phone..."
+              placeholder="Search by shop name, owner, or phone..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full border border-gray-300 rounded px-2 py-1 text-sm"
@@ -100,22 +104,22 @@ const PaginatedUserDropdown = ({ value, onChange, error, disabled }) => {
 
           {loading ? (
             <p className="p-2 text-center text-blue-500">Loading...</p>
-          ) : filteredUsers.length === 0 ? (
-            <p className="p-2 text-center text-gray-500">No users found</p>
+          ) : filteredShops.length === 0 ? (
+            <p className="p-2 text-center text-gray-500">No shops found</p>
           ) : (
-            filteredUsers.map((user) => (
+            filteredShops.map((shop) => (
               <div
-                key={user.id}
+                key={shop.id}
                 onClick={() => {
-                  onChange(user);
+                  onChange(shop);
                   setDropdownOpen(false);
                   setSearchTerm("");
                 }}
                 className={`cursor-pointer px-3 py-2 hover:bg-blue-100 ${
-                  value?.id === user.id ? "bg-blue-200 font-semibold" : ""
+                  value?.id === shop.id ? "bg-blue-200 font-semibold" : ""
                 }`}
               >
-                {`${user.full_name || "(No Name)"} - ${user.phone || "No phone"}`}
+                {`${shop.name || "(No Name)"} - ${shop.phone || "No phone"}`}
               </div>
             ))
           )}
@@ -143,4 +147,4 @@ const PaginatedUserDropdown = ({ value, onChange, error, disabled }) => {
   );
 };
 
-export default PaginatedUserDropdown;
+export default PaginatedShopDropdown;

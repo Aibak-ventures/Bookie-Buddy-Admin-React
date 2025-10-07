@@ -3,7 +3,7 @@ import { Search } from 'lucide-react';
 import DataTable from '../ui components/DataTable';
 import { fetchShops, blockUnblockShop } from '../../api/AdminApis';
 import ConfirmationModal from '../Modals/ConfirmationModal';
-
+import CreateShopModal from '../Modals/CreateShopModal'; // ✅ Added back
 
 const Shops = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -15,35 +15,51 @@ const Shops = () => {
   const [error, setError] = useState(null);
   const [currentUrl, setCurrentUrl] = useState('/api/v1/shop/admin/shops/');
   const [modalState, setModalState] = useState({ isOpen: false, shopId: null, isActive: null });
+  const [createModalOpen, setCreateModalOpen] = useState(false); // ✅ Added back
+
+  /** 🔄 Fetch / Refresh shops */
+  const refreshShops = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await fetchShops(currentUrl);
+      setShops(data.results || []);
+      setCount(data.count || 0);
+      setNext(data.next);
+      setPrevious(data.previous);
+    } catch (err) {
+      console.error(err);
+      setError('Unable to load shops. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadShops = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const data = await fetchShops(currentUrl);
-        setShops(data.results);
-        setCount(data.count);
-        setNext(data.next);
-        setPrevious(data.previous);
-      } catch (err) {
-        setError('Unable to load shops. Please try again.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadShops();
+    refreshShops();
   }, [currentUrl]);
 
-  
+  /** ✅ Block / Unblock Handler */
+  const handleToggleStatus = async (shopId, isActive) => {
+    try {
+      await blockUnblockShop(shopId, !isActive);
+      refreshShops();
+    } catch (err) {
+      console.error(err);
+      alert('Failed to update shop status.');
+    } finally {
+      setModalState({ ...modalState, isOpen: false });
+    }
+  };
 
+  /** 🔎 Client-side filtering */
   const filteredShops = shops.filter(shop =>
     [shop.name, shop.place, shop.email]
       .filter(Boolean)
       .some(field => field.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
+  /** 📊 Table columns */
   const columns = [
     {
       header: 'Shop',
@@ -51,7 +67,10 @@ const Shops = () => {
       cell: (row) => (
         <div className="flex items-center space-x-3">
           <img
-            src={row.img ||  'https://ui-avatars.com/api/?name=NA&background=random&size=40&rounded=true'}
+            src={
+              row.img ||
+              'https://ui-avatars.com/api/?name=NA&background=random&size=40&rounded=true'
+            }
             alt={row.name}
             className="w-10 h-10 rounded-lg object-cover"
           />
@@ -81,7 +100,11 @@ const Shops = () => {
           }`}
           onClick={(e) => {
             e.stopPropagation();
-            setModalState({ isOpen: true, shopId: row.id, isActive: row.is_active });
+            setModalState({
+              isOpen: true,
+              shopId: row.id,
+              isActive: row.is_active
+            });
           }}
         >
           {row.is_active ? 'Block' : 'Unblock'}
@@ -92,10 +115,18 @@ const Shops = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
+      {/* 🔹 Header + Create Button */}
       <div className="flex items-center justify-between mb-8">
         <h1 className="text-3xl font-bold text-gray-800">Shops</h1>
+        <button
+          onClick={() => setCreateModalOpen(true)}
+          className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md"
+        >
+          + Create Shop
+        </button>
       </div>
 
+      {/* 🔹 Search & Table */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-6">
           <div className="relative">
@@ -128,12 +159,23 @@ const Shops = () => {
         )}
       </div>
 
-
+      {/* 🔹 Block/Unblock Confirmation */}
       <ConfirmationModal
         isOpen={modalState.isOpen}
         onClose={() => setModalState({ ...modalState, isOpen: false })}
-        onConfirm={() => handleToggleStatus(modalState.shopId, modalState.isActive)}
-        message={`Are you sure you want to ${modalState.isActive ? 'block' : 'unblock'} this shop?`}
+        onConfirm={() =>
+          handleToggleStatus(modalState.shopId, modalState.isActive)
+        }
+        message={`Are you sure you want to ${
+          modalState.isActive ? 'block' : 'unblock'
+        } this shop?`}
+      />
+
+      {/* 🔹 Create Shop Modal */}
+      <CreateShopModal
+        isOpen={createModalOpen}
+        onClose={() => setCreateModalOpen(false)}
+        onCreated={refreshShops} // refresh list after creation
       />
     </div>
   );

@@ -18,6 +18,7 @@ const menuItems = [
   { name: 'General services', icon: FolderOpen, path: '/general-services' },
   { name: 'Feature management', icon: FileCode, path: '/feature-management' },
   { name: 'Subscritpions', icon: Settings, path: '/subscription-management' },
+  { name: 'Push Notifications', icon: DollarSign, path: '/push-notifications' },
 
 
 

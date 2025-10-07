@@ -104,7 +104,6 @@ export const fetchUserShops = async (userId) => {
 
 //Block/Unblock User
 export const blockUnblockUser = async (userId, isActive) => {
-  console.log("this is my action ",userId,isActive);
   
 
   try {
@@ -276,6 +275,13 @@ export const registerShopWithUser = async (formData, logoFile) => {
     data.append('shop_city', formData.shop_city);               // city -> shop_city
     data.append('shop_state', formData.shop_state);             // state -> shop_state
     data.append('shop_pincode', formData.shop_pincode);         // postCode -> shop_pincode
+     // Optional invoice_start_from
+    if (formData.booking_start_id) {
+      data.append('booking_start_id', formData.booking_start_id);
+    }
+     if (formData.sale_start_id) {
+      data.append('sale_start_id', formData.sale_start_id);
+    }
 
     if (logoFile) {
       data.append('image', logoFile);
@@ -294,9 +300,48 @@ export const registerShopWithUser = async (formData, logoFile) => {
 
 
 
+// Create shop only
+export const createShop = async (formData, logoFile) => {
+  try {
+    const data = new FormData();
+
+    data.append('name', formData.name);
+    data.append('place', formData.place);
+    data.append('phone', formData.phone);                
+    data.append('phone2', formData.phone2 || '');
+    data.append('email', formData.email);                
+    data.append('address', formData.address);            
+    data.append('city', formData.city);                  
+    data.append('state', formData.state);                
+    data.append('pincode', formData.pincode);            
+    data.append('gst_number', formData.gst_number);
+
+     if (formData.booking_start_id) {
+      data.append('booking_start_id', formData.booking_start_id);
+    }
+     if (formData.sale_start_id) {
+      data.append('sale_start_id', formData.sale_start_id);
+    }
+
+    if (logoFile) {
+      data.append('img', logoFile);                      
+    }
+
+    const response = await multipartClient.post(API_URLS.SHOPS, data);
+    return response;
+  } catch (error) {
+    console.error('Error creating shop:', error);
+    throw error;
+  }
+};
+
+
+
+
 // update shop details
 
 export const updateShopDetails = async (shopId, data) => {
+  
   
    return await multipartClient.patch(API_URLS.SINGLE_SHOP(shopId), data);
 };
@@ -323,6 +368,17 @@ export const toggleShopServiceStatus = async ({ shop_service_id, is_active }) =>
 };
 
 
+
+// shop report
+export const getShopReport = async (data) => {
+  try {
+    const response = await apiClient.post(API_URLS.SHOP_REPORT, data);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching report:", error);
+    throw error;
+  }
+};
 
 
 
@@ -475,7 +531,6 @@ export const deleteGeneralService = async (id) => {
 // Fetch Features
 export const fetchFeatures = async () => {
   const response = await apiClient.get(API_URLS.FEATURES_URL);
-  console.log("data",response);
   
   return response.data;
 };
@@ -522,4 +577,18 @@ export const updateSubscription = async (id, data) => {
 export const deleteSubscription = async (id) => {
   const response = await apiClient.delete(API_URLS.SUBSCRIPTION(id));
   return response.data;
+};
+
+
+
+// #############################################  Push Notifications  ##############################################
+export const sendPushNotification = async (data) => {
+  
+  try {
+    const response = await multipartClient.post(API_URLS.PUSH_NOTIFICATION, data);
+    return response.data;
+  } catch (error) {
+    console.error("Push Notification API Error:", error);
+    throw error;
+  }
 };

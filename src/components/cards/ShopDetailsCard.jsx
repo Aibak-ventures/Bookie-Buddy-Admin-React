@@ -14,6 +14,7 @@ import ShopDetailItem from './ShopDetailItem';
 import UpdateShopModal from '../Modals/UpdateShopModal';
 
 const ShopDetailsCard = ({ shopData }) => {
+  
   const [showModal, setShowModal] = useState(false);
 
   const getInitials = (name) => {
@@ -82,6 +83,10 @@ const ShopDetailsCard = ({ shopData }) => {
           )}
           
           <ShopDetailItem icon={ProjectorIcon} text={`Total products: ${shopData.total_product_count}`} />
+          <ShopDetailItem icon={ProjectorIcon} text={`Invoice start for sales : ${shopData.sale_start_id }`} />
+          <ShopDetailItem icon={ProjectorIcon} text={`Invoice start for booking : ${shopData.booking_start_id }`} />
+
+
 
 
 

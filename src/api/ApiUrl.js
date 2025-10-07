@@ -7,6 +7,7 @@ const API_URLS = {
   LINKED_USERS: (shopId) => `/api/v1/shop/admin/link-user/?shop_id=${shopId}`,
   SHOP_WITH_USER: '/api/v1/shop/admin/shop-with-user/',
   REFRESH_TOKEN_URL : '/api/token/refresh/',
+  SHOP_REPORT : '/api/v1/shop/admin/shops/report/',
 
   // USER
   ADD_USER_WITH_ROLE:'/api/v1/shop/admin/shop-with-user/create-with-role/',
@@ -36,6 +37,9 @@ const API_URLS = {
 
   // RESET PASSWORD
   RESET_PASSWORD: '/api/v1/auth/admin/users/reset-password/',
+
+  // PUSH NOTIFICATIONS
+  PUSH_NOTIFICATION:'/api/v3/notifications/admin/notifications/send/'
 };
 
 export default API_URLS;
