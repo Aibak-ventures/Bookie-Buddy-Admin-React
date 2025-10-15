@@ -118,11 +118,8 @@ const handleSubmit = async () => {
 
   try {
     const res = await updateShopDetails(shopData.id, patchData);
-    console.log('Patch Data Entries:');
-for (let [key, value] of patchData.entries()) {
-  console.log(`${key}:`, value);
-}
-
+    console.log('patch data',patchData);
+    
     
     if (res.status === 200 || res.status === 204) {
       onSuccess?.();
