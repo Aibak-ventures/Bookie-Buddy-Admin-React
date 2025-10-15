@@ -90,7 +90,18 @@ const handleSubmit = async () => {
       if (isChanged) {
         patchData.append(key, JSON.stringify(cleanTerms));
       }
-    } else {
+
+    }
+     else if (key === 'sale_start_id' || key === 'booking_start_id') {
+      // ✅ Compare numerically (avoid string-number mismatch)
+      const newValue = value ? Number(value) : null;
+      const oldValue = original ? Number(original) : null;
+      if (newValue !== oldValue) {
+        patchData.append(key, newValue);
+      }
+    }
+
+     else {
       isChanged = normalize(value) !== normalize(original || '');
       if (isChanged) {
         patchData.append(key, normalize(value));
@@ -107,6 +118,11 @@ const handleSubmit = async () => {
 
   try {
     const res = await updateShopDetails(shopData.id, patchData);
+    console.log('Patch Data Entries:');
+for (let [key, value] of patchData.entries()) {
+  console.log(`${key}:`, value);
+}
+
     
     if (res.status === 200 || res.status === 204) {
       onSuccess?.();
