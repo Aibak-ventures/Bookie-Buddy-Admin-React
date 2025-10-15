@@ -345,6 +345,7 @@ export const updateShopDetails = async (shopId, data) => {
   
   
   
+  
    return await multipartClient.patch(API_URLS.SINGLE_SHOP(shopId), data);
 };
   
