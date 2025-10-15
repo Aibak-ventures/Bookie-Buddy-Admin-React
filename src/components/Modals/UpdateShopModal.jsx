@@ -118,8 +118,6 @@ const handleSubmit = async () => {
 
   try {
     const res = await updateShopDetails(shopData.id, patchData);
-    console.log('patch data',patchData);
-    
     
     if (res.status === 200 || res.status === 204) {
       onSuccess?.();
