@@ -341,6 +341,9 @@ export const createShop = async (formData, logoFile) => {
 // update shop details
 
 export const updateShopDetails = async (shopId, data) => {
+  console.log();
+  
+  
   
   
    return await multipartClient.patch(API_URLS.SINGLE_SHOP(shopId), data);
