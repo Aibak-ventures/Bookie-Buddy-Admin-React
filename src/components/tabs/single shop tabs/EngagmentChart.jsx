@@ -36,7 +36,7 @@ function EngagementChart({ shop_id }) {
 
   const [chartData, setChartData] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [period, setPeriod] = useState("daily");
+  const [period, setPeriod] = useState("monthly");
   const [reportType, setReportType] = useState("both");
   const [startDate, setStartDate] = useState(start);
   const [endDate, setEndDate] = useState(end);

@@ -4,18 +4,30 @@ import DataTable from '../ui components/DataTable';
 import { fetchShops, blockUnblockShop } from '../../api/AdminApis';
 import ConfirmationModal from '../Modals/ConfirmationModal';
 import CreateShopModal from '../Modals/CreateShopModal'; // ✅ Added back
+import { useNavigate, useLocation } from 'react-router-dom';
+
 
 const Shops = () => {
-  const [searchTerm, setSearchTerm] = useState('');
   const [shops, setShops] = useState([]);
   const [count, setCount] = useState(0);
   const [next, setNext] = useState(null);
   const [previous, setPrevious] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [currentUrl, setCurrentUrl] = useState('/api/v1/shop/admin/shops/');
   const [modalState, setModalState] = useState({ isOpen: false, shopId: null, isActive: null });
   const [createModalOpen, setCreateModalOpen] = useState(false); // ✅ Added back
+
+  const navigate = useNavigate();
+const location = useLocation();
+
+const queryParams = new URLSearchParams(location.search);
+const initialSearch = queryParams.get('search') || '';
+const initialPage = queryParams.get('page') || 1;
+
+const [searchTerm, setSearchTerm] = useState(initialSearch);
+const [currentUrl, setCurrentUrl] = useState(`/api/v1/shop/admin/shops/?page=${initialPage}&search=${initialSearch}`);
+
+
 
   /** 🔄 Fetch / Refresh shops */
   const refreshShops = async () => {
@@ -53,12 +65,10 @@ const Shops = () => {
   };
 
   /** 🔎 Client-side filtering */
-  const filteredShops = shops.filter(shop =>
-    [shop.name, shop.place, shop.email]
-      .filter(Boolean)
-      .some(field => field.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
-
+useEffect(() => {
+  let url = `/api/v1/shop/admin/shops/?search=${searchTerm}`;
+  setCurrentUrl(url);
+}, [searchTerm]);
   /** 📊 Table columns */
   const columns = [
     {
@@ -135,7 +145,13 @@ const Shops = () => {
               type="text"
               placeholder="Search or type command..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                const newSearch = e.target.value;
+                setSearchTerm(newSearch);
+                navigate(`?page=1&search=${newSearch}`);
+                setCurrentUrl(`/api/v1/shop/admin/shops/?page=1&search=${newSearch}`);
+              }}
+
               className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-64"
             />
           </div>
@@ -148,10 +164,24 @@ const Shops = () => {
         ) : (
           <DataTable
             columns={columns}
-            data={filteredShops}
+            data={shops}
             totalEntries={count}
-            onNextPage={() => setCurrentUrl(next)}
-            onPreviousPage={() => setCurrentUrl(previous)}
+            onNextPage={() => {
+              if (next) {
+                const nextPageNumber = new URL(next).searchParams.get('page');
+                navigate(`?page=${nextPageNumber}&search=${searchTerm}`);
+                setCurrentUrl(`/api/v1/shop/admin/shops/?page=${nextPageNumber}&search=${searchTerm}`);
+              }
+            }}
+
+            onPreviousPage={() => {
+              if (previous) {
+                const prevPageNumber = new URL(previous).searchParams.get('page');
+                navigate(`?page=${prevPageNumber}&search=${searchTerm}`);
+                setCurrentUrl(`/api/v1/shop/admin/shops/?page=${prevPageNumber}&search=${searchTerm}`);
+              }
+            }}
+
             disableNext={!next}
             disablePrevious={!previous}
             rowClickPath="shops"
