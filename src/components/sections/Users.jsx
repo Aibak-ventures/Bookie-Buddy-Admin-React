@@ -4,19 +4,30 @@ import DataTable from '../ui components/DataTable';
 import ConfirmationModal from '../Modals/ConfirmationModal';
 import { fetchUsers, blockUnblockUser, createUser } from '../../api/AdminApis';
 import AddUserOnly from '../Modals/AddUserOnly';
+import { useNavigate, useLocation } from 'react-router-dom';
+
 
 
 const Users = () => {
-  const [searchTerm, setSearchTerm] = useState('');
   const [users, setUsers] = useState([]);
   const [count, setCount] = useState(0);
   const [next, setNext] = useState(null);
   const [previous, setPrevious] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [currentUrl, setCurrentUrl] = useState('/api/v1/auth/admin/users/');
   const [modalState, setModalState] = useState({ isOpen: false, userId: null, isActive: null });
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
+
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const queryParams = new URLSearchParams(location.search);
+  const initialSearch = queryParams.get('search') || '';
+  const initialPage = queryParams.get('page') || 1;
+
+  const [searchTerm, setSearchTerm] = useState(initialSearch);
+  const [currentUrl, setCurrentUrl] = useState(`/api/v1/auth/admin/users/?page=${initialPage}&search=${initialSearch}`);
+
 
   // Fetch users on mount and on pagination URL change
   useEffect(() => {
@@ -81,13 +92,10 @@ const Users = () => {
   };
 
   // Filter users based on search
-  const filteredUsers = useMemo(() => {
-    return users.filter(user =>
-      [user.full_name, user.email, user.phone]
-        .filter(Boolean)
-        .some(field => field.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
-  }, [searchTerm, users]);
+useEffect(() => {
+  let url = `/api/v1/auth/admin/users/?search=${searchTerm}`;
+  setCurrentUrl(url);
+}, [searchTerm]);
 
   const columns = [
     {
@@ -149,7 +157,13 @@ const Users = () => {
               type="text"
               placeholder="Search by name, phone, or email"
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => {
+                const newSearch = e.target.value;
+                setSearchTerm(newSearch);
+                navigate(`?page=1&search=${newSearch}`);
+                setCurrentUrl(`/api/v1/auth/admin/users/?page=1&search=${newSearch}`);
+                }}
+
               className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-64"
             />
           </div>
@@ -162,10 +176,24 @@ const Users = () => {
         ) : (
           <DataTable
             columns={columns}
-            data={filteredUsers}
+            data={users}
             totalEntries={count}
-            onNextPage={() => setCurrentUrl(next)}
-            onPreviousPage={() => setCurrentUrl(previous)}
+            onNextPage={() => {
+            if (next) {
+              const nextPageNumber = new URL(next).searchParams.get('page');
+              navigate(`?page=${nextPageNumber}&search=${searchTerm}`);
+              setCurrentUrl(`/api/v1/auth/admin/users/?page=${nextPageNumber}&search=${searchTerm}`);
+            }
+          }}
+
+          onPreviousPage={() => {
+            if (previous) {
+              const prevPageNumber = new URL(previous).searchParams.get('page');
+              navigate(`?page=${prevPageNumber}&search=${searchTerm}`);
+              setCurrentUrl(`/api/v1/auth/admin/users/?page=${prevPageNumber}&search=${searchTerm}`);
+            }
+          }}
+
             disableNext={!next}
             disablePrevious={!previous}
             rowClickPath="users"

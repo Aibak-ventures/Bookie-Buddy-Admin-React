@@ -70,7 +70,7 @@ const AddUserModal = ({ isOpen, onClose, shopId, shopName, onUserAdded }) => {
 
       onClose();
     } catch (err) {
-      alert(`Failed :${err?.response?.data?.error}`)
+     
 
 
 
@@ -136,7 +136,6 @@ const AddUserModal = ({ isOpen, onClose, shopId, shopName, onUserAdded }) => {
               label="Email"
               placeholder="info@gmail.com"
               type="email"
-              required
               value={formData.email}
               onChange={(e) => handleChange('email', e.target.value)}
             />

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Trash2, Lock, Unlock } from 'lucide-react';
 import AddUserModal from '../../Modals/AddUser';
-import { fetchLinkedUsers, detachUserFromShop, blockUnblockUser, changeUserRole } from '../../../api/AdminApis';
+import { fetchLinkedUsers, detachUserFromShop, blockOrUnblockUserFromShop, changeUserRole } from '../../../api/AdminApis';
 import AssignExistingUserModal from '../../Modals/AssignExistingUserModal';
 import ConfirmationModal from '../../Modals/ConfirmationModal';
 
@@ -33,6 +33,8 @@ const AssociateUsersTab = ({ shopId, shopName }) => {
       setError(null);
       try {
         const data = await fetchLinkedUsers(shopId);
+        console.log("these are my users",data);
+        
         setUsers(data);
       } catch (err) {
         console.error(err);
@@ -85,7 +87,9 @@ const AssociateUsersTab = ({ shopId, shopName }) => {
             u.id === selectedUser.id ? { ...u, is_active: newStatus } : u
           )
         );
-        await blockUnblockUser(selectedUser.id, newStatus);
+        console.log("selected user id",selectedUser);
+        
+        await blockOrUnblockUserFromShop(selectedUser.id, newStatus);
         alert(`User ${newStatus ? 'unblocked' : 'blocked'} successfully`);
       } else if (selectedAction === 'changeRole' && pendingRole) {
         await changeUserRole(shopId, selectedUser.id, pendingRole);

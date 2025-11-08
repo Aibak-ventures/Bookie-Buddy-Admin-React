@@ -14,39 +14,55 @@ const PaginatedUserDropdown = ({ value, onChange, error, disabled }) => {
 
   const dropdownRef = useRef(null);
 
-  useEffect(() => {
-    if (!dropdownOpen) return;
+ useEffect(() => {
+  if (!dropdownOpen) return;
 
-    const loadUsers = async () => {
-      setLoading(true);
-      try {
-        const data = await fetchUsers(currentPageUrl);
-        setFullUsers(data.results);
-        setNextPageUrl(data.next);
-        setPrevPageUrl(data.previous);
-      } catch (err) {
-        setFullUsers([]);
-        setNextPageUrl(null);
-        setPrevPageUrl(null);
-      } finally {
-        setLoading(false);
+  const loadUsers = async () => {
+    setLoading(true);
+    try {
+      let url = currentPageUrl;
+
+      // 👇 add search support in backend
+      if (searchTerm) {
+        const searchQuery = encodeURIComponent(searchTerm);
+        if (url.includes("?")) {
+          url += `&search=${searchQuery}`;
+        } else {
+          url += `?search=${searchQuery}`;
+        }
       }
-    };
 
-    loadUsers();
-  }, [currentPageUrl, dropdownOpen]);
+      const data = await fetchUsers(url);
+      setFullUsers(data.results || []);
+      setNextPageUrl(data.next);
+      setPrevPageUrl(data.previous);
+      setFilteredUsers(data.results || []); // use API response directly
+    } catch (err) {
+      console.error(err);
+      setFullUsers([]);
+      setFilteredUsers([]);
+      setNextPageUrl(null);
+      setPrevPageUrl(null);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  loadUsers();
+}, [currentPageUrl, dropdownOpen, searchTerm]);
+
 
   // Filter users when search term changes
-  useEffect(() => {
-    const term = searchTerm.toLowerCase();
-    setFilteredUsers(
-      fullUsers.filter(
-        (u) =>
-          u.full_name?.toLowerCase().includes(term) ||
-          u.phone?.toLowerCase().includes(term)
-      )
-    );
-  }, [searchTerm, fullUsers]);
+  // useEffect(() => {
+  //   const term = searchTerm.toLowerCase();
+  //   setFilteredUsers(
+  //     fullUsers.filter(
+  //       (u) =>
+  //         u.full_name?.toLowerCase().includes(term) ||
+  //         u.phone?.toLowerCase().includes(term)
+  //     )
+  //   );
+  // }, [searchTerm, fullUsers]);
 
   useEffect(() => {
     const handleClickOutside = (e) => {
@@ -124,19 +140,34 @@ const PaginatedUserDropdown = ({ value, onChange, error, disabled }) => {
           <div className="flex justify-between border-t border-gray-300 px-3 py-1 bg-gray-50">
             <button
               disabled={!prevPageUrl || disabled}
-              onClick={() => prevPageUrl && setCurrentPageUrl(prevPageUrl)}
+              onClick={() => {
+                if (prevPageUrl) {
+                  const url = searchTerm
+                    ? `${prevPageUrl}&search=${encodeURIComponent(searchTerm)}`
+                    : prevPageUrl;
+                  setCurrentPageUrl(url);
+                }
+              }}
               className={`text-sm font-medium text-blue-600 disabled:text-gray-400`}
             >
               Prev
             </button>
             <button
               disabled={!nextPageUrl || disabled}
-              onClick={() => nextPageUrl && setCurrentPageUrl(nextPageUrl)}
+              onClick={() => {
+                if (nextPageUrl) {
+                  const url = searchTerm
+                    ? `${nextPageUrl}&search=${encodeURIComponent(searchTerm)}`
+                    : nextPageUrl;
+                  setCurrentPageUrl(url);
+                }
+              }}
               className={`text-sm font-medium text-blue-600 disabled:text-gray-400`}
             >
               Next
             </button>
           </div>
+
         </div>
       )}
     </div>

@@ -65,6 +65,8 @@ export const createUserForShop = async (userData, shopId) => {
       shop: shopId, // ensure the backend expects this field
     };
     const response = await apiClient.post(API_URLS.ADD_USER_WITH_ROLE, payload);
+    console.log("response",response);
+    
         
     return response;
   } catch (error) {
@@ -179,6 +181,23 @@ export const detachUserFromShop = async (id) => {
     throw error;
   }
 };
+
+// block or unblock user from shop
+// detatch user
+export const blockOrUnblockUserFromShop = async (id, status) => {
+  console.log("id",id,status);
+  
+  try {
+    const response = await apiClient.patch(
+      `${API_URLS.LINK_USER_TO_SHOP}${id}/` ,{"is_active":status}
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Failed to detach user:", error);
+    throw error;
+  }
+};
+
 
 
 
