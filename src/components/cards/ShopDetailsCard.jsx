@@ -19,11 +19,12 @@ const ShopDetailsCard = ({ shopData }) => {
 
   const getInitials = (name) => {
     if (!name) return 'NA';
-    const words = name.trim().split(' ');
-    return words.length > 1
-      ? words[0][0].toUpperCase() + words[1][0].toUpperCase()
-      : name.slice(0, 2).toUpperCase();
-
+    const words = name.trim().split(' ').filter(word => word.length > 0);
+    if (words.length === 0) return 'NA';
+    if (words.length > 1) {
+      return words[0][0].toUpperCase() + words[1][0].toUpperCase();
+    }
+    return name.trim().slice(0, 2).toUpperCase();
   };
   
 
