@@ -17,7 +17,7 @@ const SingleShop = () => {
 
   const tabs = [
     { id: 'associate-users', label: 'Associate users', icon: Users },
-    // { id: 'subscription', label: 'Subscription', icon: CreditCard },
+    { id: 'subscription', label: 'Subscription & Features', icon: CreditCard },
     { id: 'services-products', label: 'Services & products', icon: Package },
     { id: 'engagement', label: 'Engagement', icon: BarChart3 }
   ];
@@ -26,6 +26,8 @@ const SingleShop = () => {
     const loadShop = async () => {
       try {
         const data = await fetchSingleShop(shopId);
+        console.log("data",data);
+        
         
         setShopData(data);
       } catch (err) {
@@ -57,6 +59,7 @@ const SingleShop = () => {
                 setActiveTab={setActiveTab}
                   shopId={shopId}
                   shopName= {shopData.name}
+                  shopSubscriptionStatus = {shopData.subscription_status}
               />
             </div>
           </div>

@@ -39,7 +39,13 @@ const API_URLS = {
   RESET_PASSWORD: '/api/v1/auth/admin/users/reset-password/',
 
   // PUSH NOTIFICATIONS
-  PUSH_NOTIFICATION:'/api/v3/notifications/admin/notifications/send/'
+  PUSH_NOTIFICATION:'/api/v3/notifications/admin/notifications/send/',
+
+  // SHOP SUBSCRIPTION 
+  ASSIGN_SUBSCRIPTION : '/api/v3/subscriptions/admin/shop-subscriptions/subscribe/',
+
+  // GET SUBSCRIPTION DETAILS OF THE SHOP
+  GET_SUBSCRIPTION_DETAILS_OF_SHOP : (id) => `/api/v3/subscriptions/admin/shop-subscription-details/${id}/`
 };
 
 export default API_URLS;

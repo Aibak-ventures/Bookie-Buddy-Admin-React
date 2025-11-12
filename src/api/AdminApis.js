@@ -65,7 +65,6 @@ export const createUserForShop = async (userData, shopId) => {
       shop: shopId, // ensure the backend expects this field
     };
     const response = await apiClient.post(API_URLS.ADD_USER_WITH_ROLE, payload);
-    console.log("response",response);
     
         
     return response;
@@ -185,7 +184,6 @@ export const detachUserFromShop = async (id) => {
 // block or unblock user from shop
 // detatch user
 export const blockOrUnblockUserFromShop = async (id, status) => {
-  console.log("id",id,status);
   
   try {
     const response = await apiClient.patch(
@@ -360,11 +358,6 @@ export const createShop = async (formData, logoFile) => {
 // update shop details
 
 export const updateShopDetails = async (shopId, data) => {
-  console.log();
-  
-  
-  
-  
    return await multipartClient.patch(API_URLS.SINGLE_SHOP(shopId), data);
 };
   
@@ -403,7 +396,31 @@ export const getShopReport = async (data) => {
 };
 
 
+// this should be updated
+export const getShopSubscriptionDetails = async (shopId) => {
+  try {
+    const res = await apiClient.get(API_URLS.GET_SUBSCRIPTION_DETAILS_OF_SHOP(shopId));
+    return res.data;
+  } catch (err) {
+    console.error("Error fetching shop subscription:", err);
+    throw err;
+  }
+};
 
+
+
+// ✅ Assign a plan to a shop
+export const assignSubscriptionToShop = async (payload) => {
+  
+  
+  try {
+    const res = await apiClient.post(API_URLS.ASSIGN_SUBSCRIPTION, payload);
+    return res.data;
+  } catch (error) {
+    console.error("Error assigning subscription:", error);
+    throw error;
+  }
+};
 
 
 
