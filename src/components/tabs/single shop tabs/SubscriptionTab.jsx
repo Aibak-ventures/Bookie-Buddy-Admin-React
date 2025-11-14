@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { getShopSubscriptionDetails } from "../../../api/AdminApis";
+import { getShopSubscriptionDetails, cancelShopSubscription } from "../../../api/AdminApis";
 
-// ✅ Import modals
+// Modals
 import AssignPlanForShop from "../../Modals/AssignPlanForShop";
 import UpdateShopPlanModal from "../../Modals/UpdateShopPlanModal";
 import UpdateShopFeaturesModal from "../../Modals/UpdateShopFeaturesModal";
@@ -11,16 +11,42 @@ const SubscriptionTab = ({ shop_id, shopSubscriptionStatus }) => {
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState(shopSubscriptionStatus);
 
-  // ✅ Modal States
+  // Modal states
   const [showAddModal, setShowAddModal] = useState(false);
   const [showUpdateSubModal, setShowUpdateSubModal] = useState(false);
   const [showUpdateFeaturesModal, setShowUpdateFeaturesModal] = useState(false);
+  console.log("my subscription data",subscriptionData);
+  
 
-  // ✅ Sync status with incoming prop
+  // Sync status
   useEffect(() => {
     setStatus(shopSubscriptionStatus);
   }, [shopSubscriptionStatus]);
 
+  // Parse custom date (DD-MM-YYYY HH:mm:ss)
+  const parseCustomDate = (dateString) => {
+    const [datePart, timePart] = dateString.split(" ");
+    const [day, month, year] = datePart.split("-").map(Number);
+    return new Date(`${year}-${month}-${day}T${timePart}`);
+  };
+
+  // 🚀 Calculate remaining days
+  const calculateRemainingDays = (start, end) => {
+    try {
+      const today = new Date();
+      const endDate = parseCustomDate(end);
+
+      if (isNaN(endDate)) return 0;
+      if (today > endDate) return 0;
+
+      const diff = endDate - today;
+      return Math.ceil(diff / (1000 * 60 * 60 * 24));
+    } catch {
+      return 0;
+    }
+  };
+
+  // Fetch subscription if active
   useEffect(() => {
     if (status === "ACTIVE") {
       fetchSubscriptionDetails();
@@ -32,11 +58,9 @@ const SubscriptionTab = ({ shop_id, shopSubscriptionStatus }) => {
     try {
       const res = await getShopSubscriptionDetails(shop_id);
       const data = res?.data?.subscription || null;
-      console.log('data',data);
-      
+
       setSubscriptionData(data);
-      if (data?.status === "ACTIVE") setStatus("ACTIVE");
-      else setStatus("NONE");
+      setStatus(data?.status === "ACTIVE" ? "ACTIVE" : "NONE");
     } catch (err) {
       console.error("Error fetching subscription details:", err);
       setSubscriptionData(null);
@@ -46,11 +70,36 @@ const SubscriptionTab = ({ shop_id, shopSubscriptionStatus }) => {
     }
   };
 
+  // 🚨 CANCEL SUBSCRIPTION HANDLER
+  const handleCancelSubscription = async () => {
+    if (!subscriptionData?.id) {
+      alert("Subscription not found");
+      return;
+    }
+
+    if (!window.confirm("Are you sure you want to cancel this subscription?")) {
+      return;
+    }
+
+    try {
+      await cancelShopSubscription(subscriptionData.id);
+      alert("Subscription cancelled successfully");
+
+      setStatus("NONE");
+      setSubscriptionData(null);
+
+      fetchSubscriptionDetails();
+    } catch (err) {
+      console.error("Error canceling subscription:", err);
+      alert("Failed to cancel subscription");
+    }
+  };
+
   return (
     <div className="relative">
       <h3 className="text-lg font-semibold mb-6">Subscription Details</h3>
 
-      {/* ===================== HEADER BUTTONS ===================== */}
+      {/* Add Subscription Button */}
       {status === "NONE" && (
         <div className="absolute right-0 top-0">
           <button
@@ -62,7 +111,7 @@ const SubscriptionTab = ({ shop_id, shopSubscriptionStatus }) => {
         </div>
       )}
 
-      {/* ===================== MODALS ===================== */}
+      {/* Modals */}
       <AssignPlanForShop
         shopId={shop_id}
         isOpen={showAddModal}
@@ -86,9 +135,10 @@ const SubscriptionTab = ({ shop_id, shopSubscriptionStatus }) => {
         isOpen={showUpdateFeaturesModal}
         onClose={() => setShowUpdateFeaturesModal(false)}
         onSuccess={fetchSubscriptionDetails}
+        currentFeatures={subscriptionData?.addon_features || []}
       />
 
-      {/* ===================== MAIN CONTENT ===================== */}
+      {/* MAIN CONTENT */}
       {loading ? (
         <p className="text-blue-500 mt-6">Loading subscription details...</p>
       ) : status === "NONE" ? (
@@ -97,46 +147,107 @@ const SubscriptionTab = ({ shop_id, shopSubscriptionStatus }) => {
         </div>
       ) : subscriptionData ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-12">
-          {/* LEFT SECTION – PLAN DETAILS */}
-          <div className="relative bg-gradient-to-r from-blue-500 to-purple-600 text-white p-6 rounded-lg shadow-md">
-            <h4 className="text-xl font-semibold mb-2">
-              {subscriptionData.plan?.name || "N/A"}
-            </h4>
-            <p className="text-blue-100 mb-4">
-              ₹{subscriptionData.plan?.base_price || "N/A"} /{" "}
-              {subscriptionData.plan?.duration_days || "N/A"} days
-            </p>
-            <div className="flex items-center gap-2 mb-4">
-              <span className="px-2 py-1 bg-green-500 text-white rounded-full text-xs">
+
+          {/* LEFT CARD - Subscription Info */}
+          <div className="relative bg-gradient-to-br from-blue-600 to-purple-700 p-6 rounded-2xl shadow-xl text-white">
+
+            {/* Header */}
+            <div className="flex justify-between items-start">
+              <div>
+                <h4 className="text-2xl font-bold mb-1">
+                  {subscriptionData.plan?.name || "N/A"}
+                </h4>
+                <p className="text-blue-200 text-sm">
+                  {subscriptionData.plan?.plan_type || "N/A"}
+                </p>
+              </div>
+
+              <div className="space-x-2 flex">
+                <button
+                  onClick={() => setShowUpdateSubModal(true)}
+                  className="bg-white text-blue-700 px-3 py-1 rounded-md hover:bg-gray-100 
+                          transition-colors text-sm font-medium shadow-sm"
+                >
+                  Update
+                </button>
+
+                {/* ❌ CANCEL BUTTON HERE */}
+                <button
+                  onClick={handleCancelSubscription}
+                  className="bg-red-600 text-white px-3 py-1 rounded-md hover:bg-red-700 
+                          transition-colors text-sm font-medium shadow-sm"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+
+            {/* Status Badge */}
+            <div className="mt-4">
+              <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold 
+                        bg-green-500 text-white tracking-wide">
                 {subscriptionData.status}
-              </span>
-              <span className="text-blue-100">
-                Until {subscriptionData.end_date || "N/A"}
               </span>
             </div>
 
-            <p className="text-sm mb-2">
-              <strong>Plan Type:</strong> {subscriptionData.plan?.plan_type}
-            </p>
-            <p className="text-sm mb-2">
-              <strong>Paid Amount:</strong> ₹{subscriptionData.paid_amount}
-            </p>
-            <p className="text-sm mb-4">
-              <strong>Auto Renew:</strong>{" "}
-              {subscriptionData.auto_renew ? "Enabled" : "Disabled"}
-            </p>
+            {/* Remaining Days */}
+            <div className="mt-5 text-xl font-semibold">
+              <span className="text-white">
+                {calculateRemainingDays(subscriptionData.start_date, subscriptionData.end_date)}
+              </span>{" "}
+              <span className="text-blue-200 text-sm">days left</span>
+            </div>
 
-            <button
-              onClick={() => setShowUpdateSubModal(true)}
-              className="absolute top-4 right-4 bg-white text-blue-600 px-3 py-1 rounded-md hover:bg-gray-100 transition-colors text-sm font-medium"
-            >
-              Update Plan Details
-            </button>
+            {/* Duration */}
+            <div className="mt-1 text-sm text-blue-200">
+              {subscriptionData.start_date} → {subscriptionData.end_date}
+            </div>
+
+            <div className="my-6 border-t border-white/30"></div>
+
+            {/* Details */}
+            <div className="space-y-3 text-sm">
+              <div className="flex justify-between">
+                <span className="text-blue-200">Paid Amount:</span>
+                <span className="font-medium text-white">
+                  ₹{subscriptionData.paid_amount || "N/A"}
+                </span>
+              </div>
+
+              <div className="flex justify-between">
+                <span className="text-blue-200">Payment Status:</span>
+                <span className="font-medium">
+                  {subscriptionData.payment_status ? "Paid" : "Unpaid"}
+                </span>
+              </div>
+
+              <div className="flex justify-between">
+                <span className="text-blue-200">Auto Renew:</span>
+                <span className="font-medium">
+                  {subscriptionData.auto_renew ? "Enabled" : "Disabled"}
+                </span>
+              </div>
+
+              <div className="flex justify-between">
+                <span className="text-blue-200">Base Price:</span>
+                <span className="font-medium">
+                  ₹{subscriptionData.plan?.base_price || "N/A"}
+                </span>
+              </div>
+
+              <div className="flex justify-between">
+                <span className="text-blue-200">Duration:</span>
+                <span className="font-medium">
+                  {subscriptionData.plan?.duration_days || "N/A"} days
+                </span>
+              </div>
+            </div>
           </div>
 
-          {/* RIGHT SECTION – ADDON FEATURES */}
+          {/* RIGHT CARD — Addon Features */}
           <div className="relative bg-gray-50 p-6 rounded-lg shadow-md">
             <h5 className="font-medium mb-4">Addon Features</h5>
+
             {subscriptionData.addon_features?.length > 0 ? (
               <ul className="space-y-3">
                 {subscriptionData.addon_features.map((feature) => (
@@ -164,7 +275,7 @@ const SubscriptionTab = ({ shop_id, shopSubscriptionStatus }) => {
               onClick={() => setShowUpdateFeaturesModal(true)}
               className="absolute top-4 right-4 bg-purple-600 text-white px-3 py-1 rounded-md hover:bg-purple-700 transition-colors text-sm font-medium"
             >
-              Update Feature Details
+              {subscriptionData.addon_features?.length > 0 ? "Update Feature Details" : "Add Feature"}
             </button>
           </div>
         </div>

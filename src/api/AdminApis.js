@@ -570,6 +570,8 @@ export const deleteGeneralService = async (id) => {
 // Fetch Features
 export const fetchFeatures = async () => {
   const response = await apiClient.get(API_URLS.FEATURES_URL);
+  console.log("in function fetching all featru",response.data);
+  
   
   return response.data;
 };
@@ -590,6 +592,24 @@ export const updateFeature = async (id, featureData) => {
 export const deleteFeature = async (id) => {
   const response =  await apiClient.delete(`${API_URLS.FEATURES_URL}${id}/`);
   return response
+};
+
+
+
+
+// add feature to shop 
+export const addFeatureToShop = async (shopId, data) => {
+  console.log(shopId,data);
+  try {
+ const  response =  apiClient.post( API_URLS.ADD_FEATURE_TO_SHOP(shopId),
+    data
+  );
+  
+  return response
+}
+ catch(error){
+  throw error
+ }
 };
 
 
@@ -618,6 +638,16 @@ export const deleteSubscription = async (id) => {
   return response.data;
 };
 
+export const cancelShopSubscription = async (subscriptionId) => {
+  console.log("subscription id", subscriptionId);
+
+  const response = await apiClient.post(
+    API_URLS.CANCEL_SUBSCRIPTION_OF_SHOP(subscriptionId)
+  );
+  console.log("URL =", API_URLS.CANCEL_SUBSCRIPTION_OF_SHOP(subscriptionId));
+
+  return response;
+};
 
 
 // #############################################  Push Notifications  ##############################################

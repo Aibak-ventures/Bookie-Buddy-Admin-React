@@ -29,6 +29,7 @@ const API_URLS = {
 
   // features
   FEATURES_URL : "/api/v3/subscriptions/admin/features/",
+  ADD_FEATURE_TO_SHOP :(shopId)=>`/api/v3/subscriptions/admin/shop-subscriptions/add-feature/${shopId}/`,
 
   // SUBSCRIPTIONS
   SUBSCRIPTIONS: "/api/v3/subscriptions/admin/subscription-plans/",
@@ -45,7 +46,10 @@ const API_URLS = {
   ASSIGN_SUBSCRIPTION : '/api/v3/subscriptions/admin/shop-subscriptions/subscribe/',
 
   // GET SUBSCRIPTION DETAILS OF THE SHOP
-  GET_SUBSCRIPTION_DETAILS_OF_SHOP : (id) => `/api/v3/subscriptions/admin/shop-subscription-details/${id}/`
+  GET_SUBSCRIPTION_DETAILS_OF_SHOP : (id) => `/api/v3/subscriptions/admin/shop-subscription-details/${id}/`,
+  CANCEL_SUBSCRIPTION_OF_SHOP : (subscriptionId) => `/api/v3/subscriptions/admin/shop-subscriptions/cancel/${subscriptionId}/`
+
+  
 };
 
 export default API_URLS;
