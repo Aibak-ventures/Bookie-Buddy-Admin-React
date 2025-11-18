@@ -3,16 +3,18 @@ import { fetchFeatures, addFeatureToShop } from "../../api/AdminApis";
 
 const UpdateShopFeaturesModal = ({
   shopId,
+  subscription_id,
   isOpen,
   onClose,
   onSuccess,
   currentFeatures = [],
 }) => {
+
   const [features, setFeatures] = useState([]);
-  const [selectedFeature, setSelectedFeature] = useState(null);
   const [saving, setSaving] = useState(false);
 
-  const [featureData, setFeatureData] = useState({});
+  // Store MULTIPLE selected features + their details
+  const [selectedFeatures, setSelectedFeatures] = useState({});
 
   const [nextUrl, setNextUrl] = useState(null);
   const [prevUrl, setPrevUrl] = useState(null);
@@ -20,33 +22,30 @@ const UpdateShopFeaturesModal = ({
 
   useEffect(() => {
     if (isOpen) {
-      setSelectedFeature(null);
-      setFeatureData({});
+      setSelectedFeatures({});
       loadFeatures();
       setPage(1);
     }
   }, [isOpen]);
 
-const loadFeatures = async (url) => {
-  try {
-    const res = await fetchFeatures(url);
+  const loadFeatures = async (url) => {
+    try {
+      const res = await fetchFeatures(url);
 
-    // Already assigned IDs
-    const assignedIds = currentFeatures.map((f) => f.id);
+      const assignedIds = currentFeatures.map((f) => f.id);
 
-    // Filter out assigned features
-    const filtered = (res.results || []).filter(
-      (feature) => !assignedIds.includes(feature.id)
-    );
+      // filter OUT already assigned features
+      const filtered = (res.results || []).filter(
+        (feature) => !assignedIds.includes(feature.id)
+      );
 
-    setFeatures(filtered);
-    setNextUrl(res.next);
-    setPrevUrl(res.previous);
-  } catch (err) {
-    console.error("Error fetching features:", err);
-  }
-};
-
+      setFeatures(filtered);
+      setNextUrl(res.next);
+      setPrevUrl(res.previous);
+    } catch (err) {
+      console.error("Error fetching features:", err);
+    }
+  };
 
   const goNext = () => {
     if (nextUrl) {
@@ -62,24 +61,43 @@ const loadFeatures = async (url) => {
     }
   };
 
-  const updateField = (field, value) => {
-    setFeatureData((prev) => ({
+  // **Toggle feature selection**
+  const toggleFeature = (feature) => {
+    setSelectedFeatures((prev) => {
+      if (prev[feature.id]) {
+        // unselect
+        const updated = { ...prev };
+        delete updated[feature.id];
+        return updated;
+      }
+      // select default record
+      return {
+        ...prev,
+        [feature.id]: {
+          feature_id: feature.id,
+          price_paid: feature.base_price,
+          start_date: new Date().toISOString().slice(0, 16),
+          end_date: "",
+        },
+      };
+    });
+  };
+
+  const updateField = (featureId, field, value) => {
+    setSelectedFeatures((prev) => ({
       ...prev,
-      [field]: value,
+      [featureId]: {
+        ...prev[featureId],
+        [field]: value,
+      },
     }));
   };
 
-  /** Save only one feature */
   const handleSave = async () => {
-    if (!selectedFeature) {
-      alert("Please select one feature to add");
-      return;
-    }
+    const selectedList = Object.values(selectedFeatures);
 
-    // Check if already assigned
-    const alreadyAssignedIds = currentFeatures.map((f) => f.id);
-    if (alreadyAssignedIds.includes(selectedFeature)) {
-      alert("This feature is already added to the shop");
+    if (selectedList.length === 0) {
+      alert("Please select at least one feature");
       return;
     }
 
@@ -87,23 +105,18 @@ const loadFeatures = async (url) => {
 
     try {
       const payload = {
-        feature_id: selectedFeature,
-        start_date: new Date().toISOString(),
+        features: selectedList,
       };
 
-      if (featureData.price_paid) payload.price_paid = Number(featureData.price_paid);
-      if (featureData.end_date) payload.end_date = featureData.end_date;
+      const response = await addFeatureToShop(subscription_id, payload);
 
-      const response = await addFeatureToShop(shopId, payload);
-      console.log("response",response);
-      alert(response?.data?.status || "feature added successfully")
-      
+      alert(response?.data?.status || "Features added successfully!");
 
       onSuccess();
       onClose();
     } catch (error) {
       console.error("Error updating shop:", error);
-      alert("Failed to update feature");
+      alert("Failed to update features");
     } finally {
       setSaving(false);
     }
@@ -116,54 +129,71 @@ const loadFeatures = async (url) => {
       <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
         <h2 className="text-lg font-semibold mb-4">Manage Addon Features</h2>
 
+        {/* FEATURES LIST */}
         <div className="max-h-64 overflow-y-auto space-y-3 mb-3 border rounded-md p-3">
           {features.length === 0 ? (
             <p className="text-gray-500 text-sm">No features found.</p>
           ) : (
-            features.map((feature) => (
-              <div key={feature.id} className="pb-3 border-b">
-                <label className="flex justify-between items-center">
-                  <div>
-                    <p className="font-medium text-gray-800">{feature.name}</p>
-                    <p className="text-xs text-gray-500">{feature.feature_type}</p>
-                  </div>
+            features.map((feature) => {
+              const selected = selectedFeatures[feature.id];
+              return (
+                <div key={feature.id} className="pb-3 border-b">
+                  <label className="flex justify-between items-center">
+                    <div>
+                      <p className="font-medium text-gray-800">{feature.name}</p>
+                      <p className="text-xs text-gray-500">{feature.feature_type}</p>
+                    </div>
 
-                  {/* RADIO BUTTON (only one selection allowed) */}
-                  <input
-                    type="radio"
-                    name="selectedFeature"
-                    checked={selectedFeature === feature.id}
-                    onChange={() => {
-                      setSelectedFeature(feature.id);
-                      setFeatureData({});
-                    }}
-                  />
-                </label>
-
-                {selectedFeature === feature.id && (
-                  <div className="mt-2 space-y-2">
-                  <label htmlFor="">Price Paid(optional)</label>
-
+                    {/* CHECKBOX FOR MULTI SELECT */}
                     <input
-                      type="number"
-                      className="w-full p-2 border rounded"
-                      value={featureData.price_paid || ""}
-                      onChange={(e) => updateField("price_paid", e.target.value)}
+                      type="checkbox"
+                      checked={!!selected}
+                      onChange={() => toggleFeature(feature)}
                     />
-                  <label htmlFor="">End Date (optional)</label>
-                    <input
-                      type="datetime-local"
-                      className="w-full p-2 border rounded"
-                      value={featureData.end_date || ""}
-                      onChange={(e) => updateField("end_date", e.target.value)}
-                    />
-                  </div>
-                )}
-              </div>
-            ))
+                  </label>
+
+                  {/* Feature Inputs */}
+                  {selected && (
+                    <div className="mt-2 space-y-2">
+                      <label>Price Paid (optional)</label>
+                        <input
+                          type="number"
+                          className="w-full p-2 border rounded"
+                          value={selected.price_paid}
+                          onChange={(e) =>
+                            updateField(feature.id, "price_paid", Number(e.target.value))
+                          }
+                        />
+
+
+                      <label>Start Date</label>
+                      <input
+                        type="datetime-local"
+                        className="w-full p-2 border rounded"
+                        value={selected.start_date}
+                        onChange={(e) =>
+                          updateField(feature.id, "start_date", e.target.value)
+                        }
+                      />
+
+                      <label>End Date (optional)</label>
+                      <input
+                        type="datetime-local"
+                        className="w-full p-2 border rounded"
+                        value={selected.end_date}
+                        onChange={(e) =>
+                          updateField(feature.id, "end_date", e.target.value)
+                        }
+                      />
+                    </div>
+                  )}
+                </div>
+              );
+            })
           )}
         </div>
 
+        {/* Pagination */}
         <div className="flex justify-between items-center mb-4">
           <button
             disabled={!prevUrl}
@@ -188,6 +218,7 @@ const loadFeatures = async (url) => {
           </button>
         </div>
 
+        {/* Footer */}
         <div className="flex justify-end gap-3">
           <button
             onClick={onClose}
@@ -201,7 +232,7 @@ const loadFeatures = async (url) => {
             disabled={saving}
             className="px-4 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
           >
-            {saving ? "Saving..." : "Save Feature"}
+            {saving ? "Saving..." : "Save Features"}
           </button>
         </div>
       </div>

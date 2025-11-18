@@ -400,6 +400,8 @@ export const getShopReport = async (data) => {
 export const getShopSubscriptionDetails = async (shopId) => {
   try {
     const res = await apiClient.get(API_URLS.GET_SUBSCRIPTION_DETAILS_OF_SHOP(shopId));
+    console.log("res",res.data);
+    
     return res.data;
   } catch (err) {
     console.error("Error fetching shop subscription:", err);
@@ -415,6 +417,8 @@ export const assignSubscriptionToShop = async (payload) => {
   
   try {
     const res = await apiClient.post(API_URLS.ASSIGN_SUBSCRIPTION, payload);
+    console.log("response in function ",res.data);
+    
     return res.data;
   } catch (error) {
     console.error("Error assigning subscription:", error);
@@ -598,10 +602,10 @@ export const deleteFeature = async (id) => {
 
 
 // add feature to shop 
-export const addFeatureToShop = async (shopId, data) => {
-  console.log(shopId,data);
+export const addFeatureToShop = async (subscription_id, data) => {
+  console.log(subscription_id,data);
   try {
- const  response =  apiClient.post( API_URLS.ADD_FEATURE_TO_SHOP(shopId),
+ const  response =  apiClient.post( API_URLS.ADD_FEATURE_TO_SHOP(subscription_id),
     data
   );
   

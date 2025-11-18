@@ -2,11 +2,16 @@ import React, { useEffect, useState } from "react";
 import { fetchSubscriptions, assignSubscriptionToShop } from "../../api/AdminApis";
 
 const AssignPlanForShop = ({ shopId, isOpen, onClose, onSuccess }) => {
-  
+
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [assigning, setAssigning] = useState(false);
+
+  // ⬇ NEW FIELDS
+  const [paidAmount, setPaidAmount] = useState("");
+  const [autoRenew, setAutoRenew] = useState(false);
+  const [durationDays, setDurationDays] = useState("");
 
   useEffect(() => {
     if (isOpen) {
@@ -17,9 +22,8 @@ const AssignPlanForShop = ({ shopId, isOpen, onClose, onSuccess }) => {
   const fetchPlans = async () => {
     setLoading(true);
     try {
-      const data = await fetchSubscriptions(); // API call
+      const data = await fetchSubscriptions();
 
-      // ✅ Ensure it's always an array
       const plansArray =
         Array.isArray(data) ? data :
         Array.isArray(data?.results) ? data.results :
@@ -37,14 +41,24 @@ const AssignPlanForShop = ({ shopId, isOpen, onClose, onSuccess }) => {
 
   const handleAssign = async () => {
     if (!selectedPlan) return alert("Please select a plan first");
+
+    if (!paidAmount) return alert("Please enter paid amount");
+
+    if (!durationDays) return alert("Please enter duration days");
+
     setAssigning(true);
+
     try {
       const payload = {
         shop_id: shopId,
         plan_id: selectedPlan.id,
+        paid_amount: Number(paidAmount),
+        auto_renew: autoRenew,
+        duration_days: Number(durationDays),
         payment_status: true,
         start_date: new Date().toISOString(),
       };
+
       await assignSubscriptionToShop(payload);
       alert("✅ Subscription assigned successfully!");
       onSuccess();
@@ -62,6 +76,7 @@ const AssignPlanForShop = ({ shopId, isOpen, onClose, onSuccess }) => {
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
       <div className="bg-white w-full max-w-3xl rounded-xl shadow-lg p-6 relative">
+        
         <h2 className="text-2xl font-semibold mb-4">Assign Subscription Plan</h2>
 
         {/* Plan List */}
@@ -70,11 +85,15 @@ const AssignPlanForShop = ({ shopId, isOpen, onClose, onSuccess }) => {
         ) : plans.length === 0 ? (
           <p className="text-gray-500 text-center">No plans available</p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[70vh] overflow-auto p-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[50vh] overflow-auto p-2">
             {plans.map((plan) => (
               <div
                 key={plan.id}
-                onClick={() => setSelectedPlan(plan)}
+                onClick={() => {
+                  setSelectedPlan(plan);
+                  setDurationDays(plan.duration_days); // prefill
+                  setPaidAmount(plan.base_price); // optional prefill
+                }}
                 className={`border rounded-lg p-5 cursor-pointer transition-all ${
                   selectedPlan?.id === plan.id
                     ? "border-blue-600 bg-blue-50 shadow-md"
@@ -119,6 +138,46 @@ const AssignPlanForShop = ({ shopId, isOpen, onClose, onSuccess }) => {
           </div>
         )}
 
+        {/* NEW INPUT FIELDS */}
+        {selectedPlan && (
+          <div className="mt-6 space-y-4 border-t pt-4">
+            
+            {/* Paid Amount */}
+            <div>
+              <label className="block font-medium mb-1">Paid Amount (₹)</label>
+              <input
+                type="number"
+                value={paidAmount}
+                onChange={(e) => setPaidAmount(e.target.value)}
+                className="w-full border rounded px-3 py-2"
+                placeholder="Enter paid amount"
+              />
+            </div>
+
+            {/* Duration Days */}
+            <div>
+              <label className="block font-medium mb-1">Duration Days</label>
+              <input
+                type="number"
+                value={durationDays}
+                onChange={(e) => setDurationDays(e.target.value)}
+                className="w-full border rounded px-3 py-2"
+                placeholder="Plan duration"
+              />
+            </div>
+
+            {/* Auto Renew */}
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={autoRenew}
+                onChange={(e) => setAutoRenew(e.target.checked)}
+              />
+              <label className="font-medium">Auto Renew</label>
+            </div>
+          </div>
+        )}
+
         {/* Actions */}
         <div className="flex justify-end gap-3 mt-6">
           <button
@@ -135,6 +194,7 @@ const AssignPlanForShop = ({ shopId, isOpen, onClose, onSuccess }) => {
             {assigning ? "Assigning..." : "Assign Plan"}
           </button>
         </div>
+
       </div>
     </div>
   );

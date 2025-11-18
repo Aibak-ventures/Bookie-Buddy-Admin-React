@@ -24,26 +24,43 @@ const SubscriptionTab = ({ shop_id, shopSubscriptionStatus }) => {
   }, [shopSubscriptionStatus]);
 
   // Parse custom date (DD-MM-YYYY HH:mm:ss)
-  const parseCustomDate = (dateString) => {
+const parseCustomDate = (dateString) => {
+  try {
+    // Split date and time
     const [datePart, timePart] = dateString.split(" ");
-    const [day, month, year] = datePart.split("-").map(Number);
-    return new Date(`${year}-${month}-${day}T${timePart}`);
-  };
 
+    if (!datePart || !timePart) return new Date(""); // invalid
+
+    const [day, month, year] = datePart.split("-").map(Number);
+    const [hours, minutes, seconds] = timePart.split(":").map(Number);
+
+    return new Date(year, month - 1, day, hours, minutes, seconds);
+  } catch (e) {
+    return new Date("");
+  }
+};
   // 🚀 Calculate remaining days
   const calculateRemainingDays = (start, end) => {
+    
     try {
       const today = new Date();
       const endDate = parseCustomDate(end);
+      console.log("here ",end,start,endDate, isNaN(endDate));
+      
 
       if (isNaN(endDate)) return 0;
-      if (today > endDate) return 0;
+      // if (today > endDate) return 0;
 
       const diff = endDate - today;
+      console.log("the diff",diff, Math.ceil(diff / (1000 * 60 * 60 * 24)));
+      
       return Math.ceil(diff / (1000 * 60 * 60 * 24));
-    } catch {
+    } catch(err) {
+      console.log("here some error ",err);
+      
       return 0;
     }
+
   };
 
   // Fetch subscription if active
@@ -58,6 +75,8 @@ const SubscriptionTab = ({ shop_id, shopSubscriptionStatus }) => {
     try {
       const res = await getShopSubscriptionDetails(shop_id);
       const data = res?.data?.subscription || null;
+      console.log("response in componen ",data);
+      
 
       setSubscriptionData(data);
       setStatus(data?.status === "ACTIVE" ? "ACTIVE" : "NONE");
@@ -132,6 +151,7 @@ const SubscriptionTab = ({ shop_id, shopSubscriptionStatus }) => {
 
       <UpdateShopFeaturesModal
         shopId={shop_id}
+        subscription_id={subscriptionData?.id}
         isOpen={showUpdateFeaturesModal}
         onClose={() => setShowUpdateFeaturesModal(false)}
         onSuccess={fetchSubscriptionDetails}

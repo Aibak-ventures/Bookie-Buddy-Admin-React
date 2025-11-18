@@ -29,7 +29,7 @@ const API_URLS = {
 
   // features
   FEATURES_URL : "/api/v3/subscriptions/admin/features/",
-  ADD_FEATURE_TO_SHOP :(shopId)=>`/api/v3/subscriptions/admin/shop-subscriptions/add-feature/${shopId}/`,
+  ADD_FEATURE_TO_SHOP :(subscription_id)=>`/api/v3/subscriptions/admin/shop-subscriptions/add-features/${subscription_id}/`,
 
   // SUBSCRIPTIONS
   SUBSCRIPTIONS: "/api/v3/subscriptions/admin/subscription-plans/",
