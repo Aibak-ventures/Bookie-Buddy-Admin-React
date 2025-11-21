@@ -413,6 +413,8 @@ export const getShopSubscriptionDetails = async (shopId) => {
 
 // ✅ Assign a plan to a shop
 export const assignSubscriptionToShop = async (payload) => {
+  console.log("payload0333333333333333",payload);
+  
   
   
   try {

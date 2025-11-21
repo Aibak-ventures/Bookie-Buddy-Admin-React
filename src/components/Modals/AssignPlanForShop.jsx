@@ -2,16 +2,23 @@ import React, { useEffect, useState } from "react";
 import { fetchSubscriptions, assignSubscriptionToShop } from "../../api/AdminApis";
 
 const AssignPlanForShop = ({ shopId, isOpen, onClose, onSuccess }) => {
-
   const [plans, setPlans] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [assigning, setAssigning] = useState(false);
 
-  // ⬇ NEW FIELDS
+  // NEW FIELDS
   const [paidAmount, setPaidAmount] = useState("");
   const [autoRenew, setAutoRenew] = useState(false);
   const [durationDays, setDurationDays] = useState("");
+
+  // ⭐ NEW FIELD → Payment Status
+  const [paymentStatus, setPaymentStatus] = useState(false);
+
+  // Start Date (Default: current timestamp)
+  const [startDate] = useState(
+    new Date().toISOString().split(".")[0]
+  );
 
   useEffect(() => {
     if (isOpen) {
@@ -25,10 +32,13 @@ const AssignPlanForShop = ({ shopId, isOpen, onClose, onSuccess }) => {
       const data = await fetchSubscriptions();
 
       const plansArray =
-        Array.isArray(data) ? data :
-        Array.isArray(data?.results) ? data.results :
-        Array.isArray(data?.data) ? data.data :
-        [];
+        Array.isArray(data)
+          ? data
+          : Array.isArray(data?.results)
+          ? data.results
+          : Array.isArray(data?.data)
+          ? data.data
+          : [];
 
       setPlans(plansArray);
     } catch (err) {
@@ -39,27 +49,35 @@ const AssignPlanForShop = ({ shopId, isOpen, onClose, onSuccess }) => {
     }
   };
 
+  const calculateEndDate = (start, days) => {
+    const startObj = new Date(start);
+    startObj.setDate(startObj.getDate() + Number(days));
+    return startObj.toISOString().split(".")[0];
+  };
+
   const handleAssign = async () => {
     if (!selectedPlan) return alert("Please select a plan first");
-
     if (!paidAmount) return alert("Please enter paid amount");
-
     if (!durationDays) return alert("Please enter duration days");
 
     setAssigning(true);
 
     try {
+      const endDate = calculateEndDate(startDate, durationDays);
+
       const payload = {
         shop_id: shopId,
         plan_id: selectedPlan.id,
-        paid_amount: Number(paidAmount),
+        payment_status: paymentStatus,       // ⭐ NEW FIELD
+        start_date: startDate,
+        end_date: endDate,
+        plan_price_paid: Number(paidAmount),
         auto_renew: autoRenew,
         duration_days: Number(durationDays),
-        payment_status: true,
-        start_date: new Date().toISOString(),
       };
 
       await assignSubscriptionToShop(payload);
+
       alert("✅ Subscription assigned successfully!");
       onSuccess();
       onClose();
@@ -76,10 +94,9 @@ const AssignPlanForShop = ({ shopId, isOpen, onClose, onSuccess }) => {
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
       <div className="bg-white w-full max-w-3xl rounded-xl shadow-lg p-6 relative">
-        
+
         <h2 className="text-2xl font-semibold mb-4">Assign Subscription Plan</h2>
 
-        {/* Plan List */}
         {loading ? (
           <p className="text-blue-500 text-center">Loading plans...</p>
         ) : plans.length === 0 ? (
@@ -91,8 +108,8 @@ const AssignPlanForShop = ({ shopId, isOpen, onClose, onSuccess }) => {
                 key={plan.id}
                 onClick={() => {
                   setSelectedPlan(plan);
-                  setDurationDays(plan.duration_days); // prefill
-                  setPaidAmount(plan.base_price); // optional prefill
+                  setDurationDays(plan.duration_days);
+                  setPaidAmount(plan.base_price);
                 }}
                 className={`border rounded-lg p-5 cursor-pointer transition-all ${
                   selectedPlan?.id === plan.id
@@ -138,10 +155,9 @@ const AssignPlanForShop = ({ shopId, isOpen, onClose, onSuccess }) => {
           </div>
         )}
 
-        {/* NEW INPUT FIELDS */}
         {selectedPlan && (
           <div className="mt-6 space-y-4 border-t pt-4">
-            
+
             {/* Paid Amount */}
             <div>
               <label className="block font-medium mb-1">Paid Amount (₹)</label>
@@ -175,6 +191,28 @@ const AssignPlanForShop = ({ shopId, isOpen, onClose, onSuccess }) => {
               />
               <label className="font-medium">Auto Renew</label>
             </div>
+
+            {/* ⭐ Payment Status */}
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                checked={paymentStatus}
+                onChange={(e) => setPaymentStatus(e.target.checked)}
+              />
+              <label className="font-medium">Payment Status</label>
+            </div>
+
+            {/* Start Date (read-only) */}
+            <div>
+              <label className="block font-medium mb-1">Start Date</label>
+              <input
+                type="text"
+                value={startDate}
+                readOnly
+                className="w-full border rounded px-3 py-2 bg-gray-100"
+              />
+            </div>
+
           </div>
         )}
 
