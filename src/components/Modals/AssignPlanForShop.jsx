@@ -7,18 +7,21 @@ const AssignPlanForShop = ({ shopId, isOpen, onClose, onSuccess }) => {
   const [selectedPlan, setSelectedPlan] = useState(null);
   const [assigning, setAssigning] = useState(false);
 
-  // NEW FIELDS
+  // Form Fields
   const [paidAmount, setPaidAmount] = useState("");
   const [autoRenew, setAutoRenew] = useState(false);
   const [durationDays, setDurationDays] = useState("");
-
-  // ⭐ NEW FIELD → Payment Status
   const [paymentStatus, setPaymentStatus] = useState(false);
 
-  // Start Date (Default: current timestamp)
-  const [startDate] = useState(
-    new Date().toISOString().split(".")[0]
-  );
+  // Editable start date (Default: Current IST)
+  const getCurrentISTDateTimeLocal = () => {
+    const now = new Date();
+    const istOffsetMs = 5.5 * 60 * 60 * 1000;
+    const istDate = new Date(now.getTime() + istOffsetMs);
+    return istDate.toISOString().slice(0, 16); // YYYY-MM-DDTHH:mm
+  };
+
+  const [startDate, setStartDate] = useState(getCurrentISTDateTimeLocal());
 
   useEffect(() => {
     if (isOpen) {
@@ -55,6 +58,19 @@ const AssignPlanForShop = ({ shopId, isOpen, onClose, onSuccess }) => {
     return startObj.toISOString().split(".")[0];
   };
 
+  // ✅ Formatter for 12hr IST preview
+  const formatTo12HrIST = (dateString) => {
+    return new Date(dateString).toLocaleString("en-IN", {
+      timeZone: "Asia/Kolkata",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  };
+
   const handleAssign = async () => {
     if (!selectedPlan) return alert("Please select a plan first");
     if (!paidAmount) return alert("Please enter paid amount");
@@ -63,13 +79,14 @@ const AssignPlanForShop = ({ shopId, isOpen, onClose, onSuccess }) => {
     setAssigning(true);
 
     try {
-      const endDate = calculateEndDate(startDate, durationDays);
+      const startISO = new Date(startDate).toISOString().split(".")[0];
+      const endDate = calculateEndDate(startISO, durationDays);
 
       const payload = {
         shop_id: shopId,
         plan_id: selectedPlan.id,
-        payment_status: paymentStatus,       // ⭐ NEW FIELD
-        start_date: startDate,
+        payment_status: paymentStatus,
+        start_date: startISO,
         end_date: endDate,
         plan_price_paid: Number(paidAmount),
         auto_renew: autoRenew,
@@ -143,9 +160,7 @@ const AssignPlanForShop = ({ shopId, isOpen, onClose, onSuccess }) => {
                     <p className="font-medium text-gray-800 mb-1">Included Features:</p>
                     <ul className="text-sm text-gray-600 list-disc ml-5 space-y-1">
                       {plan.included_features.map((f) => (
-                        <li key={f.id}>
-                          {f.name} ({f.feature_type})
-                        </li>
+                        <li key={f.id}>{f.name} ({f.feature_type})</li>
                       ))}
                     </ul>
                   </div>
@@ -166,7 +181,6 @@ const AssignPlanForShop = ({ shopId, isOpen, onClose, onSuccess }) => {
                 value={paidAmount}
                 onChange={(e) => setPaidAmount(e.target.value)}
                 className="w-full border rounded px-3 py-2"
-                placeholder="Enter paid amount"
               />
             </div>
 
@@ -178,7 +192,6 @@ const AssignPlanForShop = ({ shopId, isOpen, onClose, onSuccess }) => {
                 value={durationDays}
                 onChange={(e) => setDurationDays(e.target.value)}
                 className="w-full border rounded px-3 py-2"
-                placeholder="Plan duration"
               />
             </div>
 
@@ -192,7 +205,7 @@ const AssignPlanForShop = ({ shopId, isOpen, onClose, onSuccess }) => {
               <label className="font-medium">Auto Renew</label>
             </div>
 
-            {/* ⭐ Payment Status */}
+            {/* Payment Status */}
             <div className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -202,15 +215,18 @@ const AssignPlanForShop = ({ shopId, isOpen, onClose, onSuccess }) => {
               <label className="font-medium">Payment Status</label>
             </div>
 
-            {/* Start Date (read-only) */}
+            {/* ✅ Editable Start Date */}
             <div>
               <label className="block font-medium mb-1">Start Date</label>
               <input
-                type="text"
+                type="datetime-local"
                 value={startDate}
-                readOnly
-                className="w-full border rounded px-3 py-2 bg-gray-100"
+                onChange={(e) => setStartDate(e.target.value)}
+                className="w-full border rounded px-3 py-2"
               />
+              <p className="text-sm text-gray-600 mt-1">
+                🕒 IST Preview: {formatTo12HrIST(startDate)} (IST)
+              </p>
             </div>
 
           </div>
@@ -218,16 +234,13 @@ const AssignPlanForShop = ({ shopId, isOpen, onClose, onSuccess }) => {
 
         {/* Actions */}
         <div className="flex justify-end gap-3 mt-6">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-100"
-          >
+          <button onClick={onClose} className="px-4 py-2 border rounded hover:bg-gray-100">
             Cancel
           </button>
           <button
             disabled={assigning}
             onClick={handleAssign}
-            className="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-700 disabled:opacity-60"
+            className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 disabled:opacity-60"
           >
             {assigning ? "Assigning..." : "Assign Plan"}
           </button>

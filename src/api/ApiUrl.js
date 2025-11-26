@@ -47,7 +47,8 @@ const API_URLS = {
 
   // GET SUBSCRIPTION DETAILS OF THE SHOP
   GET_SUBSCRIPTION_DETAILS_OF_SHOP : (id) => `/api/v3/subscriptions/admin/shop-subscription-details/${id}/`,
-  CANCEL_SUBSCRIPTION_OF_SHOP : (subscriptionId) => `/api/v3/subscriptions/admin/shop-subscriptions/cancel/${subscriptionId}/`
+  CANCEL_SUBSCRIPTION_OF_SHOP : (subscriptionId) => `/api/v3/subscriptions/admin/shop-subscriptions/cancel/${subscriptionId}/`,
+  UPDATE_SHOP_SUB: (shopSubscriptionId) =>`/api/v3/subscriptions/admin/shop-subscriptions/update/${shopSubscriptionId}/`,
 
   
 };

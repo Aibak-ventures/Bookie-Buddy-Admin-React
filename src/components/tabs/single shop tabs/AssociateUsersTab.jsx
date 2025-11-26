@@ -12,6 +12,7 @@ const shopRoleOptions = [
 ];
 
 const AssociateUsersTab = ({ shopId, shopName }) => {
+
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -33,7 +34,6 @@ const AssociateUsersTab = ({ shopId, shopName }) => {
       setError(null);
       try {
         const data = await fetchLinkedUsers(shopId);
-        console.log("these are my users",data);
         
         setUsers(data);
       } catch (err) {
@@ -87,7 +87,6 @@ const AssociateUsersTab = ({ shopId, shopName }) => {
             u.id === selectedUser.id ? { ...u, is_active: newStatus } : u
           )
         );
-        console.log("selected user id",selectedUser);
         
         await blockOrUnblockUserFromShop(selectedUser.id, newStatus);
         alert(`User ${newStatus ? 'unblocked' : 'blocked'} successfully`);

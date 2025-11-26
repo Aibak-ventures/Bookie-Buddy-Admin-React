@@ -400,7 +400,6 @@ export const getShopReport = async (data) => {
 export const getShopSubscriptionDetails = async (shopId) => {
   try {
     const res = await apiClient.get(API_URLS.GET_SUBSCRIPTION_DETAILS_OF_SHOP(shopId));
-    console.log("res",res.data);
     
     return res.data;
   } catch (err) {
@@ -413,17 +412,26 @@ export const getShopSubscriptionDetails = async (shopId) => {
 
 // ✅ Assign a plan to a shop
 export const assignSubscriptionToShop = async (payload) => {
-  console.log("payload0333333333333333",payload);
-  
-  
   
   try {
     const res = await apiClient.post(API_URLS.ASSIGN_SUBSCRIPTION, payload);
-    console.log("response in function ",res.data);
-    
     return res.data;
   } catch (error) {
     console.error("Error assigning subscription:", error);
+    throw error;
+  }
+};
+
+//  Update shop subscription details
+export const updateShopSubscription = async (shopSubscriptionId, data) => {
+  try {
+    const response = await apiClient.patch(
+      API_URLS.UPDATE_SHOP_SUB(shopSubscriptionId),
+      data
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Failed to update shop subscription:", error);
     throw error;
   }
 };
@@ -576,8 +584,6 @@ export const deleteGeneralService = async (id) => {
 // Fetch Features
 export const fetchFeatures = async () => {
   const response = await apiClient.get(API_URLS.FEATURES_URL);
-  console.log("in function fetching all featru",response.data);
-  
   
   return response.data;
 };
@@ -605,7 +611,6 @@ export const deleteFeature = async (id) => {
 
 // add feature to shop 
 export const addFeatureToShop = async (subscription_id, data) => {
-  console.log(subscription_id,data);
   try {
  const  response =  apiClient.post( API_URLS.ADD_FEATURE_TO_SHOP(subscription_id),
     data
@@ -645,12 +650,10 @@ export const deleteSubscription = async (id) => {
 };
 
 export const cancelShopSubscription = async (subscriptionId) => {
-  console.log("subscription id", subscriptionId);
 
   const response = await apiClient.post(
     API_URLS.CANCEL_SUBSCRIPTION_OF_SHOP(subscriptionId)
   );
-  console.log("URL =", API_URLS.CANCEL_SUBSCRIPTION_OF_SHOP(subscriptionId));
 
   return response;
 };
