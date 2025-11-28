@@ -2,9 +2,10 @@ import React from 'react';
 import AssociateUsersTab from '../tabs/single shop tabs/AssociateUsersTab';
 import ServicesProductsTab from '../tabs/single shop tabs/ServicesProductsTab';
 import EngagmentChart from '../tabs/single shop tabs/EngagmentChart';
+import SubscriptionTab from '../tabs/single shop tabs/SubscriptionTab';
 
 
-const TabbedContentCard = ({ tabs, activeTab, setActiveTab,shopId ,shopName }) => {
+const TabbedContentCard = ({ tabs, activeTab, setActiveTab,shopId ,shopName ,shopSubscriptionStatus}) => {
   return (
     <div className="bg-white rounded-lg shadow-sm border">
       <div className="border-b">
@@ -30,6 +31,8 @@ const TabbedContentCard = ({ tabs, activeTab, setActiveTab,shopId ,shopName }) =
         {activeTab === 'associate-users' && <AssociateUsersTab shopId={shopId} shopName={shopName}/>}
         {activeTab === 'services-products' && <ServicesProductsTab shop_id={shopId} />}
         {activeTab === 'engagement' && <EngagmentChart shop_id={shopId} />}
+        {activeTab === 'subscription' && <SubscriptionTab shop_id={shopId} shopSubscriptionStatus={shopSubscriptionStatus} />}
+
         
       </div>
     </div>

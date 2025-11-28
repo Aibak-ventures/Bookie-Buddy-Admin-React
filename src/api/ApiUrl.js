@@ -29,6 +29,7 @@ const API_URLS = {
 
   // features
   FEATURES_URL : "/api/v3/subscriptions/admin/features/",
+  ADD_FEATURE_TO_SHOP :(subscription_id)=>`/api/v3/subscriptions/admin/shop-subscriptions/add-features/${subscription_id}/`,
 
   // SUBSCRIPTIONS
   SUBSCRIPTIONS: "/api/v3/subscriptions/admin/subscription-plans/",
@@ -39,7 +40,17 @@ const API_URLS = {
   RESET_PASSWORD: '/api/v1/auth/admin/users/reset-password/',
 
   // PUSH NOTIFICATIONS
-  PUSH_NOTIFICATION:'/api/v3/notifications/admin/notifications/send/'
+  PUSH_NOTIFICATION:'/api/v3/notifications/admin/notifications/send/',
+
+  // SHOP SUBSCRIPTION 
+  ASSIGN_SUBSCRIPTION : '/api/v3/subscriptions/admin/shop-subscriptions/subscribe/',
+
+  // GET SUBSCRIPTION DETAILS OF THE SHOP
+  GET_SUBSCRIPTION_DETAILS_OF_SHOP : (id) => `/api/v3/subscriptions/admin/shop-subscription-details/${id}/`,
+  CANCEL_SUBSCRIPTION_OF_SHOP : (subscriptionId) => `/api/v3/subscriptions/admin/shop-subscriptions/cancel/${subscriptionId}/`,
+  UPDATE_SHOP_SUB: (shopSubscriptionId) =>`/api/v3/subscriptions/admin/shop-subscriptions/update/${shopSubscriptionId}/`,
+
+  
 };
 
 export default API_URLS;

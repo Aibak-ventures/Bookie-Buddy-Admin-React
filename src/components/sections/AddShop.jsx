@@ -77,7 +77,15 @@ const ShopRegistrationForm = () => {
     }
   };
 
-  const stateOptions = [{ value: 'kerala', label: 'Kerala' }];
+  const stateOptions = [
+    { value: 'kerala', label: 'Kerala' },
+    { value: 'tamil nadu', label: 'Tamil Nadu' },
+    { value: 'karnataka', label: 'Karnataka' },
+    { value: 'andhra pradesh', label: 'Andhra Pradesh' },
+    { value: 'telangana', label: 'Telangana' },
+    { value: 'maharashtra', label: 'Maharashtra' },
+    { value: 'goa', label: 'Goa' },
+  ];
 
   return (
     <div className="max-w-6xl mx-auto p-6 bg-white">
