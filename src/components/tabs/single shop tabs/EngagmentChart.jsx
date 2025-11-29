@@ -30,28 +30,25 @@ function EngagementChart({ shop_id }) {
   const today = new Date();
   const currentYear = today.getFullYear();
   const currentMonth = today.getMonth();
-
-  // Default to current month range
   const { start, end } = getMonthRange(currentYear, currentMonth);
 
   const [chartData, setChartData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [period, setPeriod] = useState("monthly");
-  const [reportType, setReportType] = useState("both");
+  const [reportType, setReportType] = useState("all");
   const [startDate, setStartDate] = useState(start);
   const [endDate, setEndDate] = useState(end);
 
-  // Selections
+  // ✅ FIX ADDED HERE
+  const [endYear, setEndYear] = useState(currentYear);
+
   const [selectedMonth, setSelectedMonth] = useState(
     `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}`
   );
   const [selectedYear, setSelectedYear] = useState(currentYear.toString());
-  const [startYear, setStartYear] = useState(currentYear - 1);
-  const [endYear, setEndYear] = useState(currentYear);
-  const [yearlyError, setYearlyError] = useState("");
   const [monthlyError, setMonthlyError] = useState("");
+  const [yearlyError, setYearlyError] = useState("");
 
-  // ---- VALIDATION HELPERS ----
   const validateYearRange = (start, end) => {
     if (start < 2020) return "Start year cannot be less than 2020.";
     if (end > 2100) return "End year cannot be greater than 2100.";
@@ -66,11 +63,9 @@ function EngagementChart({ shop_id }) {
     return "";
   };
 
-  // ---- API CALL ----
   const fetchReport = async () => {
-    // Prevent invalid fetch
     if ((period === "yearly" && yearlyError) || (period === "monthly" && monthlyError)) {
-      console.warn("Validation failed, skipping fetch.");
+      console.warn("Validation failed, skipping fetch");
       return;
     }
 
@@ -78,7 +73,7 @@ function EngagementChart({ shop_id }) {
     try {
       const payload = {
         shop_id: shop_id,
-        report_type: reportType === "both" ? undefined : reportType,
+        report_type: reportType === "all" ? undefined : reportType,
         period,
         start_date: startDate,
         end_date: endDate,
@@ -90,30 +85,36 @@ function EngagementChart({ shop_id }) {
         const result = response.data.results;
         const salesData = result.sales || [];
         const bookingData = result.bookings || [];
+        const tailorData = result.tailor_orders || [];
 
         const allPeriods = Array.from(
           new Set([
             ...salesData.map((i) => i.period),
             ...bookingData.map((i) => i.period),
+            ...tailorData.map((i) => i.period),
           ])
         );
 
-        const combinedData = allPeriods.map((p) => ({
+        const combined = allPeriods.map((p) => ({
           name: p,
           sales: salesData.find((s) => s.period === p)?.count || 0,
           bookings: bookingData.find((b) => b.period === p)?.count || 0,
+          tailor_orders: tailorData.find((t) => t.period === p)?.count || 0,
         }));
 
-        setChartData(combinedData);
+        setChartData(combined);
       }
     } catch (error) {
-      console.error("Error fetching chart data:", error);
+      console.error("Error fetching report:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  // ---- HANDLERS ----
+  useEffect(() => {
+    fetchReport();
+  }, [shop_id, period, reportType, startDate, endYear]);
+
   const handleMonthChange = (e) => {
     const value = e.target.value;
     setSelectedMonth(value);
@@ -124,90 +125,51 @@ function EngagementChart({ shop_id }) {
   };
 
   const handleYearChange = (e) => {
-    const year = parseInt(e.target.value);
-    setSelectedYear(year.toString());
-    const error = validateMonthlyYear(year);
-    setMonthlyError(error);
+    const y = parseInt(e.target.value);
+    setSelectedYear(y.toString());
+    const err = validateMonthlyYear(y);
+    setMonthlyError(err);
 
-    if (!error) {
-      const { start, end } = getYearRange(year);
+    if (!err) {
+      const { start, end } = getYearRange(y);
       setStartDate(start);
       setEndDate(end);
     }
   };
 
   const handleYearlyRangeChange = (type, value) => {
-    const numericValue = parseInt(value);
+    const v = parseInt(value);
     if (type === "start") {
-      setStartYear(numericValue);
-      setStartDate(`${numericValue}-01-01`);
-      setEndDate(`${endYear}-12-31`);
-      const error = validateYearRange(numericValue, endYear);
-      setYearlyError(error);
+      setStartDate(`${v}-01-01`);
     } else {
-      setEndYear(numericValue);
-      setStartDate(`${startYear}-01-01`);
-      setEndDate(`${numericValue}-12-31`);
-      const error = validateYearRange(startYear, numericValue);
-      setYearlyError(error);
+      setEndYear(v);
+      setEndDate(`${v}-12-31`);
     }
+    const err = validateYearRange(parseInt(selectedYear), v);
+    setYearlyError(err);
   };
-
-  useEffect(() => {
-    fetchReport();
-  }, [period, reportType, startDate, endDate]);
 
   return (
     <div className="bg-white rounded-2xl shadow-md p-6">
-      {/* Header and Filters */}
       <div className="flex flex-wrap justify-between items-center mb-6">
-        <h2 className="text-xl font-semibold text-gray-800">
-          Engagement Report
-        </h2>
+        <h2 className="text-xl font-semibold text-gray-800">Engagement Report</h2>
 
-        <div className="flex flex-wrap gap-3 items-center">
-          {/* Report Type */}
+        <div className="flex flex-wrap gap-3">
           <select
             value={reportType}
             onChange={(e) => setReportType(e.target.value)}
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
           >
             <option value="sales">Sales</option>
             <option value="bookings">Bookings</option>
-            <option value="both">Both</option>
+            <option value="tailor_orders">Tailor Orders</option>
+            <option value="all">All</option>
           </select>
 
-          {/* Period */}
           <select
             value={period}
-            onChange={(e) => {
-              const newPeriod = e.target.value;
-              setPeriod(newPeriod);
-              setYearlyError("");
-              setMonthlyError("");
-
-              if (newPeriod === "monthly") {
-                const { start, end } = getYearRange(currentYear);
-                setSelectedYear(currentYear.toString());
-                setStartDate(start);
-                setEndDate(end);
-              } else if (newPeriod === "yearly") {
-                const s = currentYear - 1;
-                const e = currentYear;
-                setStartYear(s);
-                setEndYear(e);
-                setStartDate(`${s}-01-01`);
-                setEndDate(`${e}-12-31`);
-              } else {
-                const { start, end } = getMonthRange(currentYear, currentMonth);
-                setSelectedMonth(
-                  `${currentYear}-${String(currentMonth + 1).padStart(2, "0")}`
-                );
-                setStartDate(start);
-                setEndDate(end);
-              }
-            }}
-            className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+            onChange={(e) => setPeriod(e.target.value)}
+            className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
           >
             <option value="daily">Daily</option>
             <option value="weekly">Weekly</option>
@@ -215,76 +177,52 @@ function EngagementChart({ shop_id }) {
             <option value="yearly">Yearly</option>
           </select>
 
-          {/* Month Picker for Daily/Weekly */}
           {(period === "daily" || period === "weekly") && (
             <input
               type="month"
               value={selectedMonth}
               onChange={handleMonthChange}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="border border-gray-300 rounded-lg px-3 py-2 text-sm"
             />
           )}
 
-          {/* Year Picker for Monthly */}
           {period === "monthly" && (
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col">
               <input
                 type="number"
-                min="2020"
-                max="2100"
                 value={selectedYear}
                 onChange={handleYearChange}
-                className={`border ${
-                  monthlyError ? "border-red-500" : "border-gray-300"
-                } rounded-lg px-3 py-2 w-24 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400`}
+                className={`border ${monthlyError ? "border-red-500" : "border-gray-300"} rounded-lg px-3 py-2 w-24 text-sm`}
               />
-              {monthlyError && (
-                <span className="text-red-500 text-xs">{monthlyError}</span>
-              )}
+              {monthlyError && <span className="text-red-500 text-xs">{monthlyError}</span>}
             </div>
           )}
 
-          {/* Year Interval for Yearly */}
           {period === "yearly" && (
             <div className="flex flex-col gap-2">
               <div className="flex gap-2 items-center">
                 <input
                   type="number"
-                  min="2020"
-                  max="2100"
-                  value={startYear}
-                  onChange={(e) =>
-                    handleYearlyRangeChange("start", e.target.value)
-                  }
-                  className={`border ${
-                    yearlyError ? "border-red-500" : "border-gray-300"
-                  } rounded-lg px-3 py-2 w-24 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400`}
+                  value={selectedYear}
+                  onChange={(e) => handleYearlyRangeChange("start", e.target.value)}
+                  className="border border-gray-300 rounded-lg px-3 py-2 w-24 text-sm"
                 />
-                <span className="text-gray-500 font-semibold">to</span>
+                <span className="text-gray-600 font-semibold">to</span>
                 <input
                   type="number"
-                  min="2020"
-                  max="2100"
                   value={endYear}
-                  onChange={(e) =>
-                    handleYearlyRangeChange("end", e.target.value)
-                  }
-                  className={`border ${
-                    yearlyError ? "border-red-500" : "border-gray-300"
-                  } rounded-lg px-3 py-2 w-24 text-sm focus:outline-none focus:ring-2 focus:ring-blue-400`}
+                  onChange={(e) => handleYearlyRangeChange("end", e.target.value)}
+                  className="border border-gray-300 rounded-lg px-3 py-2 w-24 text-sm"
                 />
               </div>
-              {yearlyError && (
-                <span className="text-red-500 text-xs">{yearlyError}</span>
-              )}
+              {yearlyError && <span className="text-red-500 text-xs">{yearlyError}</span>}
             </div>
           )}
         </div>
       </div>
 
-      {/* Chart Section */}
       {loading ? (
-        <div className="text-center text-gray-500 py-10">Loading Chart...</div>
+        <div className="text-center text-gray-500 py-10">Loading chart...</div>
       ) : (
         <ResponsiveContainer width="100%" height={400}>
           <LineChart data={chartData}>
@@ -293,24 +231,11 @@ function EngagementChart({ shop_id }) {
             <YAxis />
             <Tooltip />
             <Legend />
-            {(reportType === "sales" || reportType === "both") && (
-              <Line
-                type="monotone"
-                dataKey="sales"
-                stroke="#3b82f6"
-                strokeWidth={3}
-                name="Sales"
-              />
-            )}
-            {(reportType === "bookings" || reportType === "both") && (
-              <Line
-                type="monotone"
-                dataKey="bookings"
-                stroke="#10b981"
-                strokeWidth={3}
-                name="Bookings"
-              />
-            )}
+
+           <Line type="monotone" dataKey="sales" strokeWidth={3} name="Sales" stroke="#3b82f6" />
+          <Line type="monotone" dataKey="bookings" strokeWidth={3} name="Bookings" stroke="#10b981" />
+          <Line type="monotone" dataKey="tailor_orders" strokeWidth={3} name="Tailor Orders" stroke="#8b5cf6" />
+
           </LineChart>
         </ResponsiveContainer>
       )}

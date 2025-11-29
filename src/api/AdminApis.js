@@ -628,6 +628,36 @@ export const addFeatureToShop = async (subscription_id, data) => {
 };
 
 
+// Update addon feature details for a shop subscription
+export const updateShopFeature = async (subscription_id,feature_id, featureData) => {
+  console.log("this is my id ",feature_id,featureData);
+  
+  try {
+    const response = await apiClient.patch(
+      API_URLS.UPDATE_SHOP_FEATURE(subscription_id,feature_id),
+      featureData
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Failed to update shop feature:", error);
+    throw error;
+  }
+};
+
+// Delete addon feature for a shop subscription
+export const deleteShopFeature = async (subscriptionId, featureId) => {
+  try {
+    const response = await apiClient.delete(
+      API_URLS.DELETE_SHOP_FEATURE(subscriptionId, featureId)
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Failed to delete shop feature:", error);
+    throw error;
+  }
+};
+
+
 
 
 

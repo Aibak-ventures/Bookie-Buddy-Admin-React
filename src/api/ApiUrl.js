@@ -30,6 +30,8 @@ const API_URLS = {
   // features
   FEATURES_URL : "/api/v3/subscriptions/admin/features/",
   ADD_FEATURE_TO_SHOP :(subscription_id)=>`/api/v3/subscriptions/admin/shop-subscriptions/add-features/${subscription_id}/`,
+  UPDATE_SHOP_FEATURE:(shop_subscription_id,feature_id)=> `/api/v3/subscriptions/admin/shop-subscriptions/${shop_subscription_id}/update-feature/${feature_id}/`,
+  DELETE_SHOP_FEATURE: (subscriptionId,featureId)=>`/api/v3/subscriptions/admin/shop-subscriptions/${subscriptionId}/features/${featureId}/`,
 
   // SUBSCRIPTIONS
   SUBSCRIPTIONS: "/api/v3/subscriptions/admin/subscription-plans/",

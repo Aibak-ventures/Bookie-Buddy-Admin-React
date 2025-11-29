@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { getShopSubscriptionDetails, cancelShopSubscription } from "../../../api/AdminApis";
+import UpdateShopFeatureDetails from "../../Modals/UpdateShopFeatureDetails";
+import { deleteShopFeature } from "../../../api/AdminApis";
 
 // Modals
 import AssignPlanForShop from "../../Modals/AssignPlanForShop";
 import UpdateShopPlanModal from "../../Modals/UpdateShopPlanModal";
-import UpdateShopFeaturesModal from "../../Modals/UpdateShopFeaturesModal";
+import UpdateShopFeaturesModal from "../../Modals/AddShopFeaturesModal";
 import UpdateShopSubscriptionModal from "../../Modals/UpdateShopSubscriptionModal";
 
 const SubscriptionTab = ({ shop_id, shopSubscriptionStatus }) => {
@@ -17,6 +19,9 @@ const SubscriptionTab = ({ shop_id, shopSubscriptionStatus }) => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showUpdateSubModal, setShowUpdateSubModal] = useState(false);
   const [showUpdateFeaturesModal, setShowUpdateFeaturesModal] = useState(false);
+
+  const [selectedFeature, setSelectedFeature] = useState(null);
+  const [showFeatureEditModal, setShowFeatureEditModal] = useState(false);
 
   // Sync status
   useEffect(() => {
@@ -81,7 +86,7 @@ const SubscriptionTab = ({ shop_id, shopSubscriptionStatus }) => {
     try {
       const res = await getShopSubscriptionDetails(shop_id);
       const data = res?.data?.subscription || null;
-
+      
       setSubscriptionData(data);
       setStatus(data?.status === "ACTIVE" ? "ACTIVE" : "NONE");
     } catch (err) {
@@ -93,7 +98,25 @@ const SubscriptionTab = ({ shop_id, shopSubscriptionStatus }) => {
     }
   };
 
-  // CANCEL SUBSCRIPTION (unchanged)
+  const handleDeleteFeature = async (featureId) => {
+    if (!window.confirm("Are you sure you want to delete this feature?")) return;
+  
+    try {
+      await deleteShopFeature(subscriptionData.id, featureId);
+      alert("Feature deleted successfully!");
+      fetchSubscriptionDetails();
+    } catch (error) {
+      alert("Failed to delete feature");
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    if (selectedFeature) {
+      setShowFeatureEditModal(true);
+    }
+  }, [selectedFeature]);
+
   const handleCancelSubscription = async () => {
     if (!subscriptionData?.id) {
       alert("Subscription not found");
@@ -107,7 +130,7 @@ const SubscriptionTab = ({ shop_id, shopSubscriptionStatus }) => {
     try {
       await cancelShopSubscription(subscriptionData.id);
       alert("Subscription cancelled successfully");
-
+  
       setStatus("NONE");
       setSubscriptionData(null);
       fetchSubscriptionDetails();
@@ -159,7 +182,6 @@ const SubscriptionTab = ({ shop_id, shopSubscriptionStatus }) => {
         currentFeatures={subscriptionData?.addon_features || []}
       />
 
-      {/* MAIN CONTENT */}
       {loading ? (
         <p className="text-blue-500 mt-6">Loading subscription details...</p>
       ) : !subscriptionData ? (
@@ -207,60 +229,101 @@ const SubscriptionTab = ({ shop_id, shopSubscriptionStatus }) => {
               {calculateRemainingDays(subscriptionData.start_date, subscriptionData.end_date)} days left
             </div>
 
-            {/* ✅ UPDATED DATE + TIME HERE */}
             <div className="mt-1 text-sm text-blue-200">
               {formatDateTime(subscriptionData.start_date)} → {formatDateTime(subscriptionData.end_date)}
             </div>
-
-            <div className="my-6 border-t border-white/30"></div>
-
-            <div className="space-y-3 text-sm">
-              <div className="flex justify-between">
-                <span>Paid Amount:</span>
-                <span>₹{subscriptionData.paid_amount || "N/A"}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Payment Status:</span>
-                <span>{subscriptionData.payment_status ? "Paid" : "Unpaid"}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Auto Renew:</span>
-                <span>{subscriptionData.auto_renew ? "Enabled" : "Disabled"}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Base Price:</span>
-                <span>₹{subscriptionData.plan?.base_price || "N/A"}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Duration:</span>
-                <span>{subscriptionData.plan?.duration_days || "N/A"} days</span>
-              </div>
-            </div>
           </div>
 
-          {/* RIGHT CARD */}
-          <div className="relative bg-gray-50 p-6 rounded-lg shadow-md">
-            <h5 className="font-medium mb-4">Addon Features</h5>
+          {/* ############################ */}
+          {/* ✅ UPDATED FEATURES UI BELOW */}
+          {/* ############################ */}
+
+          <div className="bg-white p-6 rounded-2xl shadow-lg border border-gray-100">
+
+            <div className="flex justify-between items-center mb-5">
+              <h4 className="text-xl font-bold text-gray-800">Addon Features</h4>
+            </div>
 
             {subscriptionData.addon_features?.length > 0 ? (
-              <ul className="space-y-3">
+              <div className="space-y-4 max-h-[420px] overflow-y-auto pr-2 scrollbar-thin">
+
                 {subscriptionData.addon_features.map((feature) => (
-                  <li key={feature.id} className="border-b pb-2 flex justify-between items-center">
-                    <div>
-                      <p className="font-medium text-gray-800">{feature.name}</p>
-                      <p className="text-xs text-gray-500">
-                        Active till {formatDateTime(feature.end_date)} {/* ✅ FORMATTED ADDON DATE + TIME */}
-                      </p>
+                  <div key={feature.id}
+                    className="bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-100 p-5 rounded-2xl shadow-sm hover:shadow-md transition-all duration-200">
+
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <h5 className="text-lg font-bold text-purple-700">{feature.name}</h5>
+                       
+                      </div>
+
+                      <span className="text-base font-extrabold text-blue-600">₹{feature.price_paid}</span>
                     </div>
-                    <span className="text-sm text-blue-600 font-semibold">₹{feature.price_paid}</span>
-                  </li>
+
+                    <div className="mt-4 grid grid-cols-2 md:grid-cols-3 gap-3 text-xs text-gray-600">
+
+                      <div>
+                        <p className="uppercase tracking-wide font-semibold text-gray-500 text-[10px]">Paid</p>
+                        <p className="font-medium">₹{feature.price_paid}</p>
+                      </div>
+
+                      <div>
+                        <p className="uppercase font-semibold tracking-wide text-gray-500 text-[10px]">Start</p>
+                        <p className="font-medium">{formatDateTime(feature.start_date)}</p>
+                      </div>
+
+                      <div>
+                        <p className="uppercase font-semibold tracking-wide text-gray-500 text-[10px]">End</p>
+                        <p className="font-medium">{formatDateTime(feature.end_date)}</p>
+                      </div>
+
+
+
+
+
+                    </div>
+
+                    <div className="mt-4 flex justify-end space-x-2">
+                      <button
+                        onClick={() => setSelectedFeature(feature)}
+                        className="bg-purple-600 text-white px-4 py-1.5 rounded-xl text-xs hover:bg-purple-700 transition-colors"
+                      >✏ Edit</button>
+
+                      <button
+                        onClick={() => handleDeleteFeature(feature.id)}
+                        className="bg-red-600 text-white px-4 py-1.5 rounded-xl text-xs hover:bg-red-700 transition-colors"
+                      >🗑 Delete</button>
+                    </div>
+
+                  </div>
                 ))}
-              </ul>
+
+              </div>
             ) : (
-              <p className="text-gray-500 text-sm">No addon features available.</p>
+              <div className="bg-gray-50 p-4 rounded-xl text-center text-gray-500 text-sm">
+                No addon features available.
+              </div>
             )}
+
+            {/* ✅ ADD FEATURES BUTTON */}
+            {subscriptionData?.id && (
+              <div className="flex justify-end mt-4">
+                <button
+                  onClick={() => setShowUpdateFeaturesModal(true)}
+                  className="bg-indigo-600 text-white px-5 py-2 rounded-xl text-sm font-semibold hover:bg-indigo-700 transition-all shadow-md"
+                >+ Add Features</button>
+              </div>
+            )}
+
           </div>
-          <UpdateShopSubscriptionModal
+        </div>
+      ) : (
+        <div className="bg-gray-50 p-6 rounded-lg text-center text-gray-500 mt-12">
+          No subscription data available.
+        </div>
+      )}
+
+      <UpdateShopSubscriptionModal
         isOpen={showUpdateModal}
         onClose={() => setShowUpdateModal(false)}
         subscription_id={subscriptionData?.id}
@@ -268,12 +331,70 @@ const SubscriptionTab = ({ shop_id, shopSubscriptionStatus }) => {
         currentSub={subscriptionData}
       />
 
-        </div>
-      ) : (
-        <div className="bg-gray-50 p-6 rounded-lg text-center text-gray-500 mt-12">
-          No subscription data available.
-        </div>
-      )}
+      <UpdateShopFeatureDetails
+        isOpen={showFeatureEditModal}
+        onClose={() => setShowFeatureEditModal(false)}
+        onSuccess={fetchSubscriptionDetails}
+        feature={selectedFeature}
+        subscription_id={subscriptionData?.id}
+      />
+
+      <UpdateShopSubscriptionModal
+        isOpen={showUpdateModal}
+        onClose={() => setShowUpdateModal(false)}
+        subscription_id={subscriptionData?.id}
+        onSuccess={fetchSubscriptionDetails}
+        currentSub={subscriptionData}
+      />
+
+      <UpdateShopFeaturesModal
+        shopId={shop_id}
+        subscription_id={subscriptionData?.id}
+        isOpen={showUpdateFeaturesModal}
+        onClose={() => setShowUpdateFeaturesModal(false)}
+        onSuccess={fetchSubscriptionDetails}
+        currentFeatures={subscriptionData?.addon_features || []}
+      />
+
+      <UpdateShopSubscriptionModal
+        isOpen={showUpdateModal}
+        onClose={() => setShowUpdateModal(false)}
+        subscription_id={subscriptionData?.id}
+        onSuccess={fetchSubscriptionDetails}
+        currentSub={subscriptionData}
+      />
+
+      <AssignPlanForShop
+        shopId={shop_id}
+        isOpen={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onSuccess={fetchSubscriptionDetails}
+      />
+
+      <UpdateShopSubscriptionModal
+        isOpen={showUpdateModal}
+        onClose={() => setShowUpdateModal(false)}
+        subscription_id={subscriptionData?.id}
+        onSuccess={fetchSubscriptionDetails}
+        currentSub={subscriptionData}
+      />
+
+      <UpdateShopFeaturesModal
+        shopId={shop_id}
+        subscription_id={subscriptionData?.id}
+        isOpen={showUpdateFeaturesModal}
+        onClose={() => setShowUpdateFeaturesModal(false)}
+        onSuccess={fetchSubscriptionDetails}
+        currentFeatures={subscriptionData?.addon_features || []}
+      />
+
+      <UpdateShopSubscriptionModal
+        isOpen={showUpdateModal}
+        onClose={() => setShowUpdateModal(false)}
+        subscription_id={subscriptionData?.id}
+        onSuccess={fetchSubscriptionDetails}
+        currentSub={subscriptionData}
+      />
     </div>
   );
 };
