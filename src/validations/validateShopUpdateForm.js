@@ -1,40 +1,34 @@
 export const validateShopUpdateForm = (formData) => {
   const errors = {};
 
-  // Shop name is mandatory
   if (!formData.name?.trim()) {
     errors.name = 'Shop name is required';
   }
   if (!formData.place?.trim()) {
-    errors.place = 'place  is required';
+    errors.place = 'Place is required';
   }
 
-  // Phone validation
- if (!/^\d{10}$/.test(formData.phone)) {
+  if (!/^\d{10}$/.test(formData.phone)) {
     errors.phone = 'Phone must be 10 digits';
   }
 
- if (formData.phone2 && !/^\d{10}$/.test(formData.phone2)) {
-
-    errors.phone2 = 'Phone must be 10 digits';
+  if (formData.phone2 && !/^\d{10}$/.test(formData.phone2)) {
+    errors.phone2 = 'Phone 2 must be 10 digits';
   }
-  // Email validation
- if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
+
+  if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
     errors.email = 'Invalid email format';
   }
-
-
-
-  // Optional: You can validate other fields like pincode, gst_number, etc.
-  if (formData.pincode &&  !/^\d{6}$/.test(formData.pincode)) {
-    errors.pincode = 'Pincode must be 6 digits';
+ if( !formData.secret_password?.trim()) {
+    errors.secret_password = 'Secret password is required';
+  }
+  if (formData.secret_password && formData.secret_password.length < 4) {
+    errors.secret_password = "Secret password must be at least 4 characters";
   }
 
-  // Optional: Validate each T&C is not empty
-//   const emptyTerms = formData.terms_and_conditions?.some(term => !term.trim());
-//   if (emptyTerms) {
-//     errors.terms_and_conditions = 'Each term must be filled out';
-//   }
+  if (formData.pincode && !/^\d{6}$/.test(formData.pincode)) {
+    errors.pincode = 'Pincode must be 6 digits';
+  }
 
   return errors;
 };

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import FormInput from '../ui components/FormInput';
 import FileUpload from '../ui components/FileUpload';
 import { updateShopDetails } from '../../api/AdminApis';
-import { X } from 'lucide-react';
+import { Eye, EyeOff, X } from 'lucide-react';
 import { validateShopUpdateForm } from '../../validations/validateShopUpdateForm';
 import FormSelect from '../ui components/FormSelect';
 
@@ -23,6 +23,7 @@ const UpdateShopModal = ({ shopData, onClose, onSuccess }) => {
     extra_stock_limit: shopData.extra_stock_limit || '',
     sale_start_id: shopData.sale_start_id ,
     booking_start_id: shopData.booking_start_id ,
+    secret_password: shopData.secret_password || '',
 
     terms_and_conditions: Array.isArray(shopData.terms_and_conditions)
       ? shopData.terms_and_conditions
@@ -34,6 +35,9 @@ const UpdateShopModal = ({ shopData, onClose, onSuccess }) => {
   const [formErrors, setFormErrors] = useState({});
   const [imageFile, setImageFile] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  // ✅ Add this state at top of component (UpdateShopModal.jsx)
+const [showSecret, setShowSecret] = useState(false);
+
 
   const handleChange = (field) => (e) => {
     
@@ -223,6 +227,35 @@ const handleSubmit = async () => {
           value={formData.sale_start_id}
           onChange={handleChange('sale_start_id')}
         />
+            {/* ✅ SECRET PASSWORD INPUT ADDED */}
+          <div>
+  <label className="block text-sm font-medium text-gray-700 mb-1">Secret Password</label>
+
+  <div className="relative">
+    <input
+      type={showSecret ? "text" : "password"}
+      name="secret_password"
+      value={formData.secret_password}
+      onChange={handleChange('secret_password')}
+      className="w-full border border-gray-300 rounded-md p-2 pr-10"
+      placeholder="Enter Secret Password"
+    />
+
+    {/* ✅ EYE BUTTON */}
+     <button
+      type="button"
+      onClick={() => setShowSecret(!showSecret)}
+      className="absolute right-3 top-[13px] text-gray-500"
+      tabIndex={-1}
+    >
+      {showSecret ? <EyeOff size={18} /> : <Eye size={18} />}
+    </button>
+  </div>
+
+  {formErrors.secret_password && (
+    <p className="text-sm text-red-500 mt-1">{formErrors.secret_password}</p>
+  )}
+</div>
 
         </div>
 

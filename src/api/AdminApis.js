@@ -281,7 +281,7 @@ export const registerShopWithUser = async (formData, logoFile) => {
     data.append('email', formData.email);                      // ownerEmail -> email
     data.append('role', 'OWNER');
     data.append('password', formData.password);
-    data.append('secondary_password', formData.secondary_password);  // secretPassword -> secondary_password
+    data.append('secret_password', formData.secret_password);  // secretPassword -> secondary_password
 
     data.append('name', formData.name);                         // businessName -> name
     data.append('place', formData.place);
@@ -339,6 +339,10 @@ export const createShop = async (formData, logoFile) => {
      if (formData.sale_start_id) {
       data.append('sale_start_id', formData.sale_start_id);
     }
+       if (formData.secret_password) {
+      data.append('secret_password', formData.secret_password);
+    }
+
 
     if (logoFile) {
       data.append('img', logoFile);                      

@@ -12,6 +12,18 @@ export const validateShopCreation = (formData) => {
 
   if (formData.pincode && !/^\d{6}$/.test(formData.pincode))
     errors.pincode = 'Pincode must be 6 digits';
+  // ✅ Secret password mandatory
+  if (!formData.secret_password?.trim()) {
+    errors.secret_password = 'Secret password is required';
+  } else if (formData.secret_password.length < 4) {
+    errors.secret_password = 'Secret password must be at least 4 characters';
+  }
 
+  // ✅ Confirmation mandatory
+  if (!formData.confirm_secret_password?.trim()) {
+    errors.confirm_secret_password = 'Please confirm secret password';
+  } else if (formData.confirm_secret_password !== formData.secret_password) {
+    errors.confirm_secret_password = 'Secret password does not match';
+  }
   return errors;
 };

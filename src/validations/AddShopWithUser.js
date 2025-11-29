@@ -50,11 +50,11 @@ export const validateShopRegistrationForm = (formData) => {
     errors.confirmPassword = 'Passwords do not match';
   }
 
-  if (!formData.secondary_password?.trim()) {
-    errors.secondary_password = 'Secret password is required';
+  if (!formData.secret_password?.trim()) {
+    errors.secret_password = 'Secret password is required';
   }
 
-  if (formData.secondary_password !== formData.confirmSecretPassword) {
+  if (formData.secret_password !== formData.confirmSecretPassword) {
     errors.confirmSecretPassword = 'Secret passwords do not match';
   }
 
