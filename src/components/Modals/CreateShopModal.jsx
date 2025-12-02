@@ -4,9 +4,12 @@ import FileUpload from '../ui components/FileUpload';
 import FormSelect from '../ui components/FormSelect';
 import { createShop } from '../../api/AdminApis';
 import { validateShopCreation } from '../../validations/AddShop';
+import { Eye, EyeOff } from 'lucide-react';
 
 const CreateShopModal = ({ isOpen, onClose, onCreated }) => {
   if (!isOpen) return null;
+  const [showSecret, setShowSecret] = useState(false);
+const [showConfirmSecret, setShowConfirmSecret] = useState(false);
 
   const [formData, setFormData] = useState({
     name: '',
@@ -21,6 +24,8 @@ const CreateShopModal = ({ isOpen, onClose, onCreated }) => {
     pincode: '',
     sale_start_id: '',
     booking_start_id: '',
+    secret_password: '',
+    confirm_secret_password: '',
     
   });
 
@@ -165,6 +170,7 @@ const CreateShopModal = ({ isOpen, onClose, onCreated }) => {
                 <p className="text-sm text-red-500">{errors.sale_start_id}</p>
               )}
             </div>
+            
 
 
 
@@ -177,6 +183,50 @@ const CreateShopModal = ({ isOpen, onClose, onCreated }) => {
               {errors.pincode && <p className="text-sm text-red-500">{errors.pincode}</p>}
             </div>
           </div>
+             {/* ✅ SECRET PASSWORD */}
+          <div className="relative w-full">
+            <FormInput
+              label="Secret Password"
+              type={showSecret ? "text" : "password"}
+              value={formData.secret_password}
+              onChange={handleInputChange('secret_password')}
+            />
+
+            <button
+              type="button"
+              onClick={() => setShowSecret(!showSecret)}
+              className="absolute right-3 top-[38px] text-gray-500"
+            >
+              {showSecret ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+
+            {errors.secret_password && (
+              <p className="text-sm text-red-500">{errors.secret_password}</p>
+            )}
+          </div>
+
+          {/* ✅ CONFIRM SECRET PASSWORD */}
+          <div className="relative w-full">
+            <FormInput
+              label="Confirm Secret Password"
+              type={showConfirmSecret ? "text" : "password"}
+              value={formData.confirm_secret_password}
+              onChange={handleInputChange('confirm_secret_password')}
+            />
+
+            <button
+              type="button"
+              onClick={() => setShowConfirmSecret(!showConfirmSecret)}
+              className="absolute right-3 top-[38px] text-gray-500"
+            >
+              {showConfirmSecret ? <EyeOff size={18} /> : <Eye size={18} />}
+            </button>
+
+            {errors.confirm_secret_password && (
+              <p className="text-sm text-red-500">{errors.confirm_secret_password}</p>
+            )}
+          </div>
+
 
           <div>
             <FileUpload onFileChange={setLogoFiles} accept="image/*" multiple={false} />

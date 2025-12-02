@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { fetchFeatures, addFeatureToShop } from "../../api/AdminApis";
 
-const UpdateShopFeaturesModal = ({
+const AddShopFeaturesModal = ({
   shopId,
   subscription_id,
   isOpen,
@@ -240,4 +240,4 @@ const UpdateShopFeaturesModal = ({
   );
 };
 
-export default UpdateShopFeaturesModal;
+export default AddShopFeaturesModal;
