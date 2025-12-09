@@ -79,7 +79,7 @@ function EngagementChart({ shop_id = 7 }) {
 
     try {
       const payload = {
-        shop_id: 7,
+        shop_id:shop_id,
         period,
         start_date: startDate,
         end_date: endDate,
