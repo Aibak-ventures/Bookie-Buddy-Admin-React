@@ -10,7 +10,6 @@ import { useParams } from 'react-router-dom'; // assuming you're using react-rou
 const SingleShop = () => {
   const { shopId } = useParams(); // assuming your route is like /shops/:shopId
   const [shopData, setShopData] = useState(null);
-  console.log("shop data",shopData);
   
   const [activeTab, setActiveTab] = useState('associate-users');
   const [loading, setLoading] = useState(true);
@@ -28,7 +27,6 @@ const SingleShop = () => {
     const loadShop = async () => {
       try {
         const data = await fetchSingleShop(shopId);
-        console.log("data",data);
         
         
         setShopData(data);
