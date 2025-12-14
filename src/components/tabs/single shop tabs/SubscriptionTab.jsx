@@ -228,10 +228,20 @@ const SubscriptionTab = ({ shop_id, shopSubscriptionStatus }) => {
             <div className="mt-5 text-xl font-semibold">
               {calculateRemainingDays(subscriptionData.start_date, subscriptionData.end_date)} days left
             </div>
+            
 
             <div className="mt-1 text-sm text-blue-200">
               {formatDateTime(subscriptionData.start_date)} → {formatDateTime(subscriptionData.end_date)}
             </div>
+            <div className="mt-1 text-sm text-white-200">
+              Auto Renew: {subscriptionData.auto_renew ? "Enabled" : "Disabled"}
+            </div>
+             <div className="mt-1 text-sm text-white-200">
+              Payment Status: {subscriptionData.payment_status ? "Paid" : "Pending"}
+            </div>  
+             <div className="mt-1 text-sm text-white-200">
+              Paid Amount: ₹{subscriptionData.paid_amount || "0"} 
+            </div>  
           </div>
 
           {/* ############################ */}

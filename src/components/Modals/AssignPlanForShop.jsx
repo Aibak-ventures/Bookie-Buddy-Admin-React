@@ -71,6 +71,15 @@ const AssignPlanForShop = ({ shopId, isOpen, onClose, onSuccess }) => {
     });
   };
 
+
+  const resetForm = () => {
+  setSelectedPlan(null);
+  setPaidAmount("");
+  setDurationDays("");
+  setAutoRenew(false);
+  setPaymentStatus(false);
+  setStartDate(getCurrentISTDateTimeLocal());
+};
   const handleAssign = async () => {
     if (!selectedPlan) return alert("Please select a plan first");
     if (!paidAmount) return alert("Please enter paid amount");
@@ -109,17 +118,23 @@ const AssignPlanForShop = ({ shopId, isOpen, onClose, onSuccess }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
-      <div className="bg-white w-full max-w-3xl rounded-xl shadow-lg p-6 relative">
+  <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+    <div className="bg-white w-full max-w-3xl rounded-xl shadow-lg relative flex flex-col max-h-[70vh]">
 
-        <h2 className="text-2xl font-semibold mb-4">Assign Subscription Plan</h2>
+      {/* Header */}
+      <div className="p-6 border-b">
+        <h2 className="text-2xl font-semibold">Assign Subscription Plan</h2>
+      </div>
+
+      {/* 🔽 Scrollable Content */}
+      <div className="overflow-y-auto px-6 py-4 flex-1">
 
         {loading ? (
           <p className="text-blue-500 text-center">Loading plans...</p>
         ) : plans.length === 0 ? (
           <p className="text-gray-500 text-center">No plans available</p>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[50vh] overflow-auto p-2">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {plans.map((plan) => (
               <div
                 key={plan.id}
@@ -157,10 +172,14 @@ const AssignPlanForShop = ({ shopId, isOpen, onClose, onSuccess }) => {
 
                 {plan.included_features?.length > 0 && (
                   <div className="mt-3">
-                    <p className="font-medium text-gray-800 mb-1">Included Features:</p>
+                    <p className="font-medium text-gray-800 mb-1">
+                      Included Features:
+                    </p>
                     <ul className="text-sm text-gray-600 list-disc ml-5 space-y-1">
                       {plan.included_features.map((f) => (
-                        <li key={f.id}>{f.name} ({f.feature_type})</li>
+                        <li key={f.id}>
+                          {f.name} ({f.feature_type})
+                        </li>
                       ))}
                     </ul>
                   </div>
@@ -173,7 +192,6 @@ const AssignPlanForShop = ({ shopId, isOpen, onClose, onSuccess }) => {
         {selectedPlan && (
           <div className="mt-6 space-y-4 border-t pt-4">
 
-            {/* Paid Amount */}
             <div>
               <label className="block font-medium mb-1">Paid Amount (₹)</label>
               <input
@@ -184,7 +202,6 @@ const AssignPlanForShop = ({ shopId, isOpen, onClose, onSuccess }) => {
               />
             </div>
 
-            {/* Duration Days */}
             <div>
               <label className="block font-medium mb-1">Duration Days</label>
               <input
@@ -195,7 +212,6 @@ const AssignPlanForShop = ({ shopId, isOpen, onClose, onSuccess }) => {
               />
             </div>
 
-            {/* Auto Renew */}
             <div className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -205,7 +221,6 @@ const AssignPlanForShop = ({ shopId, isOpen, onClose, onSuccess }) => {
               <label className="font-medium">Auto Renew</label>
             </div>
 
-            {/* Payment Status */}
             <div className="flex items-center gap-2">
               <input
                 type="checkbox"
@@ -215,7 +230,6 @@ const AssignPlanForShop = ({ shopId, isOpen, onClose, onSuccess }) => {
               <label className="font-medium">Payment Status</label>
             </div>
 
-            {/* ✅ Editable Start Date */}
             <div>
               <label className="block font-medium mb-1">Start Date</label>
               <input
@@ -231,24 +245,32 @@ const AssignPlanForShop = ({ shopId, isOpen, onClose, onSuccess }) => {
 
           </div>
         )}
+      </div>
 
-        {/* Actions */}
-        <div className="flex justify-end gap-3 mt-6">
-          <button onClick={onClose} className="px-4 py-2 border rounded hover:bg-gray-100">
+      {/* Footer (Always Visible) */}
+      <div className="p-6 border-t flex justify-end gap-3">
+         <button
+            onClick={() => {
+              resetForm();
+              onClose();
+            }}
+            className="px-4 py-2 border rounded hover:bg-gray-100"
+          >
             Cancel
           </button>
-          <button
-            disabled={assigning}
-            onClick={handleAssign}
-            className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 disabled:opacity-60"
-          >
-            {assigning ? "Assigning..." : "Assign Plan"}
-          </button>
-        </div>
-
+        <button
+          disabled={assigning}
+          onClick={handleAssign}
+          className="bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 disabled:opacity-60"
+        >
+          {assigning ? "Assigning..." : "Assign Plan"}
+        </button>
       </div>
+
     </div>
-  );
+  </div>
+);
+
 };
 
 export default AssignPlanForShop;
