@@ -29,7 +29,7 @@ const UpdateShopModal = ({ shopData, onClose, onSuccess }) => {
       ? shopData.terms_and_conditions
       : [''],
   };
-  
+  console.log("THIS I SMY DATA",initialForm);
 
   const [formData, setFormData] = useState(initialForm);
   const [formErrors, setFormErrors] = useState({});
@@ -37,7 +37,6 @@ const UpdateShopModal = ({ shopData, onClose, onSuccess }) => {
   const [submitting, setSubmitting] = useState(false);
   // ✅ Add this state at top of component (UpdateShopModal.jsx)
 const [showSecret, setShowSecret] = useState(false);
-
 
   const handleChange = (field) => (e) => {
     
@@ -165,11 +164,11 @@ const handleSubmit = async () => {
             {formErrors.name && <p className="text-sm text-red-500">{formErrors.name}</p>}
           </div>
           <div>
-          <FormInput label="Phone" value={formData.phone} onChange={handleChange('phone')} />
+          <FormInput label="Phone"  value={formData.phone} onChange={handleChange('phone')} />
           {formErrors.phone && <p className="text-sm text-red-500">{formErrors.phone}</p>}
           </div>
           <div>
-          <FormInput label="Phone 2" value={formData.phone2} onChange={handleChange('phone2')} />
+          <FormInput label="Phone 2"    value={formData.phone2} onChange={handleChange('phone2')} />
           {formErrors.phone2 && <p className="text-sm text-red-500">{formErrors.phone2}</p>}
           </div>
           <div>
