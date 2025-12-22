@@ -83,8 +83,8 @@ const Users = () => {
 
     }
     catch(err){
-     alert(`Failed :${err?.response?.data?.error}`)
-
+     console.log("error",err);
+     
     }
       
       

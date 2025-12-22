@@ -23,13 +23,12 @@ const UpdateShopModal = ({ shopData, onClose, onSuccess }) => {
     extra_stock_limit: shopData.extra_stock_limit || '',
     sale_start_id: shopData.sale_start_id ,
     booking_start_id: shopData.booking_start_id ,
-    secret_password: shopData.secret_password || '',
+    secret_password: shopData.secret_password ||'',
 
     terms_and_conditions: Array.isArray(shopData.terms_and_conditions)
       ? shopData.terms_and_conditions
       : [''],
   };
-  console.log("THIS I SMY DATA",initialForm);
 
   const [formData, setFormData] = useState(initialForm);
   const [formErrors, setFormErrors] = useState({});
@@ -137,9 +136,14 @@ const handleSubmit = async () => {
 };
 
 
-  const stateOptions = [
+const stateOptions = [
   { value: 'kerala', label: 'Kerala' },
-  // Add more states as needed
+  { value: 'tamil nadu', label: 'Tamil Nadu' },
+  { value: 'karnataka', label: 'Karnataka' },
+  { value: 'andhra pradesh', label: 'Andhra Pradesh' },
+  { value: 'telangana', label: 'Telangana' },
+  { value: 'maharashtra', label: 'Maharashtra' },
+  { value: 'goa', label: 'Goa' },
 ];
 
   return (

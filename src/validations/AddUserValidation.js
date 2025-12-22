@@ -1,4 +1,8 @@
-// validations/AddUserValidation.js
+import {
+  validatePhone,
+  validateEmail,
+  validatePasswordMatch,
+} from './commonValidation';
 
 export const validateUserForm = (formData) => {
   const errors = {};
@@ -7,43 +11,32 @@ export const validateUserForm = (formData) => {
     errors.full_name = 'Full name is required';
   }
 
+  // 📞 Phone
+  const phoneError = validatePhone(formData.phone, {
+    required: true,
+  });
+  if (phoneError) errors.phone = phoneError;
 
+  // 📧 Email
+  const emailError = validateEmail(
+    formData.email,
+    'Invalid email address'
+  );
+  if (emailError) errors.email = emailError;
 
+  // 🔒 Password
+  const passwordError = validatePasswordMatch(
+    formData.password,
+    formData.confirm_password
+  );
+  if (passwordError) errors.confirm_password = passwordError;
 
-  if (!formData.phone?.trim()) {
-    errors.phone = 'Phone is required';
-  } else if (!/^\+?[\d\s\-()]{10,15}$/.test(formData.phone)) {
-    errors.phone = 'Invalid phone number';
-  }
-
- if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
-    errors.email = 'Invalid email address';
-  }
-
-  if (!formData.password) {
-    errors.password = 'Password is required';
-  }
-
-  if (!formData.confirm_password) {
-    errors.confirm_password = 'Please confirm your password';
-  } else if (formData.confirm_password !== formData.password) {
-    errors.confirm_password = 'Passwords do not match';
-  }
-
-  if (!formData.secondary_password) {
-    errors.secondary_password = 'Secret password is required';
-  }
-
-  if (!formData.confirm_secondary_password) {
-    errors.confirm_secondary_password = 'Please confirm your secret password';
-  } else if (formData.confirm_secondary_password !== formData.secondary_password) {
-    errors.confirm_secondary_password = 'Secret passwords do not match';
-  }
-
+  // 🎭 Role
   if (!formData.role) {
     errors.role = 'Role is required';
   }
 
+  // 🏪 Shop Role
   if (!formData.shop_role) {
     errors.shop_role = 'Shop role is required';
   }

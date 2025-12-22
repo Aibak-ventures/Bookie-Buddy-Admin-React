@@ -1,3 +1,11 @@
+import {
+  validatePhone,
+  validateEmail,
+  validatePincode,
+  validatePasswordMatch,
+  validateSecretPassword,
+} from './commonValidation';
+
 export const validateShopRegistrationForm = (formData) => {
   const errors = {};
 
@@ -10,53 +18,59 @@ export const validateShopRegistrationForm = (formData) => {
     errors.place = 'Place is required';
   }
 
-  if (!/^\d{10}$/.test(formData.shop_phone)) {
-    errors.shop_phone = 'Phone number must be 10 digits';
-  }
+  // Shop phone (required)
+  const shopPhoneError = validatePhone(formData.shop_phone, {
+    required: true,
+    fieldName: 'Phone number',
+  });
+  if (shopPhoneError) errors.shop_phone = shopPhoneError;
 
-  if (formData.shop_email && !/\S+@\S+\.\S+/.test(formData.shop_email)) {
-    errors.shop_email = 'Invalid email format';
-  }
+  // Shop email
+  const shopEmailError = validateEmail(formData.shop_email);
+  if (shopEmailError) errors.shop_email = shopEmailError;
 
-  if (formData.shop_pincode && !/^\d{6}$/.test(formData.shop_pincode)) {
-    errors.shop_pincode = 'Pincode must be 6 digits';
-  }
+  // Shop pincode
+  const shopPincodeError = validatePincode(formData.shop_pincode);
+  if (shopPincodeError) errors.shop_pincode = shopPincodeError;
 
   // === 👤 Owner Details ===
   if (!formData.full_name?.trim()) {
     errors.full_name = 'Owner full name is required';
   }
 
-  if (!formData.phone?.trim()) {
-    errors.phone = 'Owner phone is required';
-  } else if (!/^\d{10}$/.test(formData.phone)) {
-    errors.phone = 'Owner phone must be 10 digits';
+  // Owner phone (required)
+  const ownerPhoneError = validatePhone(formData.phone, {
+    required: true,
+    fieldName: 'Owner phone',
+  });
+  if (ownerPhoneError) errors.phone = ownerPhoneError;
+
+  // Secondary phone (optional)
+  if (formData.phone2) {
+    const phone2Error = validatePhone(formData.phone2);
+    if (phone2Error) errors.phone2 = phone2Error;
   }
 
-   if (formData.phone2 && !/^\d{10}$/.test(formData.phone2)) {
-    errors.phone2 = 'Phone number must be 10 digits';
-  }
-
-  if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
-    errors.email = 'Invalid owner email';
-  }
+  // Owner email
+  const ownerEmailError = validateEmail(
+    formData.email,
+    'Invalid owner email'
+  );
+  if (ownerEmailError) errors.email = ownerEmailError;
 
   // === 🔒 Passwords ===
-  if (!formData.password?.trim()) {
-    errors.password = 'Password is required';
-  }
+  const passwordError = validatePasswordMatch(
+    formData.password,
+    formData.confirmPassword
+  );
+  if (passwordError) errors.confirmPassword = passwordError;
 
-  if (formData.password !== formData.confirmPassword) {
-    errors.confirmPassword = 'Passwords do not match';
-  }
-
-  if (!formData.secret_password?.trim()) {
-    errors.secret_password = 'Secret password is required';
-  }
-
-  if (formData.secret_password !== formData.confirmSecretPassword) {
-    errors.confirmSecretPassword = 'Secret passwords do not match';
-  }
+  const secretPasswordError = validateSecretPassword(
+    formData.secret_password,
+    formData.confirmSecretPassword
+  );
+  if (secretPasswordError)
+    errors.confirmSecretPassword = secretPasswordError;
 
   return errors;
 };
