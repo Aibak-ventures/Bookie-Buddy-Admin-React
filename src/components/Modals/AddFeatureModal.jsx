@@ -16,6 +16,7 @@ const AddFeatureModal = ({ isOpen, onClose, onAdd, onUpdate, featureData }) => {
     requires_features: [],
   });
 
+
   const [availableFeatures, setAvailableFeatures] = useState([]);
   const [errors, setErrors] = useState({});
 

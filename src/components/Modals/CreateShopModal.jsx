@@ -33,7 +33,16 @@ const [showConfirmSecret, setShowConfirmSecret] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [errors, setErrors] = useState({});
 
-  const stateOptions = [{ value: 'kerala', label: 'Kerala' }];
+  const stateOptions = [
+    { value: 'kerala', label: 'Kerala' },
+    { value: 'tamil nadu', label: 'Tamil Nadu' },
+    { value: 'karnataka', label: 'Karnataka' },
+    { value: 'andhra pradesh', label: 'Andhra Pradesh' },
+    { value: 'telangana', label: 'Telangana' },
+    { value: 'maharashtra', label: 'Maharashtra' },
+    { value: 'goa', label: 'Goa' },
+  ];
+
 
   const handleInputChange = (field) => (e) => {
     setFormData((prev) => ({ ...prev, [field]: e.target.value }));

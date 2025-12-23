@@ -25,8 +25,6 @@ const AddUserModal = ({ isOpen, onClose, shopId, shopName, onUserAdded }) => {
     full_name: '',
     password: '',
     confirm_password: '',
-    secondary_password: '',
-    confirm_secondary_password: '',
     role: '',
     shop_role: '',
   });
@@ -77,12 +75,13 @@ const AddUserModal = ({ isOpen, onClose, shopId, shopName, onUserAdded }) => {
       let backendMessage = '';
 
       if (err.response?.data?.errors) {
+        
         const errorsObj = err.response.data.errors;
         const firstKey = Object.keys(errorsObj)[0];
-        if (firstKey && errorsObj[firstKey].length > 0) {
-          backendMessage = errorsObj[firstKey][0];
+        if (errorsObj[firstKey].length > 0) {
+          backendMessage = errorsObj[firstKey];
         }
-      }
+      }      
 
       if (!backendMessage) {
         backendMessage = err.response?.data?.message || err.message || 'Failed to assign user';
@@ -187,50 +186,10 @@ const AddUserModal = ({ isOpen, onClose, shopId, shopName, onUserAdded }) => {
           </div>
 
           {/* Secret Password with eye toggle */}
-          <div className="relative">
-            <FormInput
-              label="Secret Password"
-              type={showSecondaryPassword ? 'text' : 'password'}
-              placeholder="Secret Password"
-              required
-              value={formData.secondary_password}
-              onChange={(e) => handleChange('secondary_password', e.target.value)}
-            />
-            <button
-              type="button"
-              onClick={() => setShowSecondaryPassword(!showSecondaryPassword)}
-              className="absolute right-3 top-[38px] text-gray-500 hover:text-gray-700"
-              tabIndex={-1}
-            >
-              {showSecondaryPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
-            {formErrors.secondary_password && (
-              <p className="text-sm text-red-500">{formErrors.secondary_password}</p>
-            )}
-          </div>
+          
 
           {/* Confirm Secret Password with eye toggle */}
-          <div className="relative">
-            <FormInput
-              label="Confirm Secret Password"
-              type={showConfirmSecondaryPassword ? 'text' : 'password'}
-              placeholder="Re-enter Secret Password"
-              required
-              value={formData.confirm_secondary_password}
-              onChange={(e) => handleChange('confirm_secondary_password', e.target.value)}
-            />
-            <button
-              type="button"
-              onClick={() => setShowConfirmSecondaryPassword(!showConfirmSecondaryPassword)}
-              className="absolute right-3 top-[38px] text-gray-500 hover:text-gray-700"
-              tabIndex={-1}
-            >
-              {showConfirmSecondaryPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-            </button>
-            {formErrors.confirm_secondary_password && (
-              <p className="text-sm text-red-500">{formErrors.confirm_secondary_password}</p>
-            )}
-          </div>
+          
 
           <div>
             <FormSelect

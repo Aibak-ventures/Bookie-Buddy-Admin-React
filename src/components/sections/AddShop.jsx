@@ -69,7 +69,27 @@ const ShopRegistrationForm = () => {
         navigate('/shops');
       }
     } catch (err) {
-      alert(`Failed :${err?.response?.data?.error}`);
+      let backendMessage = '';
+
+      
+      if (err.response?.data?.errors) {
+      const errorsObj = err.response.data.errors;
+      const firstKey = Object.keys(errorsObj)[0];
+      if (errorsObj[firstKey].length > 0) {
+        backendMessage = errorsObj[firstKey];
+      }
+    }
+     
+    if (!backendMessage) {
+      backendMessage = err.response?.data?.message || err.message || 'Failed to create shop';
+      console.log("error",err.response?.data?.message);
+      
+    }
+
+    alert(`Failed to assign user: ${backendMessage}`);
+
+      // 
+      
     } finally {
       setSubmitting(false);
     }

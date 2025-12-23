@@ -12,10 +12,13 @@ import {
 } from 'lucide-react';
 import ShopDetailItem from './ShopDetailItem';
 import UpdateShopModal from '../Modals/UpdateShopModal';
+import GenerateInvoiceModal from '../Modals/GenerateInvoiceModal';
 
 const ShopDetailsCard = ({ shopData }) => {
   
   const [showModal, setShowModal] = useState(false);
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false);
+
 
   const getInitials = (name) => {
     if (!name) return 'NA';
@@ -106,14 +109,30 @@ const ShopDetailsCard = ({ shopData }) => {
         </div>
 
         {/* Edit Button */}
-        <button
-          className="w-full mt-6 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
-          onClick={() => setShowModal(true)}
-        >
-          <Edit size={16} />
-          Edit Shop Details
-        </button>
+        <div className="flex gap-3 mt-6">
+              <button
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                onClick={() => setShowModal(true)}
+              >
+                <Edit size={16} />
+                Edit Shop Details
+              </button>
+
+              <button
+                className="flex-1 px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+                onClick={() => setShowInvoiceModal(true)}
+              >
+                <ProjectorIcon size={16} />
+                Generate Invoice
+              </button>
+            </div>
+
       </div>
+      <GenerateInvoiceModal
+  isOpen={showInvoiceModal}
+  onClose={() => setShowInvoiceModal(false)}
+  shopData={shopData}
+/>
     </>
   );
 };

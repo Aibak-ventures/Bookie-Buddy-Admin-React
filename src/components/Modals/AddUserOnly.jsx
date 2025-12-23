@@ -16,8 +16,6 @@ const AddUserOnly = ({ isOpen, onClose, onSubmit }) => {
     email: '',
     password: '',
     confirm_password: '',
-    secondary_password: '',
-    confirm_secondary_password: '',
     role: '',
   });
 
@@ -26,8 +24,6 @@ const AddUserOnly = ({ isOpen, onClose, onSubmit }) => {
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [showSecondaryPassword, setShowSecondaryPassword] = useState(false);
-  const [showConfirmSecondaryPassword, setShowConfirmSecondaryPassword] = useState(false);
 
   const handleChange = (field) => (e) => {
     setFormData((prev) => ({ ...prev, [field]: e.target.value }));
@@ -57,138 +53,143 @@ const AddUserOnly = ({ isOpen, onClose, onSubmit }) => {
 
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50">
-      <div className="bg-white w-full max-w-4xl p-6 rounded-md relative">
-        <button className="absolute top-4 right-4 text-gray-500" onClick={onClose}>
-          <X />
-        </button>
-        <h2 className="text-xl font-semibold mb-4">Add New User</h2>
-
-        <form onSubmit={handleSubmit} className="flex gap-6">
-          {/* Left Section */}
-          <div className="flex-1 space-y-2">
-            <FormInput
-              placeholder="Full Name"
-              value={formData.full_name}
-              onChange={handleChange('full_name')}
-            />
-
-            <FormInput
-              placeholder="Email"
-              value={formData.email}
-              onChange={handleChange('email')}
-            />
-            {formErrors.email && <p className="text-sm text-red-500">{formErrors.email}</p>}
-
-            <FormInput
-              placeholder="Phone"
-              value={formData.phone}
-              onChange={handleChange('phone')}
-            />
-            {formErrors.phone && <p className="text-sm text-red-500">{formErrors.phone}</p>}
-
-            {/* Password */}
-            <div className="relative">
-              <FormInput
-                placeholder="Password"
-                type={showPassword ? 'text' : 'password'}
-                value={formData.password}
-                onChange={handleChange('password')}
-              />
-              <span
-                className="absolute right-3 top-[20px] cursor-pointer text-gray-600"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </span>
-            </div>
-            {formErrors.password && <p className="text-sm text-red-500">{formErrors.password}</p>}
-
-            {/* Confirm Password */}
-            <div className="relative">
-              <FormInput
-                placeholder="Confirm Password"
-                type={showConfirmPassword ? 'text' : 'password'}
-                value={formData.confirm_password}
-                onChange={handleChange('confirm_password')}
-              />
-              <span
-                className="absolute right-3 top-[20px] cursor-pointer text-gray-600"
-                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-              >
-                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </span>
-            </div>
-            {formErrors.confirm_password && (
-              <p className="text-sm text-red-500">{formErrors.confirm_password}</p>
-            )}
+    return (
+      <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
+        <div className="bg-white w-full max-w-4xl rounded-xl shadow-xl relative">
+    
+          {/* Header */}
+          <div className="flex items-center justify-between px-6 py-4 border-b">
+            <h2 className="text-lg font-semibold text-gray-800">
+              Add New User
+            </h2>
+            <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+              <X />
+            </button>
           </div>
-
-          {/* Right Section */}
-          <div className="flex-1 space-y-2">
-            {/* Secret Password */}
-            <div className="relative">
-              <FormInput
-                placeholder="Secret Password"
-                type={showSecondaryPassword ? 'text' : 'password'}
-                value={formData.secondary_password}
-                onChange={handleChange('secondary_password')}
-              />
-              <span
-                className="absolute right-3 top-[20px] cursor-pointer text-gray-600"
-                onClick={() => setShowSecondaryPassword(!showSecondaryPassword)}
-              >
-                {showSecondaryPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </span>
+    
+          {/* Body */}
+          <form onSubmit={handleSubmit} className="p-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    
+              {/* LEFT SECTION — User Details */}
+              <div className="space-y-4">
+                <h3 className="text-sm font-semibold text-gray-600 uppercase">
+                  User Information
+                </h3>
+    
+                <FormInput
+                  placeholder="Full Name"
+                  value={formData.full_name}
+                  onChange={handleChange('full_name')}
+                />
+    
+                <div>
+                  <FormInput
+                    placeholder="Email"
+                    value={formData.email}
+                    onChange={handleChange('email')}
+                  />
+                  {formErrors.email && (
+                    <p className="text-xs text-red-500 mt-1">{formErrors.email}</p>
+                  )}
+                </div>
+    
+                <div>
+                  <FormInput
+                    placeholder="Phone"
+                    value={formData.phone}
+                    onChange={handleChange('phone')}
+                  />
+                  {formErrors.phone && (
+                    <p className="text-xs text-red-500 mt-1">{formErrors.phone}</p>
+                  )}
+                </div>
+              </div>
+    
+              {/* RIGHT SECTION — Security & Role */}
+              <div className="space-y-4">
+                <h3 className="text-sm font-semibold text-gray-600 uppercase">
+                  Security & Access
+                </h3>
+    
+                {/* Password */}
+                <div className="relative">
+                  <FormInput
+                    placeholder="Password"
+                    type={showPassword ? 'text' : 'password'}
+                    value={formData.password}
+                    onChange={handleChange('password')}
+                  />
+                  <span
+                    className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </span>
+                </div>
+                {formErrors.password && (
+                  <p className="text-xs text-red-500">{formErrors.password}</p>
+                )}
+    
+                {/* Confirm Password */}
+                <div className="relative">
+                  <FormInput
+                    placeholder="Confirm Password"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    value={formData.confirm_password}
+                    onChange={handleChange('confirm_password')}
+                  />
+                  <span
+                    className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-gray-500"
+                    onClick={() =>
+                      setShowConfirmPassword(!showConfirmPassword)
+                    }
+                  >
+                    {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                  </span>
+                </div>
+                {formErrors.confirm_password && (
+                  <p className="text-xs text-red-500">
+                    {formErrors.confirm_password}
+                  </p>
+                )}
+    
+                <div>
+                  <FormSelect
+                    label="Role"
+                    value={formData.role}
+                    options={roleOptions}
+                    onChange={handleChange('role')}
+                  />
+                  {formErrors.role && (
+                    <p className="text-xs text-red-500 mt-1">
+                      {formErrors.role}
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
-            {formErrors.secondary_password && (
-              <p className="text-sm text-red-500">{formErrors.secondary_password}</p>
-            )}
-
-            {/* Confirm Secret Password */}
-            <div className="relative">
-              <FormInput
-                placeholder="Confirm Secret Password"
-                type={showConfirmSecondaryPassword ? 'text' : 'password'}
-                value={formData.confirm_secondary_password}
-                onChange={handleChange('confirm_secondary_password')}
-              />
-              <span
-                className="absolute right-3 top-[20px] cursor-pointer text-gray-600"
-                onClick={() => setShowConfirmSecondaryPassword(!showConfirmSecondaryPassword)}
-              >
-                {showConfirmSecondaryPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-              </span>
-            </div>
-            {formErrors.confirm_secondary_password && (
-              <p className="text-sm text-red-500">{formErrors.confirm_secondary_password}</p>
-            )}
-
-            <FormSelect
-              label="Role"
-              value={formData.role}
-              options={roleOptions}
-              onChange={handleChange('role')}
-            />
-            {formErrors.role && <p className="text-sm text-red-500">{formErrors.role}</p>}
-
-            <div className="flex justify-end mt-4">
+    
+            {/* Footer */}
+            <div className="flex justify-end mt-6 pt-4 border-t">
               <button
                 type="submit"
                 disabled={submitting}
-                className={`px-6 py-2 rounded-md text-white ${
-                  submitting ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
-                }`}
+                className={`px-6 py-2 rounded-md text-white font-medium transition
+                  ${
+                    submitting
+                      ? 'bg-blue-400 cursor-not-allowed'
+                      : 'bg-blue-600 hover:bg-blue-700'
+                  }`}
               >
                 {submitting ? 'Submitting...' : 'Add User'}
               </button>
             </div>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
-    </div>
-  );
+    );
+    
 };
 
 export default AddUserOnly;

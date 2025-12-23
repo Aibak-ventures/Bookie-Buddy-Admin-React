@@ -1,4 +1,5 @@
 export const validateShopUpdateForm = (formData) => {
+  // console.log("THIS I SMY FORM DATA IN VALIDATION",formData);
   const errors = {};
 
   if (!formData.name?.trim()) {
@@ -8,13 +9,20 @@ export const validateShopUpdateForm = (formData) => {
     errors.place = 'Place is required';
   }
 
-  if (!/^\d{10}$/.test(formData.phone)) {
-    errors.phone = 'Phone must be 10 digits';
+  console.log("THIS I SMY PHONE",formData.phone2);
+  if (formData.phone && !/^\+?\d[\d\s]*$/.test(formData.phone.trim())) {
+    errors.phone2 = 'Phone must contain only digits';
   }
 
-  if (formData.phone2 && !/^\d{10}$/.test(formData.phone2)) {
-    errors.phone2 = 'Phone 2 must be 10 digits';
+  if (formData.phone2 && !/^\+?\d[\d\s]*$/.test(formData.phone2.trim())) {
+    errors.phone2 = 'Phone must contain only digits';
   }
+
+
+  // if (formData.phone2 && !/^\d{10}$/.test(formData.phone2)) {
+  // console.log("THIS I SMY PHONE2",formData.phone2);
+  //   errors.phone2 = 'Phone 2 must be 10 digits';
+  // }
 
   if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
     errors.email = 'Invalid email format';

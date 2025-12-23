@@ -23,13 +23,12 @@ const UpdateShopModal = ({ shopData, onClose, onSuccess }) => {
     extra_stock_limit: shopData.extra_stock_limit || '',
     sale_start_id: shopData.sale_start_id ,
     booking_start_id: shopData.booking_start_id ,
-    secret_password: shopData.secret_password || '',
+    secret_password: shopData.secret_password ||'',
 
     terms_and_conditions: Array.isArray(shopData.terms_and_conditions)
       ? shopData.terms_and_conditions
       : [''],
   };
-  
 
   const [formData, setFormData] = useState(initialForm);
   const [formErrors, setFormErrors] = useState({});
@@ -37,7 +36,6 @@ const UpdateShopModal = ({ shopData, onClose, onSuccess }) => {
   const [submitting, setSubmitting] = useState(false);
   // ✅ Add this state at top of component (UpdateShopModal.jsx)
 const [showSecret, setShowSecret] = useState(false);
-
 
   const handleChange = (field) => (e) => {
     
@@ -138,9 +136,14 @@ const handleSubmit = async () => {
 };
 
 
-  const stateOptions = [
+const stateOptions = [
   { value: 'kerala', label: 'Kerala' },
-  // Add more states as needed
+  { value: 'tamil nadu', label: 'Tamil Nadu' },
+  { value: 'karnataka', label: 'Karnataka' },
+  { value: 'andhra pradesh', label: 'Andhra Pradesh' },
+  { value: 'telangana', label: 'Telangana' },
+  { value: 'maharashtra', label: 'Maharashtra' },
+  { value: 'goa', label: 'Goa' },
 ];
 
   return (
@@ -165,11 +168,11 @@ const handleSubmit = async () => {
             {formErrors.name && <p className="text-sm text-red-500">{formErrors.name}</p>}
           </div>
           <div>
-          <FormInput label="Phone" value={formData.phone} onChange={handleChange('phone')} />
+          <FormInput label="Phone"  value={formData.phone} onChange={handleChange('phone')} />
           {formErrors.phone && <p className="text-sm text-red-500">{formErrors.phone}</p>}
           </div>
           <div>
-          <FormInput label="Phone 2" value={formData.phone2} onChange={handleChange('phone2')} />
+          <FormInput label="Phone 2"    value={formData.phone2} onChange={handleChange('phone2')} />
           {formErrors.phone2 && <p className="text-sm text-red-500">{formErrors.phone2}</p>}
           </div>
           <div>
