@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import html2pdf from "html2pdf.js";
 import InvoicePreview from "../cards/InvoicePreview";
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
+
+
 
 const DEFAULT_FROM_ADDRESS = `2nd Floor, Venture Arcade,
 Mavoor Road, Thondayad,
@@ -11,6 +15,8 @@ Kozhikode, Kerala, 673016, India
 
 const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
   if (!isOpen) return null;
+  console.log("data in geneara invoice",shopData);
+  
 
   const [from, setFrom] = useState({
     orgName: "Bookie Buddy",
@@ -54,6 +60,12 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
         dueDate: "",
       });
     }
+
+    setTerms(
+      Array.isArray(shopData.terms_and_conditions)
+        ? shopData.terms_and_conditions
+        : []
+    );
   }, [shopData]);
 
   /* ---------------- CALCULATIONS ---------------- */
@@ -82,7 +94,7 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
       return false;
     }
     
-    if (balance > 0 && !invoice.dueDate) newErrors.dueDate = "Due date is required when balance is due";
+    // if (balance > 0 && !invoice.dueDate) newErrors.dueDate = "Due date is required when balance is due";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -133,32 +145,67 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
     setShowPreview(true);
   };
 
-  /* ---------------- PDF GENERATION ---------------- */
   const generatePDF = async () => {
     try {
-      const element = document.getElementById('invoice-content');
-      if (!element) return;
-
+      const pages = document.querySelectorAll('.invoice-page');
+      if (!pages.length) {
+        alert('No invoice pages found');
+        return;
+      }
+  
+      // Import jsPDF
+      // const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+        compress: true
+      });
+  
+      // Process each page
+      for (let i = 0; i < pages.length; i++) {
+        const page = pages[i];
+        
+        console.log(`Processing page ${i + 1} of ${pages.length}...`);
+        
+        // Capture page as canvas with high quality
+        const canvas = await html2canvas(page, {
+          scale: 2,
+          useCORS: true,
+          allowTaint: false,
+          backgroundColor: '#ffffff',
+          logging: false,
+          width: page.offsetWidth,
+          height: page.offsetHeight,
+        });
+  
+        // Convert to image
+        const imgData = canvas.toDataURL('image/jpeg', 0.95);
+        
+        // Add new page if not the first one
+        if (i > 0) {
+          pdf.addPage();
+        }
+        
+        // Add image to PDF - fill entire A4 page
+        pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297, '', 'FAST');
+      }
+  
+      // Save the PDF
+      pdf.save(`${invoice.invoiceNo}.pdf`);
       
-      const opt = {
-        margin: 15,
-        filename: `${invoice.invoiceNo}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-
-      await html2pdf().set(opt).from(element).save();
-      
-      alert("Invoice generated successfully!");
+      console.log('PDF generated successfully!');
+  
       setShowPreview(false);
       onClose();
     } catch (error) {
-      console.error('PDF generation error:', error);
-      alert("Error generating PDF. Please try again.");
+      console.error("PDF generation error:", error);
+      alert(`Error generating PDF: ${error.message}`);
     }
   };
-
+  
+  
+  
   /* ---------------- UI ---------------- */
   return (
     <>
@@ -437,9 +484,9 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
                   </div>
                   {balance > 0 && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Due Date <span className="text-red-500">*</span>
-                      </label>
+                     <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Due Date <span className="text-gray-400">(optional)</span>
+                    </label>
                       <input
                         type="date"
                         className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition ${
