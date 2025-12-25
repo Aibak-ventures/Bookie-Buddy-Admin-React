@@ -12,10 +12,59 @@ Kozhikode, Kerala, 673016, India
 +91 97448 98185`;
 
 
+const DEFAULT_TERMS = [
+  "Basic plan includes up to 150 stocks.",
+  "Provide all stock details within 7 days of purchase to avoid setup issues.",
+  "After one year, maintenance is minimum ₹500/month (billed yearly).",
+  "Premium features are free for the first year. Third-party integrations (e.g., WhatsApp automation etc)",
+];
+
+const DEFAULT_ITEMS = [
+  {
+    description: "Bookie Buddy mobile application",
+    price: 12000,
+    offer: 0,
+    total: 12000,
+  },
+  {
+    description: "Database service (1ST YEAR FREE)",
+    price: 0,
+    offer: 100,
+    total: 0,
+  },
+  {
+    description: "Cloud maintenance (1ST YEAR FREE)",
+    price: 0,
+    offer: 0,
+    total: 0,
+  },
+  {
+    description: "Software updates (LIFE TIME FREE)",
+    price: 0,
+    offer: 0,
+    total: 0,
+  },
+];
+
+
 
 const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
+  console.log("shop data",shopData);
+  
   if (!isOpen) return null;
   console.log("data in geneara invoice",shopData);
+
+  const generateInvoiceNumber = (count = 1) => {
+    const today = new Date();
+  
+    const dd = String(today.getDate()).padStart(2, "0");
+    const mm = String(today.getMonth() + 1).padStart(2, "0");
+    const yyyy = today.getFullYear();
+  
+    const sequence = String(count).padStart(2, "0");
+  
+    return `BB${dd}${mm}${yyyy}${sequence}`;
+  };
   
 
   const [from, setFrom] = useState({
@@ -36,11 +85,11 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
     dueDate: "",
   });
 
-  const [items, setItems] = useState([
-    { description: "", price: 0, offer: 0, total: 0 },
-  ]);
+  const [items, setItems] = useState(DEFAULT_ITEMS);
 
-  const [terms, setTerms] = useState([]);
+
+  const [terms, setTerms] = useState(DEFAULT_TERMS);
+
   const [errors, setErrors] = useState({});
   const [showPreview, setShowPreview] = useState(false);
 
@@ -52,21 +101,20 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
         place: shopData.place || "",
         phone: shopData.phone || "",
       });
-
+  
       setInvoice({
-        invoiceNo: `BB${Date.now()}`,
+        invoiceNo: generateInvoiceNumber(1),
         invoiceDate: new Date().toISOString().slice(0, 10),
         paidTotal: 0,
         dueDate: "",
       });
     }
-
-    setTerms(
-      Array.isArray(shopData.terms_and_conditions)
-        ? shopData.terms_and_conditions
-        : []
-    );
+  
+    // RESET DEFAULTS ON OPEN
+    setTerms(DEFAULT_TERMS);
+    setItems(DEFAULT_ITEMS);
   }, [shopData]);
+  
 
   /* ---------------- CALCULATIONS ---------------- */
   const calculateRowTotal = (price, offer) => {
@@ -192,7 +240,7 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
       }
   
       // Save the PDF
-      pdf.save(`${invoice.invoiceNo}.pdf`);
+      pdf.save(`${shopData.name}_${invoice.invoiceNo}.pdf`);
       
       console.log('PDF generated successfully!');
   
