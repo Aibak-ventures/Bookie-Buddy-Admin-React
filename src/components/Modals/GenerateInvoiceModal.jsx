@@ -17,7 +17,8 @@ const DEFAULT_TERMS = [
   "Basic plan includes up to 150 stocks.",
   "Provide all stock details within 7 days of purchase to avoid setup issues.",
   "After one year, maintenance is minimum ₹500/month (billed yearly).",
-  "Premium features are free for the first year. Third-party integrations (e.g., WhatsApp automation etc)",
+  "Premium features are free for the first year, except Third-party integrations"
+
 ];
 
 const DEFAULT_ITEMS = [

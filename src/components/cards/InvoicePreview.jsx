@@ -162,7 +162,15 @@ const InvoicePreview = ({ data, onClose, onDownload }) => {
                   >
                   {/* LEFT */}
                   <div>
-                    <div className="bg-yellow-100  px-3 py-3 text-bold text-center text-yellow-500">
+                    <div style={{
+                              backgroundColor: "#FFF7E6", // 🌟 soft cream
+                              padding: "12px",
+                              textAlign: "center",
+                              color: "#B45309",           // muted gold
+                              fontWeight: 700,
+                              borderRadius: "6px",
+                            }}
+>
                     <span style={{ fontWeight: 700 }}>
                         👑 1 Year of Premium Features — Absolutely Free
                       </span>
@@ -189,7 +197,7 @@ const InvoicePreview = ({ data, onClose, onDownload }) => {
                            style={{
                           backgroundColor: "#F2F6FF", 
                          fontFamily: "revert-layer",   // ✅ font family
-                         fontSize: "13px",
+                         fontSize: "18px",   
                         // ✅ FIX 3: full blue rows
                         }}>
                       <span className="font-bold">SUB-TOTAL</span>
@@ -199,11 +207,11 @@ const InvoicePreview = ({ data, onClose, onDownload }) => {
                     </div>
 
                     <div
-                      className="flex justify-between items-center mt-3 px-4 py-2 text-white font-bold"
+                      className="flex justify-between items-center mt-3 px-2 py-2 text-white font-bold"
                       style={{ backgroundColor: "#6B4C7A" }}
                     >
-                      <span style={{ fontFamily: "revert", fontWeight :500 ,fontSize :"16px"}}>PAID TOTAL</span>
-                      <span style={{ fontFamily: "revert", fontWeight :500 }}>
+                      <span style={{ fontFamily: "revert", fontWeight :500 , fontSize: "20px", }}>PAID TOTAL</span>
+                      <span style={{ fontFamily: "revert", fontWeight :500 , fontSize: "20px",}}>
                         ₹ {data.invoice.paidTotal.toLocaleString()}
                       </span>
                     </div>
@@ -248,7 +256,7 @@ const InvoicePreview = ({ data, onClose, onDownload }) => {
                 </div>
 
                 {/* THANK YOU — LEFT */}
-                <div className="mt-12">
+                <div className="mt-12 pb-10">
                   <p className="font-bold text-purple-700 text-xl">
                     THANK YOU FOR CHOOSING BOOKIE BUDDY!
                   </p>
