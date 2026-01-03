@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import html2pdf from "html2pdf.js";
 import InvoicePreview from "../cards/InvoicePreview";
-import html2canvas from 'html2canvas';
 import { jsPDF } from 'jspdf';
+import { toPng } from "html-to-image";
+
 
 
 
@@ -23,28 +24,33 @@ const DEFAULT_ITEMS = [
   {
     description: "Bookie Buddy mobile application",
     price: 12000,
+    priceLabel: "",
     offer: 0,
     total: 12000,
   },
   {
-    description: "Database service (1ST YEAR FREE)",
+    description: "Database service",
     price: 0,
+    priceLabel: "1ST YEAR FREE",
     offer: 100,
     total: 0,
   },
   {
-    description: "Cloud maintenance (1ST YEAR FREE)",
+    description: "Cloud maintenance",
     price: 0,
+    priceLabel: "1ST YEAR FREE",
     offer: 0,
     total: 0,
   },
   {
-    description: "Software updates (LIFE TIME FREE)",
+    description: "Software updates",
     price: 0,
+    priceLabel: "LIFE TIME FREE",
     offer: 0,
     total: 0,
   },
 ];
+
 
 
 
@@ -193,56 +199,34 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
     setShowPreview(true);
   };
 
+
+  
   const generatePDF = async () => {
     try {
-      const pages = document.querySelectorAll('.invoice-page');
-      if (!pages.length) {
-        alert('No invoice pages found');
+      const node = document.querySelector(".invoice-page");
+      if (!node) {
+        alert("Invoice not found");
         return;
       }
   
-      // Import jsPDF
-      // const { jsPDF } = window.jspdf;
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'mm',
-        format: 'a4',
-        compress: true
+      const dataUrl = await toPng(node, {
+        quality: 1,
+        pixelRatio: 2,
+        backgroundColor: "#ffffff",
+        cacheBust: true,
       });
   
-      // Process each page
-      for (let i = 0; i < pages.length; i++) {
-        const page = pages[i];
-        
-        console.log(`Processing page ${i + 1} of ${pages.length}...`);
-        
-        // Capture page as canvas with high quality
-        const canvas = await html2canvas(page, {
-          scale: 2,
-          useCORS: true,
-          allowTaint: false,
-          backgroundColor: '#ffffff',
-          logging: false,
-          width: page.offsetWidth,
-          height: page.offsetHeight,
-        });
+      const pdf = new jsPDF("p", "mm", "a4");
+      pdf.addImage(dataUrl, "PNG", 0, 0, 210, 297);
   
-        // Convert to image
-        const imgData = canvas.toDataURL('image/jpeg', 0.95);
-        
-        // Add new page if not the first one
-        if (i > 0) {
-          pdf.addPage();
-        }
-        
-        // Add image to PDF - fill entire A4 page
-        pdf.addImage(imgData, 'JPEG', 0, 0, 210, 297, '', 'FAST');
-      }
+      // ✅ SAME NAMING LOGIC AS BEFORE
+      const safeShopName = shopData?.name
+        ?.replace(/[^a-z0-9]/gi, "_")
+        ?.toLowerCase();
   
-      // Save the PDF
-      pdf.save(`${shopData.name}_${invoice.invoiceNo}.pdf`);
-      
-      console.log('PDF generated successfully!');
+      const fileName = `${safeShopName}_${invoice.invoiceNo}.pdf`;
+  
+      pdf.save(fileName);
   
       setShowPreview(false);
       onClose();
@@ -467,14 +451,22 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
                       onChange={(e) => updateItem(i, "description", e.target.value)}
                       placeholder="Item description"
                     />
-                    <input
-                      type="number"
-                      min="0"
-                      className="col-span-2 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition"
-                      value={item.price}
-                      onChange={(e) => updateItem(i, "price", e.target.value)}
-                      placeholder="0"
-                    />
+                   <div className="col-span-2">
+                    {item.priceLabel ? (
+                      <div className="px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-sm font-semibold text-gray-700 text-center">
+                        {item.priceLabel}
+                      </div>
+                    ) : (
+                      <input
+                        type="number"
+                        min="0"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition"
+                        value={item.price}
+                        onChange={(e) => updateItem(i, "price", e.target.value)}
+                        placeholder="0"
+                      />
+                    )}
+                  </div>
                     <input
                       type="number"
                       min="0"
@@ -614,6 +606,17 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
 
         </div>
       </div>
+      <div
+        id="pdf-root"
+        style={{
+          position: "fixed",
+          left: "-9999px",
+          top: 0,
+          width: "794px",
+          height: "1123px",
+          background: "white",
+        }}
+      />
 
       {/* Preview Modal */}
       {showPreview && (

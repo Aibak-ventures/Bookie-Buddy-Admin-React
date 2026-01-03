@@ -39,7 +39,7 @@ const InvoicePreview = ({ data, onClose, onDownload }) => {
                   <div />
                   <h1
                     style={{
-                      fontSize: "34px",
+                      fontSize: "40px",
                       fontWeight: 700, // ✅ FIX 2: reduced boldness
                       letterSpacing: "0.5px",
                     }}
@@ -49,15 +49,17 @@ const InvoicePreview = ({ data, onClose, onDownload }) => {
                 </div>
 
                 {/* FROM / TO */}
-                <div className="grid grid-cols-2 gap-12 mb-8">
+                <div className="grid grid-cols-2 gap-12 mb-4">
                   <div>
-                    <p className="text-lg  mb-1" style={{ fontWeight: 600, }}>FROM</p>
+                    <p className="text-lg  mb-1" style={{ fontWeight: 700, }}>FROM</p>
                     <p
                       className="whitespace-pre-line"
                       style={{
                         fontSize: "13px",                 // ✅ smaller address text
                         fontFamily: "revert-layer",   // ✅ font family
                         lineHeight: "1.5",
+                        color: "#6B4C7A",
+                        fontWeight: 500,
                       }}
                     >
                       {data.from.address}
@@ -66,22 +68,22 @@ const InvoicePreview = ({ data, onClose, onDownload }) => {
                   </div>
 
                   <div className="text-right">
-                    <p className="text-lg mb-1" style={{ fontWeight: 600, }}>TO</p>
-                    <p className="font-semibold">{data.to.name}</p>
-                    <p className="font-semibold">{data.to.place}</p>
-                    <p className="font-semibold">{data.to.phone}</p>
+                    <p className="text-lg mb-1" style={{ fontWeight: 700, }}>TO</p>
+                    <p className="font-bold text-large text-"  style={{ fontFamily: "sans-serif",fontWeight: 700,fontSize: "13px",}}>{data.to.name}</p>
+                    <p className="font-semibold"  style={{ fontFamily: "sans-serif",fontWeight: 700,fontSize: "13px",}}>{data.to.place}</p>
+                    <p className="font-semibold"  style={{ fontFamily: "sans-serif",fontWeight: 700,fontSize: "13px",}}>{data.to.phone}</p>
                   </div>
                 </div>
 
                 {/* META */}
                 <div
-                  className="grid grid-cols-2 mb-6"
+                  className="grid grid-cols-2 mb-3"
                   style={{
                     border: "3px solid #2f2f2f",
                     fontWeight: 600,
                   }}
                 >
-                  <div className="px-4 py-2" style={{ fontWeight: 700, }}>
+                  <div className="px-4 py-2 font-bold" style={{ letterSpacing: "0.01em",fontSize: "16px",}}>
                     INVOICE DATE :{" "}
                     {new Date(data.invoice.invoiceDate)
                       .toLocaleDateString("en-US", {
@@ -91,13 +93,16 @@ const InvoicePreview = ({ data, onClose, onDownload }) => {
                       })
                       .toUpperCase()}
                   </div>
-                  <div className="px-4 py-2 text-right">
+                  <div className="px-7 py-2 text-right font-bold" style={{ letterSpacing: "0.01em",fontSize: "16px",}} >
                     INVOICE ID : {data.invoice.invoiceNo}
                   </div>
                 </div>
 
                 {/* ITEMS TABLE */}
-                <table className="w-full mb-6 border-collapse">
+                <table className="w-full  border-collapse" style={{
+                    borderCollapse: "separate",
+                    borderSpacing: "0 6px", // 👈 vertical row gap
+                  }}>
                   <thead>
                     <tr
                       style={{
@@ -107,9 +112,9 @@ const InvoicePreview = ({ data, onClose, onDownload }) => {
                     >
                       <th className="py-2 px-3 text-left">NO</th>
                       <th className="py-2 px-3 text-left">DESCRIPTION</th>
-                      <th className="py-2 px-3 text-right">PRICE</th>
-                      <th className="py-2 px-3 text-right">OFFER</th>
-                      <th className="py-2 px-3 text-right">TOTAL</th>
+                      <th className="py-2 px-3 text-center">PRICE</th>
+                      <th className="py-2 px-3 text-center">OFFER</th>
+                      <th className="py-2 px-3 text-center">TOTAL</th>
                     </tr>
                   </thead>
 
@@ -120,25 +125,30 @@ const InvoicePreview = ({ data, onClose, onDownload }) => {
                         style={{
                           backgroundColor: "#F2F6FF", 
                          fontFamily: "revert-layer",   // ✅ font family
+                         fontSize: "13px",
                         // ✅ FIX 3: full blue rows
                         }}
                       >
-                        <td className="py-2 px-3" style={{ fontFamily: "revert-layer",  }}>{idx + 1}</td>
-                          <td className="py-2 px-3" style={{ fontFamily: "revert", fontWeight :500 }}>{item.description}</td>
-                        <td className="py-2 px-3 text-right" style={{ fontFamily: "revert", fontWeight :500 }}>
-                          {item.price > 0
-                            ? `₹ ${item.price.toLocaleString()}`
-                            : item.description.includes("LIFE")
-                              ? "LIFE TIME FREE"
-                              : item.description.includes("YEAR")
-                                ? "1ST YEAR FREE"
-                                : "₹ 0"}
-                        </td>
-                        <td className="py-2 px-3 text-right" style={{ fontFamily: "revert", fontWeight :500 }}>
+                        <td className="py-2 px-3 font-bold" style={{ fontFamily: "revert-layer",  }}>{idx + 1}</td>
+                          <td className="py-2 px-3 font-bold" style={{ fontFamily: "revert", }}>{item.description}</td>
+                          <td
+                              className="py-2 px-3 text-center font-bold"
+                              style={{
+                                fontFamily: "revert",
+                                whiteSpace: "nowrap", // 👈 prevents wrapping
+                              }}
+                            >
+                              {item.priceLabel
+                                ? item.priceLabel
+                                : item.price > 0
+                                  ? `₹ ${item.price.toLocaleString()}`
+                                  : "₹ 0"}
+                            </td>
+                        <td className="py-2 px-3 text-center font-bold" style={{ fontFamily: "revert",  }}>
                           {item.offer}%
                         </td>
-                        <td className="py-2 px-3 text-right" style={{ fontFamily: "revert", fontWeight :500 }}>
-                          ₹ {item.total.toLocaleString()}
+                        <td className="py-2 px-3 text-center font-bold" style={{ fontFamily: "revert", }}>
+                          {item.total.toLocaleString()}
                         </td>
                       </tr>
                     ))}
@@ -146,35 +156,44 @@ const InvoicePreview = ({ data, onClose, onDownload }) => {
                 </table>
 
                 {/* SUMMARY SECTION */}
-                <div className="grid grid-cols-2 gap-8 mt-6">
+                <div
+                    className="grid gap-6 mt-4"
+                    style={{ gridTemplateColumns: "2fr 1fr" }}
+                  >
                   {/* LEFT */}
                   <div>
-                    <div className="bg-yellow-50 px-3 py-3 text-sm  text-yellow-700">
-                      👑 1 Year of Premium Features — Absolutely Free
+                    <div className="bg-yellow-100  px-3 py-3 text-bold text-center text-yellow-500">
+                    <span style={{ fontWeight: 700 }}>
+                        👑 1 Year of Premium Features — Absolutely Free
+                      </span>
                     </div>
 
                     {data.balance > 0 && data.invoice.dueDate && (
-                      <p className="text-red-600 mt-4">
+                      <p className="text-red-600 mt-4 font-semibold" >
                         The balance amount is kindly requested to be paid
                         <br />
                         on or before{" "}
-                        <strong>
                           {new Date(data.invoice.dueDate)
                             .toLocaleDateString("en-US", {
                               day: "numeric",
                               month: "long",
                             })}
                           .
-                        </strong>
                       </p>
                     )}
                   </div>
 
                   {/* RIGHT */}
                   <div>
-                    <div className="flex justify-between py-2 border-b">
-                      <span style={{ fontFamily: "revert", fontWeight :500 }}>SUB-TOTAL</span>
-                      <span className="font-bold">
+                    <div className="flex justify-between p-3 border-b " 
+                           style={{
+                          backgroundColor: "#F2F6FF", 
+                         fontFamily: "revert-layer",   // ✅ font family
+                         fontSize: "13px",
+                        // ✅ FIX 3: full blue rows
+                        }}>
+                      <span className="font-bold">SUB-TOTAL</span>
+                      <span className="font-bold" >
                         ₹ {data.subTotal.toLocaleString()}
                       </span>
                     </div>
@@ -183,16 +202,27 @@ const InvoicePreview = ({ data, onClose, onDownload }) => {
                       className="flex justify-between items-center mt-3 px-4 py-2 text-white font-bold"
                       style={{ backgroundColor: "#6B4C7A" }}
                     >
-                      <span style={{ fontFamily: "revert", fontWeight :500 }}>PAID TOTAL</span>
+                      <span style={{ fontFamily: "revert", fontWeight :500 ,fontSize :"16px"}}>PAID TOTAL</span>
                       <span style={{ fontFamily: "revert", fontWeight :500 }}>
                         ₹ {data.invoice.paidTotal.toLocaleString()}
                       </span>
                     </div>
 
                     {data.balance > 0 && (
-                      <div className="flex justify-between mt-3">
-                        <span style={{ fontFamily: "revert", fontWeight :500 }}>BALANCE AMOUNT</span>
-                        <span style={{ fontFamily: "revert", fontWeight :500 }}>
+                      <div className="flex justify-between mt-3 p-3">
+                        <span  style={{
+                         fontFamily: "revert-layer",   // ✅ font family
+                         fontSize: "13px",
+                         fontWeight: 700,
+                        // ✅ FIX 3: full blue rows
+                        }}>BALANCE AMOUNT</span>
+                        <span  style={{
+                         fontFamily: "revert-layer",   // ✅ font family
+                         fontSize: "13px",
+                         fontWeight: 700,
+
+                        // ✅ FIX 3: full blue rows
+                        }}>
                           ₹ {data.balance.toLocaleString()}
                         </span>
                       </div>
@@ -201,8 +231,13 @@ const InvoicePreview = ({ data, onClose, onDownload }) => {
                 </div>
 
                 {/* TERMS */}
-                <div className="mt-10">
-                  <p className="font-bold mb-3">
+                <div className="mt-7">
+                  <p className=" mb-2" style={{
+                         fontFamily: "revert-layer",   // ✅ font family
+                         fontSize: "16px",
+                         fontWeight: 700,
+                        // ✅ FIX 3: full blue rows
+                        }}>
                     TERMS AND CONDITIONS
                   </p>
                   <ul className="list-disc ml-5 space-y-1 font-semibold">
@@ -214,10 +249,10 @@ const InvoicePreview = ({ data, onClose, onDownload }) => {
 
                 {/* THANK YOU — LEFT */}
                 <div className="mt-12">
-                  <p className="font-bold text-purple-700 text-lg">
+                  <p className="font-bold text-purple-700 text-xl">
                     THANK YOU FOR CHOOSING BOOKIE BUDDY!
                   </p>
-                  <p className="text-gray-600">
+                  <p className="text-black" style={{fontSize:"13px",fontWeight: 500,}}>
                     We appreciate your trust and look forward to supporting your business.
                   </p>
                 </div>
