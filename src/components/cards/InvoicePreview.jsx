@@ -1,150 +1,271 @@
 import React from "react";
+import invoiceBg from "../../assets/invoice-bg.svg";
 
 const InvoicePreview = ({ data, onClose, onDownload }) => {
   return (
     <div className="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-4">
       <div className="bg-white w-full max-w-[900px] rounded-xl shadow-2xl flex flex-col max-h-[95vh]">
 
-        {/* HEADER */}
-        <div className="relative bg-purple-700 text-white px-8 py-6">
-          <div className="flex justify-between items-start">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold">bookie</span>
-              <span className="text-2xl font-bold">buddy</span>
-            </div>
-            <h1 className="text-3xl font-extrabold tracking-wider">INVOICE</h1>
-          </div>
-        </div>
-
-        {/* CONTENT */}
-        <div className="p-8 overflow-y-auto flex-1">
+        {/* PREVIEW AREA */}
+        <div className="overflow-y-auto flex-1 p-6">
           <div id="invoice-content">
 
-            {/* FROM / TO */}
-            <div className="grid grid-cols-2 gap-8 mb-6">
-              <div>
-                <p className="text-xs font-bold text-gray-700 mb-1">FROM</p>
-                <p className="text-sm font-semibold">{data.from.orgName}</p>
-                <p className="text-sm text-gray-700 whitespace-pre-line">
-                  {data.from.address}
-                </p>
-              </div>
+            <div
+              className="invoice-page"
+              style={{
+                width: "210mm",
+                height: "297mm",
+                position: "relative",
+                backgroundColor: "white",
+              }}
+            >
+              {/* SVG BACKGROUND */}
+              <img
+                src={invoiceBg}
+                alt="Invoice Background"
+                className="absolute top-0 left-0 w-full h-full object-cover z-0 pointer-events-none"
+              />
 
-              <div className="text-right">
-                <p className="text-xs font-bold text-gray-700 mb-1">TO</p>
-                <p className="text-sm font-semibold">{data.to.name}</p>
-                <p className="text-sm text-gray-700">{data.to.place}</p>
-                <p className="text-sm text-gray-700">{data.to.phone}</p>
-              </div>
-            </div>
+              {/* CONTENT */}
+              <div
+                className="relative z-10 mx-auto text-sm text-gray-900"
+                style={{
+                  maxWidth: "190mm",
+                  paddingTop: "120px", // ✅ FIX 1: push content below SVG logo
+                }}
+              >
+                {/* HEADER */}
+                <div className="flex justify-between mb-10">
+                  <div />
+                  <h1
+                    style={{
+                      fontSize: "40px",
+                      fontWeight: 700, // ✅ FIX 2: reduced boldness
+                      letterSpacing: "0.5px",
+                    }}
+                  >
+                    INVOICE
+                  </h1>
+                </div>
 
-            {/* INVOICE META STRIP */}
-            <div className="border-2 border-purple-700 grid grid-cols-2 text-sm font-semibold mb-6">
-              <div className="px-4 py-2">
-                INVOICE DATE :{" "}
-                {new Date(data.invoice.invoiceDate)
-                  .toLocaleDateString("en-US", {
-                    month: "short",
-                    day: "2-digit",
-                    year: "numeric",
-                  })
-                  .toUpperCase()}
-              </div>
-              <div className="px-4 py-2 text-right">
-                INVOICE ID : {data.invoice.invoiceNo}
-              </div>
-            </div>
-
-            {/* ITEMS TABLE */}
-            <table className="w-full mb-6 border-collapse">
-              <thead>
-                <tr className="bg-purple-700 text-white text-sm">
-                  <th className="py-3 px-3 text-left">NO</th>
-                  <th className="py-3 px-3 text-left">DESCRIPTION</th>
-                  <th className="py-3 px-3 text-right">PRICE</th>
-                  <th className="py-3 px-3 text-right">OFFER</th>
-                  <th className="py-3 px-3 text-right">TOTAL</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.items
-                  .filter((i) => i.description.trim())
-                  .map((item, idx) => (
-                    <tr
-                      key={idx}
-                      className={idx % 2 === 0 ? "bg-gray-50" : "bg-white"}
+                {/* FROM / TO */}
+                <div className="grid grid-cols-2 gap-12 mb-4">
+                  <div>
+                    <p className="text-lg  mb-1" style={{ fontWeight: 700, }}>FROM</p>
+                    <p
+                      className="whitespace-pre-line"
+                      style={{
+                        fontSize: "13px",                 // ✅ smaller address text
+                        fontFamily: "revert-layer",   // ✅ font family
+                        lineHeight: "1.5",
+                        color: "#6B4C7A",
+                        fontWeight: 500,
+                      }}
                     >
-                      <td className="py-3 px-3 text-sm">{idx + 1}</td>
-                      <td className="py-3 px-3 text-sm">
-                        {item.description}
-                      </td>
-                      <td className="py-3 px-3 text-sm text-right">
-                        {typeof item.price === "number"
-                          ? `₹ ${item.price.toLocaleString()}`
-                          : item.price}
-                      </td>
-                      <td className="py-3 px-3 text-sm text-right">
-                        {item.offer}%
-                      </td>
-                      <td className="py-3 px-3 text-sm text-right font-medium">
-                        ₹ {Number(item.total).toLocaleString()}
-                      </td>
+                      {data.from.address}
+                    </p>
+                    <p>{data.from.phone}</p>
+                  </div>
+
+                  <div className="text-right">
+                    <p className="text-lg mb-1" style={{ fontWeight: 700, }}>TO</p>
+                    <p className="font-bold text-large text-"  style={{ fontFamily: "sans-serif",fontWeight: 700,fontSize: "13px",}}>{data.to.name}</p>
+                    <p className="font-semibold"  style={{ fontFamily: "sans-serif",fontWeight: 700,fontSize: "13px",}}>{data.to.place}</p>
+                    <p className="font-semibold"  style={{ fontFamily: "sans-serif",fontWeight: 700,fontSize: "13px",}}>{data.to.phone}</p>
+                  </div>
+                </div>
+
+                {/* META */}
+                <div
+                  className="grid grid-cols-2 mb-3"
+                  style={{
+                    border: "3px solid #2f2f2f",
+                    fontWeight: 600,
+                  }}
+                >
+                  <div className="px-4 py-2 font-bold" style={{ letterSpacing: "0.01em",fontSize: "16px",}}>
+                    INVOICE DATE :{" "}
+                    {new Date(data.invoice.invoiceDate)
+                      .toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "2-digit",
+                        year: "numeric",
+                      })
+                      .toUpperCase()}
+                  </div>
+                  <div className="px-7 py-2 text-right font-bold" style={{ letterSpacing: "0.01em",fontSize: "16px",}} >
+                    INVOICE ID : {data.invoice.invoiceNo}
+                  </div>
+                </div>
+
+                {/* ITEMS TABLE */}
+                <table className="w-full  border-collapse" style={{
+                    borderCollapse: "separate",
+                    borderSpacing: "0 6px", // 👈 vertical row gap
+                  }}>
+                  <thead>
+                    <tr
+                      style={{
+                        backgroundColor: "#6B4C7A",
+                        color: "white",
+                      }}
+                    >
+                      <th className="py-2 px-3 text-left">NO</th>
+                      <th className="py-2 px-3 text-left">DESCRIPTION</th>
+                      <th className="py-2 px-3 text-center">PRICE</th>
+                      <th className="py-2 px-3 text-center">OFFER</th>
+                      <th className="py-2 px-3 text-center">TOTAL</th>
                     </tr>
-                  ))}
-              </tbody>
-            </table>
+                  </thead>
 
-            {/* FREE HIGHLIGHT */}
-            <div className="bg-yellow-50 border border-yellow-300 text-yellow-800 px-4 py-3 rounded mb-6 text-sm font-semibold">
-              👑 1 Year of Premium Features — Absolutely Free
-            </div>
+                  <tbody>
+                    {data.items.map((item, idx) => (
+                      <tr
+                        key={idx}
+                        style={{
+                          backgroundColor: "#F2F6FF", 
+                         fontFamily: "revert-layer",   // ✅ font family
+                         fontSize: "13px",
+                        // ✅ FIX 3: full blue rows
+                        }}
+                      >
+                        <td className="py-2 px-3 font-bold" style={{ fontFamily: "revert-layer",  }}>{idx + 1}</td>
+                          <td className="py-2 px-3 font-bold" style={{ fontFamily: "revert", }}>{item.description}</td>
+                          <td
+                              className="py-2 px-3 text-center font-bold"
+                              style={{
+                                fontFamily: "revert",
+                                whiteSpace: "nowrap", // 👈 prevents wrapping
+                              }}
+                            >
+                              {item.priceLabel
+                                ? item.priceLabel
+                                : item.price > 0
+                                  ? `₹ ${item.price.toLocaleString()}`
+                                  : "₹ 0"}
+                            </td>
+                        <td className="py-2 px-3 text-center font-bold" style={{ fontFamily: "revert",  }}>
+                          {item.offer}%
+                        </td>
+                        <td className="py-2 px-3 text-center font-bold" style={{ fontFamily: "revert", }}>
+                          {item.total.toLocaleString()}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
 
-            {/* TOTALS */}
-            <div className="flex justify-end mb-8">
-              <div className="w-80 text-sm">
-                <div className="flex justify-between py-2 border-b">
-                  <span className="font-medium">SUB-TOTAL</span>
-                  <span className="font-bold">
-                    ₹ {data.subTotal.toLocaleString()}
-                  </span>
+                {/* SUMMARY SECTION */}
+                <div
+                    className="grid gap-6 mt-4"
+                    style={{ gridTemplateColumns: "2fr 1fr" }}
+                  >
+                  {/* LEFT */}
+                  <div>
+                    <div style={{
+                              backgroundColor: "#FFF7E6", // 🌟 soft cream
+                              padding: "12px",
+                              textAlign: "center",
+                              color: "#B45309",           // muted gold
+                              fontWeight: 700,
+                              borderRadius: "6px",
+                            }}
+>
+                    <span style={{ fontWeight: 700 }}>
+                        👑 1 Year of Premium Features — Absolutely Free
+                      </span>
+                    </div>
+
+                    {data.balance > 0 && data.invoice.dueDate && (
+                      <p className="text-red-600 mt-4 font-semibold" >
+                        The balance amount is kindly requested to be paid
+                        <br />
+                        on or before{" "}
+                          {new Date(data.invoice.dueDate)
+                            .toLocaleDateString("en-US", {
+                              day: "numeric",
+                              month: "long",
+                            })}
+                          .
+                      </p>
+                    )}
+                  </div>
+
+                  {/* RIGHT */}
+                  <div>
+                    <div className="flex justify-between p-3 border-b " 
+                           style={{
+                          backgroundColor: "#F2F6FF", 
+                         fontFamily: "revert-layer",   // ✅ font family
+                         fontSize: "18px",   
+                        // ✅ FIX 3: full blue rows
+                        }}>
+                      <span className="font-bold">SUB-TOTAL</span>
+                      <span className="font-bold" >
+                        ₹ {data.subTotal.toLocaleString()}
+                      </span>
+                    </div>
+
+                    <div
+                      className="flex justify-between items-center mt-3 px-2 py-2 text-white font-bold"
+                      style={{ backgroundColor: "#6B4C7A" }}
+                    >
+                      <span style={{ fontFamily: "revert", fontWeight :500 , fontSize: "20px", }}>PAID TOTAL</span>
+                      <span style={{ fontFamily: "revert", fontWeight :500 , fontSize: "20px",}}>
+                        ₹ {data.invoice.paidTotal.toLocaleString()}
+                      </span>
+                    </div>
+
+                    {data.balance > 0 && (
+                      <div className="flex justify-between mt-3 p-3">
+                        <span  style={{
+                         fontFamily: "revert-layer",   // ✅ font family
+                         fontSize: "13px",
+                         fontWeight: 700,
+                        // ✅ FIX 3: full blue rows
+                        }}>BALANCE AMOUNT</span>
+                        <span  style={{
+                         fontFamily: "revert-layer",   // ✅ font family
+                         fontSize: "13px",
+                         fontWeight: 700,
+
+                        // ✅ FIX 3: full blue rows
+                        }}>
+                          ₹ {data.balance.toLocaleString()}
+                        </span>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                <div className="flex justify-between items-center mt-3 bg-purple-700 text-white px-4 py-3 font-bold text-base">
-                  <span>PAID TOTAL</span>
-                  <span>
-                    ₹ {Number(data.invoice.paidTotal).toLocaleString()}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* TERMS */}
-            {data.terms.length > 0 && (
-              <div className="border-t pt-4">
-                <p className="text-sm font-bold mb-2">
-                  TERMS AND CONDITIONS
-                </p>
-                <ul className="list-disc ml-5 text-sm text-gray-700 space-y-1">
-                  {data.terms
-                    .filter((t) => t.trim())
-                    .map((t, i) => (
+                {/* TERMS */}
+                <div className="mt-7">
+                  <p className=" mb-2" style={{
+                         fontFamily: "revert-layer",   // ✅ font family
+                         fontSize: "16px",
+                         fontWeight: 700,
+                        // ✅ FIX 3: full blue rows
+                        }}>
+                    TERMS AND CONDITIONS
+                  </p>
+                  <ul className="list-disc ml-5 space-y-1 font-semibold">
+                    {data.terms.map((t, i) => (
                       <li key={i}>{t}</li>
                     ))}
-                </ul>
+                  </ul>
+                </div>
+
+                {/* THANK YOU — LEFT */}
+                <div className="mt-12 pb-10">
+                  <p className="font-bold text-purple-700 text-xl">
+                    THANK YOU FOR CHOOSING BOOKIE BUDDY!
+                  </p>
+                  <p className="text-black" style={{fontSize:"13px",fontWeight: 500,}}>
+                    We appreciate your trust and look forward to supporting your business.
+                  </p>
+                </div>
               </div>
-            )}
-
-            {/* FOOTER */}
-            <div className="mt-10 text-center">
-              <p className="font-bold text-purple-700 text-lg">
-                THANK YOU FOR CHOOSING BOOKIE BUDDY!
-              </p>
-              <p className="text-sm text-gray-600">
-                We appreciate your trust and look forward to supporting your
-                business.
-              </p>
             </div>
-
           </div>
         </div>
 
@@ -163,7 +284,6 @@ const InvoicePreview = ({ data, onClose, onDownload }) => {
             Download PDF
           </button>
         </div>
-
       </div>
     </div>
   );

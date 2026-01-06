@@ -27,14 +27,32 @@ function EngagementChart({ shop_id = 7 }) {
     };
   };
 
+  const getLastSixMonthsRange = () => {
+    const today = new Date();
+  
+    // Start = first day of month, 5 months ago
+    const start = new Date(today.getFullYear(), today.getMonth() - 5, 1);
+  
+    // End = last day of current month
+    const end = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+  
+    return {
+      start: start.toISOString().split("T")[0],
+      end: end.toISOString().split("T")[0],
+    };
+  };
+
   const { start: defaultMonthStart, end: defaultMonthEnd } = getCurrentMonthRange();
 
   // Default → Monthly: full year
-  const [period, setPeriod] = useState("monthly");
   const [reportType, setReportType] = useState("all");
 
-  const [startDate, setStartDate] = useState(`${currentYear}-01-01`);
-  const [endDate, setEndDate] = useState(`${currentYear}-12-31`);
+  const { start: defaultStart, end: defaultEnd } = getLastSixMonthsRange();
+
+const [period, setPeriod] = useState("monthly");
+const [startDate, setStartDate] = useState(defaultStart);
+const [endDate, setEndDate] = useState(defaultEnd);
+
 
   const [chartData, setChartData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -47,17 +65,19 @@ function EngagementChart({ shop_id = 7 }) {
       setStartDate(defaultMonthStart);
       setEndDate(defaultMonthEnd);
     }
-
+  
     if (period === "monthly") {
-      setStartDate(`${currentYear}-01-01`);
-      setEndDate(`${currentYear}-12-31`);
+      const { start, end } = getLastSixMonthsRange();
+      setStartDate(start);
+      setEndDate(end);
     }
-
+  
     if (period === "yearly") {
       setStartDate(`${currentYear}-01-01`);
       setEndDate(`${currentYear}-12-31`);
     }
   }, [period]);
+  
 
   // ---------------------------------------------------------
   // DATE VALIDATION → startDate must NOT exceed endDate

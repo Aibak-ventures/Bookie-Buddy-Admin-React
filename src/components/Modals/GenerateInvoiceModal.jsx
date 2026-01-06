@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 import html2pdf from "html2pdf.js";
 import InvoicePreview from "../cards/InvoicePreview";
+import { jsPDF } from 'jspdf';
+import { toPng } from "html-to-image";
+
+
+
 
 const DEFAULT_FROM_ADDRESS = `2nd Floor, Venture Arcade,
 Mavoor Road, Thondayad,
@@ -8,9 +13,66 @@ Kozhikode, Kerala, 673016, India
 +91 97448 98185`;
 
 
+const DEFAULT_TERMS = [
+  "Basic plan includes up to 150 stocks.",
+  "Provide all stock details within 7 days of purchase to avoid setup issues.",
+  "After one year, maintenance is minimum ₹500/month (billed yearly).",
+  "Premium features are free for the first year, except Third-party integrations"
+
+];
+
+const DEFAULT_ITEMS = [
+  {
+    description: "Bookie Buddy mobile application",
+    price: 12000,
+    priceLabel: "",
+    offer: 0,
+    total: 12000,
+  },
+  {
+    description: "Database service",
+    price: 0,
+    priceLabel: "1ST YEAR FREE",
+    offer: 100,
+    total: 0,
+  },
+  {
+    description: "Cloud maintenance",
+    price: 0,
+    priceLabel: "1ST YEAR FREE",
+    offer: 0,
+    total: 0,
+  },
+  {
+    description: "Software updates",
+    price: 0,
+    priceLabel: "LIFE TIME FREE",
+    offer: 0,
+    total: 0,
+  },
+];
+
+
+
 
 const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
+  console.log("shop data",shopData);
+  
   if (!isOpen) return null;
+  console.log("data in geneara invoice",shopData);
+
+  const generateInvoiceNumber = (count = 1) => {
+    const today = new Date();
+  
+    const dd = String(today.getDate()).padStart(2, "0");
+    const mm = String(today.getMonth() + 1).padStart(2, "0");
+    const yyyy = today.getFullYear();
+  
+    const sequence = String(count).padStart(2, "0");
+  
+    return `BB${dd}${mm}${yyyy}${sequence}`;
+  };
+  
 
   const [from, setFrom] = useState({
     orgName: "Bookie Buddy",
@@ -30,11 +92,11 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
     dueDate: "",
   });
 
-  const [items, setItems] = useState([
-    { description: "", price: 0, offer: 0, total: 0 },
-  ]);
+  const [items, setItems] = useState(DEFAULT_ITEMS);
 
-  const [terms, setTerms] = useState([]);
+
+  const [terms, setTerms] = useState(DEFAULT_TERMS);
+
   const [errors, setErrors] = useState({});
   const [showPreview, setShowPreview] = useState(false);
 
@@ -46,15 +108,20 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
         place: shopData.place || "",
         phone: shopData.phone || "",
       });
-
+  
       setInvoice({
-        invoiceNo: `BB${Date.now()}`,
+        invoiceNo: generateInvoiceNumber(1),
         invoiceDate: new Date().toISOString().slice(0, 10),
         paidTotal: 0,
         dueDate: "",
       });
     }
+  
+    // RESET DEFAULTS ON OPEN
+    setTerms(DEFAULT_TERMS);
+    setItems(DEFAULT_ITEMS);
   }, [shopData]);
+  
 
   /* ---------------- CALCULATIONS ---------------- */
   const calculateRowTotal = (price, offer) => {
@@ -82,7 +149,7 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
       return false;
     }
     
-    if (balance > 0 && !invoice.dueDate) newErrors.dueDate = "Due date is required when balance is due";
+    // if (balance > 0 && !invoice.dueDate) newErrors.dueDate = "Due date is required when balance is due";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -133,32 +200,45 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
     setShowPreview(true);
   };
 
-  /* ---------------- PDF GENERATION ---------------- */
+
+  
   const generatePDF = async () => {
     try {
-      const element = document.getElementById('invoice-content');
-      if (!element) return;
-
-      
-      const opt = {
-        margin: 15,
-        filename: `${invoice.invoiceNo}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-
-      await html2pdf().set(opt).from(element).save();
-      
-      alert("Invoice generated successfully!");
+      const node = document.querySelector(".invoice-page");
+      if (!node) {
+        alert("Invoice not found");
+        return;
+      }
+  
+      const dataUrl = await toPng(node, {
+        quality: 1,
+        pixelRatio: 2,
+        backgroundColor: "#ffffff",
+        cacheBust: true,
+      });
+  
+      const pdf = new jsPDF("p", "mm", "a4");
+      pdf.addImage(dataUrl, "PNG", 0, 0, 210, 297);
+  
+      // ✅ SAME NAMING LOGIC AS BEFORE
+      const safeShopName = shopData?.name
+        ?.replace(/[^a-z0-9]/gi, "_")
+        ?.toLowerCase();
+  
+      const fileName = `${safeShopName}_${invoice.invoiceNo}.pdf`;
+  
+      pdf.save(fileName);
+  
       setShowPreview(false);
       onClose();
     } catch (error) {
-      console.error('PDF generation error:', error);
-      alert("Error generating PDF. Please try again.");
+      console.error("PDF generation error:", error);
+      alert(`Error generating PDF: ${error.message}`);
     }
   };
-
+  
+  
+  
   /* ---------------- UI ---------------- */
   return (
     <>
@@ -372,14 +452,22 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
                       onChange={(e) => updateItem(i, "description", e.target.value)}
                       placeholder="Item description"
                     />
-                    <input
-                      type="number"
-                      min="0"
-                      className="col-span-2 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition"
-                      value={item.price}
-                      onChange={(e) => updateItem(i, "price", e.target.value)}
-                      placeholder="0"
-                    />
+                   <div className="col-span-2">
+                    {item.priceLabel ? (
+                      <div className="px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-sm font-semibold text-gray-700 text-center">
+                        {item.priceLabel}
+                      </div>
+                    ) : (
+                      <input
+                        type="number"
+                        min="0"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition"
+                        value={item.price}
+                        onChange={(e) => updateItem(i, "price", e.target.value)}
+                        placeholder="0"
+                      />
+                    )}
+                  </div>
                     <input
                       type="number"
                       min="0"
@@ -437,9 +525,9 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
                   </div>
                   {balance > 0 && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Due Date <span className="text-red-500">*</span>
-                      </label>
+                     <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Due Date <span className="text-gray-400">(optional)</span>
+                    </label>
                       <input
                         type="date"
                         className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition ${
@@ -519,6 +607,17 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
 
         </div>
       </div>
+      <div
+        id="pdf-root"
+        style={{
+          position: "fixed",
+          left: "-9999px",
+          top: 0,
+          width: "794px",
+          height: "1123px",
+          background: "white",
+        }}
+      />
 
       {/* Preview Modal */}
       {showPreview && (
