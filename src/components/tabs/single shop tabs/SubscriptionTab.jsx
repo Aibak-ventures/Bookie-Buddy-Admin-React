@@ -458,7 +458,7 @@ const SubscriptionTab = ({ shop_id, shopSubscriptionStatus }) => {
 
 
                     <div className="bg-white bg-opacity-60 rounded-lg sm:rounded-xl p-3 sm:p-4 mb-3 sm:mb-4">
-                    <h6 className="font-semibold py-3">Total usage : {feature?.usage_limit?.use ?? "N/A"}</h6>
+                    <h6 className="font-semibold py-3">Total usage : {feature?.used ?? "N/A"}</h6>
 
                       <div className="grid grid-cols-3 gap-2 sm:gap-3 text-xs">
                         <div>
