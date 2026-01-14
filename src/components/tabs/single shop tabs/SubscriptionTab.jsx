@@ -5,8 +5,7 @@ import { deleteShopFeature } from "../../../api/AdminApis";
 
 // Modals
 import AssignPlanForShop from "../../Modals/AssignPlanForShop";
-import UpdateShopPlanModal from "../../Modals/UpdateShopPlanModal";
-import UpdateShopFeaturesModal from "../../Modals/AddShopFeaturesModal";
+import AddShopFeaturesModal from "../../Modals/AddShopFeaturesModal";
 import UpdateShopSubscriptionModal from "../../Modals/UpdateShopSubscriptionModal";
 
 const SubscriptionTab = ({ shop_id, shopSubscriptionStatus }) => {
@@ -17,7 +16,6 @@ const SubscriptionTab = ({ shop_id, shopSubscriptionStatus }) => {
 
   // Modal states
   const [showAddModal, setShowAddModal] = useState(false);
-  const [showUpdateSubModal, setShowUpdateSubModal] = useState(false);
   const [showUpdateFeaturesModal, setShowUpdateFeaturesModal] = useState(false);
 
   const [selectedFeature, setSelectedFeature] = useState(null);
@@ -86,7 +84,7 @@ const SubscriptionTab = ({ shop_id, shopSubscriptionStatus }) => {
     try {
       const res = await getShopSubscriptionDetails(shop_id);
       const data = res?.data?.subscription || null;
-      
+    console.log("this is my response",res);
       setSubscriptionData(data);
       setStatus(data?.status === "ACTIVE" ? "ACTIVE" : "NONE");
     } catch (err) {
@@ -166,14 +164,9 @@ const SubscriptionTab = ({ shop_id, shopSubscriptionStatus }) => {
         }}
       />
 
-      <UpdateShopPlanModal
-        shopId={shop_id}
-        isOpen={showUpdateSubModal}
-        onClose={() => setShowUpdateSubModal(false)}
-        onSuccess={fetchSubscriptionDetails}
-      />
+      
 
-      <UpdateShopFeaturesModal
+      <AddShopFeaturesModal
         shopId={shop_id}
         subscription_id={subscriptionData?.id}
         isOpen={showUpdateFeaturesModal}
@@ -286,11 +279,6 @@ const SubscriptionTab = ({ shop_id, shopSubscriptionStatus }) => {
                         <p className="uppercase font-semibold tracking-wide text-gray-500 text-[10px]">End</p>
                         <p className="font-medium">{formatDateTime(feature.end_date)}</p>
                       </div>
-
-
-
-
-
                     </div>
 
                     <div className="mt-4 flex justify-end space-x-2">
@@ -333,14 +321,6 @@ const SubscriptionTab = ({ shop_id, shopSubscriptionStatus }) => {
         </div>
       )}
 
-      <UpdateShopSubscriptionModal
-        isOpen={showUpdateModal}
-        onClose={() => setShowUpdateModal(false)}
-        subscription_id={subscriptionData?.id}
-        onSuccess={fetchSubscriptionDetails}
-        currentSub={subscriptionData}
-      />
-
       <UpdateShopFeatureDetails
         isOpen={showFeatureEditModal}
         onClose={() => setShowFeatureEditModal(false)}
@@ -356,55 +336,13 @@ const SubscriptionTab = ({ shop_id, shopSubscriptionStatus }) => {
         onSuccess={fetchSubscriptionDetails}
         currentSub={subscriptionData}
       />
-
-      <UpdateShopFeaturesModal
-        shopId={shop_id}
-        subscription_id={subscriptionData?.id}
-        isOpen={showUpdateFeaturesModal}
-        onClose={() => setShowUpdateFeaturesModal(false)}
-        onSuccess={fetchSubscriptionDetails}
-        currentFeatures={subscriptionData?.addon_features || []}
-      />
-
-      <UpdateShopSubscriptionModal
-        isOpen={showUpdateModal}
-        onClose={() => setShowUpdateModal(false)}
-        subscription_id={subscriptionData?.id}
-        onSuccess={fetchSubscriptionDetails}
-        currentSub={subscriptionData}
-      />
-
       <AssignPlanForShop
         shopId={shop_id}
         isOpen={showAddModal}
         onClose={() => setShowAddModal(false)}
         onSuccess={fetchSubscriptionDetails}
       />
-
-      <UpdateShopSubscriptionModal
-        isOpen={showUpdateModal}
-        onClose={() => setShowUpdateModal(false)}
-        subscription_id={subscriptionData?.id}
-        onSuccess={fetchSubscriptionDetails}
-        currentSub={subscriptionData}
-      />
-
-      <UpdateShopFeaturesModal
-        shopId={shop_id}
-        subscription_id={subscriptionData?.id}
-        isOpen={showUpdateFeaturesModal}
-        onClose={() => setShowUpdateFeaturesModal(false)}
-        onSuccess={fetchSubscriptionDetails}
-        currentFeatures={subscriptionData?.addon_features || []}
-      />
-
-      <UpdateShopSubscriptionModal
-        isOpen={showUpdateModal}
-        onClose={() => setShowUpdateModal(false)}
-        subscription_id={subscriptionData?.id}
-        onSuccess={fetchSubscriptionDetails}
-        currentSub={subscriptionData}
-      />
+      
     </div>
   );
 };

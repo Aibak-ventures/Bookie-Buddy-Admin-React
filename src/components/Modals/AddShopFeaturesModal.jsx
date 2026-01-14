@@ -9,7 +9,6 @@ const AddShopFeaturesModal = ({
   onSuccess,
   currentFeatures = [],
 }) => {
-
   const [features, setFeatures] = useState([]);
   const [saving, setSaving] = useState(false);
 
@@ -31,6 +30,7 @@ const AddShopFeaturesModal = ({
   const loadFeatures = async (url) => {
     try {
       const res = await fetchFeatures(url);
+      
 
       const assignedIds = currentFeatures.map((f) => f.id);
 
@@ -61,16 +61,15 @@ const AddShopFeaturesModal = ({
     }
   };
 
-  // **Toggle feature selection**
+  // Toggle feature selection
   const toggleFeature = (feature) => {
     setSelectedFeatures((prev) => {
       if (prev[feature.id]) {
-        // unselect
         const updated = { ...prev };
         delete updated[feature.id];
         return updated;
       }
-      // select default record
+
       return {
         ...prev,
         [feature.id]: {
@@ -78,6 +77,15 @@ const AddShopFeaturesModal = ({
           price_paid: feature.base_price,
           start_date: new Date().toISOString().slice(0, 16),
           end_date: "",
+
+          // ✅ NEW: usage limit support
+          usage_limit_enabled: false,
+          usage_limit: {
+            extra_limit: null,
+            valid_until: "",
+            is_active: true,
+            reason: "",
+          },
         },
       };
     });
@@ -93,6 +101,19 @@ const AddShopFeaturesModal = ({
     }));
   };
 
+  const updateUsageLimitField = (featureId, field, value) => {
+    setSelectedFeatures((prev) => ({
+      ...prev,
+      [featureId]: {
+        ...prev[featureId],
+        usage_limit: {
+          ...prev[featureId].usage_limit,
+          [field]: value,
+        },
+      },
+    }));
+  };
+
   const handleSave = async () => {
     const selectedList = Object.values(selectedFeatures);
 
@@ -101,11 +122,41 @@ const AddShopFeaturesModal = ({
       return;
     }
 
+    // ✅ Validation: extra_limit mandatory if enabled
+    for (const f of selectedList) {
+      if (
+        f.usage_limit_enabled &&
+        (f.usage_limit.extra_limit === null ||
+          f.usage_limit.extra_limit <= 0)
+      ) {
+        alert("Extra limit is required when usage limit is enabled");
+        return;
+      }
+    }
+
     setSaving(true);
 
     try {
       const payload = {
-        features: selectedList,
+        features: selectedList.map((f) => {
+          const base = {
+            feature_id: f.feature_id,
+            price_paid: f.price_paid,
+            start_date: f.start_date,
+            end_date: f.end_date || undefined,
+          };
+
+          if (f.usage_limit_enabled) {
+            base.usage_limit = {
+              extra_limit: f.usage_limit.extra_limit,
+              valid_until: f.usage_limit.valid_until || undefined,
+              is_active: true,
+              reason: f.usage_limit.reason || undefined,
+            };
+          }
+
+          return base;
+        }),
       };
 
       const response = await addFeatureToShop(subscription_id, payload);
@@ -127,7 +178,9 @@ const AddShopFeaturesModal = ({
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
       <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
-        <h2 className="text-lg font-semibold mb-4">Manage Addon Features</h2>
+        <h2 className="text-lg font-semibold mb-4">
+          Manage Addon Features
+        </h2>
 
         {/* FEATURES LIST */}
         <div className="max-h-64 overflow-y-auto space-y-3 mb-3 border rounded-md p-3">
@@ -140,11 +193,14 @@ const AddShopFeaturesModal = ({
                 <div key={feature.id} className="pb-3 border-b">
                   <label className="flex justify-between items-center">
                     <div>
-                      <p className="font-medium text-gray-800">{feature.name}</p>
-                      <p className="text-xs text-gray-500">{feature.feature_type}</p>
+                      <p className="font-medium text-gray-800">
+                        {feature.name}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {feature.feature_type}
+                      </p>
                     </div>
 
-                    {/* CHECKBOX FOR MULTI SELECT */}
                     <input
                       type="checkbox"
                       checked={!!selected}
@@ -152,19 +208,21 @@ const AddShopFeaturesModal = ({
                     />
                   </label>
 
-                  {/* Feature Inputs */}
                   {selected && (
                     <div className="mt-2 space-y-2">
                       <label>Price Paid (optional)</label>
-                        <input
-                          type="number"
-                          className="w-full p-2 border rounded"
-                          value={selected.price_paid}
-                          onChange={(e) =>
-                            updateField(feature.id, "price_paid", Number(e.target.value))
-                          }
-                        />
-
+                      <input
+                        type="number"
+                        className="w-full p-2 border rounded"
+                        value={selected.price_paid}
+                        onChange={(e) =>
+                          updateField(
+                            feature.id,
+                            "price_paid",
+                            Number(e.target.value)
+                          )
+                        }
+                      />
 
                       <label>Start Date</label>
                       <input
@@ -172,7 +230,11 @@ const AddShopFeaturesModal = ({
                         className="w-full p-2 border rounded"
                         value={selected.start_date}
                         onChange={(e) =>
-                          updateField(feature.id, "start_date", e.target.value)
+                          updateField(
+                            feature.id,
+                            "start_date",
+                            e.target.value
+                          )
                         }
                       />
 
@@ -182,9 +244,86 @@ const AddShopFeaturesModal = ({
                         className="w-full p-2 border rounded"
                         value={selected.end_date}
                         onChange={(e) =>
-                          updateField(feature.id, "end_date", e.target.value)
+                          updateField(
+                            feature.id,
+                            "end_date",
+                            e.target.value
+                          )
                         }
                       />
+
+                      {/* Usage Limit Toggle */}
+                      <div className="flex items-center gap-2 mt-2">
+                        <input
+                          type="checkbox"
+                          checked={selected.usage_limit_enabled}
+                          onChange={(e) =>
+                            setSelectedFeatures((prev) => ({
+                              ...prev,
+                              [feature.id]: {
+                                ...prev[feature.id],
+                                usage_limit_enabled: e.target.checked,
+                              },
+                            }))
+                          }
+                        />
+                        <span className="text-sm font-medium">
+                          Enable Usage Limit
+                        </span>
+                      </div>
+
+                      {/* Usage Limit Fields */}
+                      {selected.usage_limit_enabled && (
+                        <div className="mt-2 space-y-2 border-l-2 pl-3 border-purple-300">
+                          <label>
+                            Extra Limit{" "}
+                            <span className="text-red-500">*</span>
+                          </label>
+                          <input
+                            type="number"
+                            className="w-full p-2 border rounded"
+                            value={selected.usage_limit.extra_limit ?? ""}
+                            onChange={(e) =>
+                              updateUsageLimitField(
+                                feature.id,
+                                "extra_limit",
+                                e.target.value === ""
+                                  ? null
+                                  : Number(e.target.value)
+                              )
+                            }
+                          />
+
+                          <label>Valid Until (optional)</label>
+                          <input
+                            type="datetime-local"
+                            className="w-full p-2 border rounded"
+                            value={selected.usage_limit.valid_until}
+                            onChange={(e) =>
+                              updateUsageLimitField(
+                                feature.id,
+                                "valid_until",
+                                e.target.value
+                              )
+                            }
+                          />
+
+                          <label>Reason (optional)</label>
+                          <input
+                            type="text"
+                            className="w-full p-2 border rounded"
+                            placeholder="Promotional bonus"
+                            value={selected.usage_limit.reason}
+                            onChange={(e) =>
+                              updateUsageLimitField(
+                                feature.id,
+                                "reason",
+                                e.target.value
+                              )
+                            }
+                          />
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -199,7 +338,9 @@ const AddShopFeaturesModal = ({
             disabled={!prevUrl}
             onClick={goPrev}
             className={`px-3 py-1 rounded ${
-              prevUrl ? "bg-gray-200 hover:bg-gray-300" : "bg-gray-100 cursor-not-allowed"
+              prevUrl
+                ? "bg-gray-200 hover:bg-gray-300"
+                : "bg-gray-100 cursor-not-allowed"
             }`}
           >
             Prev
@@ -211,7 +352,9 @@ const AddShopFeaturesModal = ({
             disabled={!nextUrl}
             onClick={goNext}
             className={`px-3 py-1 rounded ${
-              nextUrl ? "bg-gray-200 hover:bg-gray-300" : "bg-gray-100 cursor-not-allowed"
+              nextUrl
+                ? "bg-gray-200 hover:bg-gray-300"
+                : "bg-gray-100 cursor-not-allowed"
             }`}
           >
             Next

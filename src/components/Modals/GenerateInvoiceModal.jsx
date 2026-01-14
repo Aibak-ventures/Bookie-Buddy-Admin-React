@@ -158,9 +158,11 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
   /* ---------------- HANDLERS ---------------- */
   const updateItem = (index, field, value) => {
     const updated = [...items];
-    
+  
     if (field === "price" || field === "offer") {
-      const numValue = Math.max(0, Number(value) || 0);
+      // allow empty string in UI, but treat it as 0 internally
+      const numValue = value === "" ? 0 : Math.max(0, Number(value) || 0);
+  
       updated[index][field] = numValue;
       updated[index].total = calculateRowTotal(
         updated[index].price,
@@ -169,7 +171,7 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
     } else {
       updated[index][field] = value;
     }
-
+  
     setItems(updated);
   };
 
@@ -462,7 +464,7 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
                         type="number"
                         min="0"
                         className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition"
-                        value={item.price}
+                        value={item.price === 0 ? "" : item.price}
                         onChange={(e) => updateItem(i, "price", e.target.value)}
                         placeholder="0"
                       />
@@ -473,7 +475,7 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
                       min="0"
                       max="100"
                       className="col-span-2 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition"
-                      value={item.offer}
+                      value={item.offer === 0 ? "" : item.offer}
                       onChange={(e) => updateItem(i, "offer", e.target.value)}
                       placeholder="0"
                     />

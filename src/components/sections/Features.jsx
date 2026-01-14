@@ -14,7 +14,7 @@ import FeatureDetailsModal from "../Modals/FeatureDetailsModal";
 const Features = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [features, setFeatures] = useState([]);
-  const [count, setCount] = useState(0);
+  const [count, setCount] = useState();
   const [next, setNext] = useState(null);
   const [previous, setPrevious] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -64,7 +64,7 @@ const Features = () => {
       alert("Feature added successfully");
     } catch (err) {
       console.error(err);
-      alert(`Failed ${err}`);
+      alert(`Failed ${err?.data?.message ?? err}`);
 
     }
   };
@@ -79,7 +79,8 @@ const Features = () => {
       await loadFeatures();
     } catch (err) {
       console.error(err);
-      alert("Failed to update feature");
+      alert(`Failed ${err?.response?.data?.error ?? err}`);
+
     }
   };
 
