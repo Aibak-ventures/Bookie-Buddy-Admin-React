@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
-import { fetchFeatures } from "../../api/AdminApis";
+import { fetchFeatures,fetchSubscriptions } from "../../api/AdminApis";
 import { validateFeatureForm } from "../../validations/featureValidator";
 
 const AddFeatureModal = ({ isOpen, onClose, onAdd, onUpdate, featureData }) => {
@@ -14,11 +14,15 @@ const AddFeatureModal = ({ isOpen, onClose, onAdd, onUpdate, featureData }) => {
     base_price: 0,
     permissions: {},
     requires_features: [],
+    usage_type: "NONE",        // ✅ NEW
+    usage_policies: [],       
   });
 
 
   const [availableFeatures, setAvailableFeatures] = useState([]);
   const [errors, setErrors] = useState({});
+  const [plans, setPlans] = useState([]);
+const [loadingPlans, setLoadingPlans] = useState(false);
 
   // Load available features
   useEffect(() => {
@@ -49,9 +53,45 @@ const AddFeatureModal = ({ isOpen, onClose, onAdd, onUpdate, featureData }) => {
         requires_features: featureData.requires_features
           ? featureData.requires_features.map((f) => f.id)
           : [],
+
+         // ✅ ADD THESE
+        usage_type: featureData.usage_type || "NONE",
+        usage_policies: featureData.usage_policies
+          ? featureData.usage_policies.map((p) => ({
+              plan: p.plan,
+              limit: p.limit,
+              reset_cycle: p.reset_cycle,
+            }))
+          : [],
       });
     }
   }, [featureData]);
+
+  useEffect(() => {
+    const fetchPlans = async () => {
+      setLoadingPlans(true);
+      try {
+        const data = await fetchSubscriptions();
+        const plansArray =
+          Array.isArray(data)
+            ? data
+            : Array.isArray(data?.results)
+            ? data.results
+            : Array.isArray(data?.data)
+            ? data.data
+            : [];
+        setPlans(plansArray);
+      } catch (err) {
+        console.error("Error fetching plans:", err);
+        setPlans([]);
+      } finally {
+        setLoadingPlans(false);
+      }
+    };
+  
+    fetchPlans();
+  }, []);
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -87,7 +127,7 @@ const AddFeatureModal = ({ isOpen, onClose, onAdd, onUpdate, featureData }) => {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-      <div className="bg-white w-full max-w-2xl rounded-lg shadow-lg p-6 relative">
+      <div className="bg-white w-full max-w-2xl rounded-lg shadow-lg p-6 relative  max-h-[90vh] overflow-y-auto">
         <button
           onClick={onClose}
           className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
@@ -204,6 +244,119 @@ const AddFeatureModal = ({ isOpen, onClose, onAdd, onUpdate, featureData }) => {
               </label>
             </div>
           </div>
+
+          {/* Usage Type */}
+          <div>
+            <label className="block text-sm font-medium">Usage Type</label>
+            <select
+              name="usage_type"
+              value={formData.usage_type}
+              onChange={handleChange}
+              className="w-full border rounded-md p-2"
+            >
+              <option value="NONE">NONE</option>
+              <option value="COUNT">COUNT</option>
+              <option value="STORAGE">STORAGE</option>
+              <option value="TIME">TIME</option>
+            </select>
+          </div>
+
+          {/* Usage Policies */}
+            {formData.usage_type !== "NONE" && (
+              <div>
+                <label className="block text-sm font-medium mb-2">
+                  Subscription Usage Policies
+                </label>
+
+                <div className="space-y-3">
+                  {plans.map((plan) => {
+                    const policy = formData.usage_policies.find(
+                      (p) => p.plan === plan.id
+                    );
+
+                    return (
+                      <div
+                        key={plan.id}
+                        className="border rounded-md p-3 space-y-2"
+                      >
+                        <label className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={!!policy}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  usage_policies: [
+                                    ...prev.usage_policies,
+                                    {
+                                      plan: plan.id,
+                                      limit: "",
+                                      reset_cycle: "LIFETIME",
+                                    },
+                                  ],
+                                }));
+                              } else {
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  usage_policies: prev.usage_policies.filter(
+                                    (p) => p.plan !== plan.id
+                                  ),
+                                }));
+                              }
+                            }}
+                          />
+                          <span className="font-medium">{plan.name}</span>
+                        </label>
+
+                        {/* Show inputs only if selected */}
+                        {policy && (
+                          <div className="grid grid-cols-2 gap-2 ml-6">
+                            <input
+                              type="number"
+                              placeholder="Limit"
+                              value={policy.limit ?? ""}
+                              onChange={(e) => {
+                                const value = Number(e.target.value);
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  usage_policies: prev.usage_policies.map((p) =>
+                                    p.plan === plan.id
+                                      ? { ...p, limit: value }
+                                      : p
+                                  ),
+                                }));
+                              }}
+                              className="border rounded-md p-2"
+                            />
+
+                            <select
+                              value={policy.reset_cycle}
+                              onChange={(e) => {
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  usage_policies: prev.usage_policies.map((p) =>
+                                    p.plan === plan.id
+                                      ? { ...p, reset_cycle: e.target.value }
+                                      : p
+                                  ),
+                                }));
+                              }}
+                              className="border rounded-md p-2"
+                            >
+                              <option value="LIFETIME">LIFETIME</option>
+                              <option value="MONTHLY">MONTHLY</option>
+                              <option value="DAILY">DAILY</option>
+                            </select>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
 
           {/* Requires Features */}
           <div>
