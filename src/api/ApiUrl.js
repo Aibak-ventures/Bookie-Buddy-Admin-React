@@ -52,6 +52,10 @@ const API_URLS = {
   CANCEL_SUBSCRIPTION_OF_SHOP : (subscriptionId) => `/api/v3/subscriptions/admin/shop-subscriptions/cancel/${subscriptionId}/`,
   UPDATE_SHOP_SUB: (shopSubscriptionId) =>`/api/v3/subscriptions/admin/shop-subscriptions/update/${shopSubscriptionId}/`,
 
+
+  // IDLE DAYS REPORT
+  IDLE_DAYS_REPORT: '/api/v1/shop/admin/shops/idle-days-report/',
+
   
 };
 

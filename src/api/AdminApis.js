@@ -704,3 +704,23 @@ export const sendPushNotification = async (data) => {
     throw error;
   }
 };
+
+
+
+
+//////////////////////////////////////////////    GET IDLE DAYS REPORT    /////////////////////////////////////////
+export const fetchIdleDaysReport = async ({
+  period_days = 30,
+  threshold = 10,
+  page = 1,
+}) => {
+  try {
+    const response = await apiClient.get(
+      `${API_URLS.IDLE_DAYS_REPORT}?period_days=${period_days}&threshold=${threshold}&page=${page}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch idle days report:', error);
+    throw error;
+  }
+};
