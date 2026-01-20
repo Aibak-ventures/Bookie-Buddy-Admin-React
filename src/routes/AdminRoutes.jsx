@@ -14,6 +14,7 @@ import GeneralServices from "../components/sections/GeneralServices";
 import Features from "../components/sections/Features";
 import Subscription from "../components/sections/Subscription";
 import PushNotifications from "../components/sections/PushNotifications";
+import IdleDaysReport from "../components/sections/IdleDaysReport";
 
 
 
@@ -35,6 +36,7 @@ const AdminRoutes = () => {
           <Route index element={<DashBoard />} />
           <Route path="shops" element={<Shops />} />
           <Route path="users" element={<Users />} />
+          <Route path="idle-days-report" element={<IdleDaysReport />} />
           <Route path="main-services" element={<MainServices />} />
           <Route path="general-services" element={<GeneralServices />} />
           <Route path="feature-management" element={<Features />} />
