@@ -18,6 +18,8 @@ export const validateShopRegistrationForm = (formData) => {
     errors.place = 'Place is required';
   }
 
+  
+
   // Shop phone (required)
   const shopPhoneError = validatePhone(formData.shop_phone, {
     required: true,

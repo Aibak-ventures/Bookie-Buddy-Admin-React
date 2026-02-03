@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import FormInput from '../ui components/FormInput';
 import FormSelect from '../ui components/FormSelect';
 import { AddUserOnlyValidation } from '../../validations/AddUserOnlyValidation';
@@ -18,6 +18,8 @@ const AddUserOnly = ({ isOpen, onClose, onSubmit }) => {
     confirm_password: '',
     role: '',
   });
+  const [isDirty, setIsDirty] = useState(false);
+
 
   const [formErrors, setFormErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
@@ -26,11 +28,25 @@ const AddUserOnly = ({ isOpen, onClose, onSubmit }) => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleChange = (field) => (e) => {
+    setIsDirty(true);
     setFormData((prev) => ({ ...prev, [field]: e.target.value }));
     if (formErrors[field]) {
       setFormErrors((prev) => ({ ...prev, [field]: '' }));
     }
   };
+
+  useEffect(() => {
+    if (!isOpen) return;
+  
+    const handleBeforeUnload = (e) => {
+      if (!isDirty) return;
+      e.preventDefault();
+      e.returnValue = '';
+    };
+  
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isDirty, isOpen]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,6 +57,7 @@ const AddUserOnly = ({ isOpen, onClose, onSubmit }) => {
     setSubmitting(true);
     try {
       await onSubmit(formData);
+      setIsDirty(false);
       onClose();
     } catch (error) {
     alert(`Failed :${err?.response?.data?.error}`)
@@ -51,18 +68,30 @@ const AddUserOnly = ({ isOpen, onClose, onSubmit }) => {
     }
   };
 
+  const handleSafeClose = () => {
+    if (isDirty) {
+      const confirmClose = window.confirm(
+        'You have unsaved changes. If you close this form, the entered data will be lost. Continue?'
+      );
+      if (!confirmClose) return;
+    }
+  
+    setIsDirty(false);
+    onClose();
+  };
+
   if (!isOpen) return null;
 
     return (
-      <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
-        <div className="bg-white w-full max-w-4xl rounded-xl shadow-xl relative">
+      <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4"  onClick={handleSafeClose}>
+        <div className="bg-white w-full max-w-4xl rounded-xl shadow-xl relative"  onClick={(e) => e.stopPropagation()}>
     
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-4 border-b">
             <h2 className="text-lg font-semibold text-gray-800">
               Add New User
             </h2>
-            <button onClick={onClose} className="text-gray-500 hover:text-gray-700">
+            <button onClick={handleSafeClose} className="text-gray-500 hover:text-gray-700">
               <X />
             </button>
           </div>

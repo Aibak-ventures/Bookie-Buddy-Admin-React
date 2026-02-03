@@ -61,19 +61,17 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
   if (!isOpen) return null;
   console.log("data in geneara invoice",shopData);
 
-  const generateInvoiceNumber = (count = 1) => {
-    const today = new Date();
+  const generateInvoiceNumber = (date, count = 1) => {
+    const selectedDate = new Date(date);
   
-    const dd = String(today.getDate()).padStart(2, "0");
-    const mm = String(today.getMonth() + 1).padStart(2, "0");
-    const yyyy = today.getFullYear();
+    const dd = String(selectedDate.getDate()).padStart(2, "0");
+    const mm = String(selectedDate.getMonth() + 1).padStart(2, "0");
+    const yyyy = selectedDate.getFullYear();
   
     const sequence = String(count).padStart(2, "0");
   
     return `BB${dd}${mm}${yyyy}${sequence}`;
   };
-  
-
   const [from, setFrom] = useState({
     orgName: "Bookie Buddy",
     address: DEFAULT_FROM_ADDRESS,
@@ -103,6 +101,8 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
   /* ---------------- INIT DATA ---------------- */
   useEffect(() => {
     if (shopData) {
+      const today = new Date().toISOString().slice(0, 10);
+  
       setTo({
         name: shopData.name || "",
         place: shopData.place || "",
@@ -110,18 +110,16 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
       });
   
       setInvoice({
-        invoiceNo: generateInvoiceNumber(1),
-        invoiceDate: new Date().toISOString().slice(0, 10),
+        invoiceNo: generateInvoiceNumber(today, 1),
+        invoiceDate: today,
         paidTotal: 0,
         dueDate: "",
       });
     }
   
-    // RESET DEFAULTS ON OPEN
     setTerms(DEFAULT_TERMS);
     setItems(DEFAULT_ITEMS);
   }, [shopData]);
-  
 
   /* ---------------- CALCULATIONS ---------------- */
   const calculateRowTotal = (price, offer) => {
@@ -403,16 +401,25 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
                     Invoice Date
                   </label>
                   <input
-                    type="date"
-                    className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition ${
-                      errors.invoiceDate ? 'border-red-500' : 'border-gray-300'
-                    }`}
-                    value={invoice.invoiceDate}
-                    onChange={(e) => {
-                      setInvoice({ ...invoice, invoiceDate: e.target.value });
-                      if (errors.invoiceDate) setErrors({ ...errors, invoiceDate: null });
-                    }}
-                  />
+                      type="date"
+                      className={`w-full px-4 py-2.5 border rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition ${
+                        errors.invoiceDate ? 'border-red-500' : 'border-gray-300'
+                      }`}
+                      value={invoice.invoiceDate}
+                      onChange={(e) => {
+                        const selectedDate = e.target.value;
+
+                        setInvoice({
+                          ...invoice,
+                          invoiceDate: selectedDate,
+                          invoiceNo: generateInvoiceNumber(selectedDate, 1),
+                        });
+
+                        if (errors.invoiceDate) {
+                          setErrors({ ...errors, invoiceDate: null });
+                        }
+                      }}
+                    />
                   {errors.invoiceDate && (
                     <p className="text-red-500 text-sm mt-1">{errors.invoiceDate}</p>
                   )}

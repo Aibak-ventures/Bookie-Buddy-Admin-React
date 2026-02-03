@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import FormInput from '../ui components/FormInput';
 import FileUpload from '../ui components/FileUpload';
 import FormSelect from '../ui components/FormSelect';
@@ -10,6 +10,8 @@ const CreateShopModal = ({ isOpen, onClose, onCreated }) => {
   if (!isOpen) return null;
   const [showSecret, setShowSecret] = useState(false);
 const [showConfirmSecret, setShowConfirmSecret] = useState(false);
+const [isDirty, setIsDirty] = useState(false);
+
 
   const [formData, setFormData] = useState({
     name: '',
@@ -26,7 +28,7 @@ const [showConfirmSecret, setShowConfirmSecret] = useState(false);
     booking_start_id: '',
     secret_password: '',
     confirm_secret_password: '',
-    
+
   });
 
   const [logoFiles, setLogoFiles] = useState([]);
@@ -45,8 +47,34 @@ const [showConfirmSecret, setShowConfirmSecret] = useState(false);
 
 
   const handleInputChange = (field) => (e) => {
+    setIsDirty(true);
     setFormData((prev) => ({ ...prev, [field]: e.target.value }));
     if (errors[field]) setErrors((prev) => ({ ...prev, [field]: '' }));
+  };
+  useEffect(() => {
+    if (!isOpen) return;
+  
+    const handleBeforeUnload = (e) => {
+      if (!isDirty) return;
+      e.preventDefault();
+      e.returnValue = '';
+    };
+  
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isDirty, isOpen]);
+
+  
+  const handleSafeClose = () => {
+    if (isDirty) {
+      const confirmClose = window.confirm(
+        'You have unsaved changes. If you close this form, the entered data will be lost. Continue?'
+      );
+      if (!confirmClose) return;
+    }
+  
+    setIsDirty(false);
+    onClose();
   };
 
   const handleSubmit = async (e) => {
@@ -60,6 +88,7 @@ const [showConfirmSecret, setShowConfirmSecret] = useState(false);
     setSubmitting(true);
     try {
       await createShop(formData, logoFiles[0]);
+      setIsDirty(false);
       onCreated();
       onClose();
     } catch (err) {
@@ -70,8 +99,8 @@ const [showConfirmSecret, setShowConfirmSecret] = useState(false);
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg w-full max-w-4xl p-6 overflow-y-auto max-h-[90vh]">
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"   onClick={handleSafeClose}>
+      <div className="bg-white rounded-lg w-full max-w-4xl p-6 overflow-y-auto max-h-[90vh]"  onClick={(e) => e.stopPropagation()}>
         <h2 className="text-xl font-semibold mb-4">Create New Shop</h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -179,7 +208,6 @@ const [showConfirmSecret, setShowConfirmSecret] = useState(false);
                 <p className="text-sm text-red-500">{errors.sale_start_id}</p>
               )}
             </div>
-            
 
 
 
@@ -238,14 +266,17 @@ const [showConfirmSecret, setShowConfirmSecret] = useState(false);
 
 
           <div>
-            <FileUpload onFileChange={setLogoFiles} accept="image/*" multiple={false} />
+            <FileUpload  onFileChange={(files) => {
+                setIsDirty(true);
+                setLogoFiles(files);
+              }} accept="image/*" multiple={false} />
           </div>
 
           <div className="flex justify-end space-x-3 mt-4">
             <button
               type="button"
               className="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
-              onClick={onClose}
+              onClick={handleSafeClose}
             >
               Cancel
             </button>
