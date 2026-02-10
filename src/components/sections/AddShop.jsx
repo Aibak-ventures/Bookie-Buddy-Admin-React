@@ -6,6 +6,7 @@ import { registerShopWithUser } from '../../api/AdminApis';
 import { useNavigate } from 'react-router-dom';
 import { validateShopRegistrationForm } from '../../validations/AddShopWithUser';
 import { Eye, EyeOff } from 'lucide-react';
+import usePrompt from '../hooks/user_prompt_hook'
 
 const ShopRegistrationForm = () => {
   const navigate = useNavigate();
@@ -31,6 +32,7 @@ const ShopRegistrationForm = () => {
     booking_start_id: '',
     sale_start_id: '',
 
+
     // ✅ moved here + renamed key
     secret_password: '',
     confirmSecretPassword: '',
@@ -39,6 +41,9 @@ const ShopRegistrationForm = () => {
   const [formErrors, setFormErrors] = useState({});
   const [logoFiles, setLogoFiles] = useState([]);
   const [submitting, setSubmitting] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
+  
+
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -46,11 +51,25 @@ const ShopRegistrationForm = () => {
   const [showConfirmSecretPassword, setShowConfirmSecretPassword] = useState(false);
 
   const handleInputChange = (field) => (e) => {
+    setIsDirty(true); 
     setFormData((prev) => ({ ...prev, [field]: e.target.value }));
     if (formErrors[field]) {
       setFormErrors((prev) => ({ ...prev, [field]: '' }));
     }
   };
+
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (!isDirty) return;
+  
+      e.preventDefault();
+      e.returnValue = ''; // Required for browser confirmation dialog
+    };
+  
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isDirty]);
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -65,6 +84,7 @@ const ShopRegistrationForm = () => {
     try {
       const response = await registerShopWithUser(formData, logoFiles[0]);
       if (response.status === 201) {
+        setIsDirty(false);
         alert('Shop registered!');
         navigate('/shops');
       }
@@ -104,6 +124,10 @@ const ShopRegistrationForm = () => {
     { value: 'maharashtra', label: 'Maharashtra' },
     { value: 'goa', label: 'Goa' },
   ];
+  usePrompt(
+    'You have unsaved changes. If you leave this page, the entered data will be lost. Continue?',
+isDirty
+);
 
   return (
     <div className="max-w-6xl mx-auto p-6 bg-white">
@@ -202,7 +226,10 @@ const ShopRegistrationForm = () => {
           {/* Logo Upload */}
           <div className="bg-gray-50 p-6 rounded-lg">
             <h2 className="text-lg font-semibold mb-4">Shop Logo</h2>
-            <FileUpload onFileChange={setLogoFiles} accept="image/*" multiple={false} />
+            <FileUpload  onFileChange={(files) => {
+              setIsDirty(true);
+              setLogoFiles(files);
+            }} accept="image/*" multiple={false} />
           </div>
 
           {/* Owner Details */}
@@ -249,6 +276,7 @@ const ShopRegistrationForm = () => {
           </div>
         </div>
       </form>
+      
     </div>
   );
 };

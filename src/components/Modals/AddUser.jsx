@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { X, Eye, EyeOff } from 'lucide-react';
 import FormInput from '../ui components/FormInput';
 import FormSelect from '../ui components/FormSelect';
@@ -18,6 +18,8 @@ const AddUserModal = ({ isOpen, onClose, shopId, shopName, onUserAdded }) => {
     { label: 'MANAGER', value: 'MANAGER' },
     { label: 'STAFF', value: 'STAFF' },
   ];
+  const [isDirty, setIsDirty] = useState(false);
+
 
   const [formData, setFormData] = useState({
     phone: '',
@@ -39,12 +41,36 @@ const AddUserModal = ({ isOpen, onClose, shopId, shopName, onUserAdded }) => {
   const [showConfirmSecondaryPassword, setShowConfirmSecondaryPassword] = useState(false);
 
   const handleChange = (key, value) => {
+    setIsDirty(true);
     setFormData(prev => ({ ...prev, [key]: value }));
     if (formErrors[key]) {
       setFormErrors(prev => ({ ...prev, [key]: '' }));
     }
   };
 
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleBeforeUnload = (e) => {
+      if (!isDirty) return;
+      e.preventDefault();
+      e.returnValue = '';
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isDirty, isOpen]);
+  
+  const handleSafeClose = () => {
+    if (isDirty) {
+      const confirmClose = window.confirm(
+        'You have unsaved changes. If you close this form, the entered data will be lost. Continue?'
+      );
+      if (!confirmClose) return;
+    }
+    setIsDirty(false);
+    onClose();
+  };
   const handleSubmit = async () => {
     const payload = { ...formData, shop_id: shopId };
     const errors = validateUserForm(payload);
@@ -65,6 +91,8 @@ const AddUserModal = ({ isOpen, onClose, shopId, shopName, onUserAdded }) => {
       if (onUserAdded) {
         onUserAdded(newUserWithDate);
       }
+      setIsDirty(false);
+
 
       onClose();
     } catch (err) {
@@ -94,10 +122,10 @@ const AddUserModal = ({ isOpen, onClose, shopId, shopName, onUserAdded }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30">
-      <div className="bg-white w-full max-w-3xl p-6 rounded-xl shadow-lg relative">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30"   onClick={handleSafeClose}>
+      <div className="bg-white w-full max-w-3xl p-6 rounded-xl shadow-lg relative"   onClick={(e) => e.stopPropagation()}>
         <button
-          onClick={onClose}
+          onClick={handleSafeClose}
           className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
         >
           <X size={20} />
@@ -218,7 +246,7 @@ const AddUserModal = ({ isOpen, onClose, shopId, shopName, onUserAdded }) => {
 
         <div className="mt-6 flex justify-end gap-4">
           <button
-            onClick={onClose}
+            onClick={handleSafeClose}
             className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100"
           >
             Close

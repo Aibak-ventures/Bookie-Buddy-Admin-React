@@ -24,11 +24,14 @@ const UpdateShopModal = ({ shopData, onClose, onSuccess }) => {
     sale_start_id: shopData.sale_start_id ,
     booking_start_id: shopData.booking_start_id ,
     secret_password: shopData.secret_password ||'',
+    extra_user_limit: shopData.extra_user_limit ,
 
     terms_and_conditions: Array.isArray(shopData.terms_and_conditions)
       ? shopData.terms_and_conditions
       : [''],
   };
+
+  console.log("initialForm",initialForm.extra_user_limit);
 
   const [formData, setFormData] = useState(initialForm);
   const [formErrors, setFormErrors] = useState({});
@@ -218,6 +221,7 @@ const stateOptions = [
           onChange={handleChange('extra_stock_limit')}
           onWheel={(e) => e.target.blur()}   // 👈 prevents scroll changing value
         />
+        <FormInput label="Extra User Limit" type="number" value={formData.extra_user_limit} onChange={handleChange('extra_user_limit')} />
         <FormInput
           label="Invoice Start For Booking"
           type="number"
