@@ -292,6 +292,8 @@ export const registerShopWithUser = async (formData, logoFile) => {
     data.append('shop_city', formData.shop_city);               // city -> shop_city
     data.append('shop_state', formData.shop_state);             // state -> shop_state
     data.append('shop_pincode', formData.shop_pincode);         // postCode -> shop_pincode
+    data.append('subscription_renewal_price', formData.subscription_renewal_price);         // postCode -> shop_pincode
+
      // Optional invoice_start_from
     if (formData.booking_start_id) {
       data.append('booking_start_id', formData.booking_start_id);
@@ -332,6 +334,8 @@ export const createShop = async (formData, logoFile) => {
     data.append('state', formData.state);                
     data.append('pincode', formData.pincode);            
     data.append('gst_number', formData.gst_number);
+    data.append('subscription_renewal_price', formData.subscription_renewal_price);
+
 
      if (formData.booking_start_id) {
       data.append('booking_start_id', formData.booking_start_id);

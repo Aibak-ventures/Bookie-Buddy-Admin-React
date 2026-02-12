@@ -25,6 +25,7 @@ const UpdateShopModal = ({ shopData, onClose, onSuccess }) => {
     booking_start_id: shopData.booking_start_id ,
     secret_password: shopData.secret_password ||'',
     extra_user_limit: shopData.extra_user_limit ,
+    subscription_renewal_price:shopData.subscription_renewal_price || '',
 
     terms_and_conditions: Array.isArray(shopData.terms_and_conditions)
       ? shopData.terms_and_conditions
@@ -234,6 +235,13 @@ const stateOptions = [
           value={formData.sale_start_id}
           onChange={handleChange('sale_start_id')}
         />
+        <FormInput
+          label="Subscription Renewal Price"
+          type="number"
+          value={formData.subscription_renewal_price}
+          onChange={handleChange('subscription_renewal_price')}
+        />
+        
             {/* ✅ SECRET PASSWORD INPUT ADDED */}
           <div>
   <label className="block text-sm font-medium text-gray-700 mb-1">Secret Password</label>

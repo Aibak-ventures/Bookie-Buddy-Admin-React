@@ -31,6 +31,7 @@ const ShopRegistrationForm = () => {
     shop_pincode: '',
     booking_start_id: '',
     sale_start_id: '',
+    subscription_renewal_price: '',
 
 
     // ✅ moved here + renamed key
@@ -178,6 +179,8 @@ isDirty
               <FormSelect label="State" options={stateOptions} value={formData.shop_state} onChange={handleInputChange('shop_state')} />
               <FormInput label="Address" value={formData.shop_address} onChange={handleInputChange('shop_address')} />
               <FormInput label="City" value={formData.shop_city} onChange={handleInputChange('shop_city')} />
+              <FormInput label="Subscriptioin Renewal Price" value={formData.subscription_renewal_price } onChange={handleInputChange('subscription_renewal_price')} />
+
 
               {/* ✅ SHOP SECRET PASSWORD SECTION */}
               <div className="relative md:col-span-2 bg-white border border-gray-200 p-4 rounded-lg shadow-sm mb-2">

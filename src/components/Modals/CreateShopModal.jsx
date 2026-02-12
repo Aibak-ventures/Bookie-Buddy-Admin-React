@@ -26,6 +26,7 @@ const [isDirty, setIsDirty] = useState(false);
     pincode: '',
     sale_start_id: '',
     booking_start_id: '',
+    subscription_renewal_price: '',
     secret_password: '',
     confirm_secret_password: '',
 
@@ -195,6 +196,17 @@ const [isDirty, setIsDirty] = useState(false);
               />
               {errors.booking_start_id && (
                 <p className="text-sm text-red-500">{errors.booking_start_id}</p>
+              )}
+            </div>
+            <div>
+              <FormInput
+                label="Subscription Renewal Price"
+                type="number"
+                value={formData.subscription_renewal_price}
+                onChange={handleInputChange('subscription_renewal_price')}
+              />
+              {errors.subscription_renewal_price && (
+                <p className="text-sm text-red-500">{errors.subscription_renewal_price}</p>
               )}
             </div>
             <div>
