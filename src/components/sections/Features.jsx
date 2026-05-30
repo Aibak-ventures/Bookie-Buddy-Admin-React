@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Plus, Search } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import DataTable from "../ui components/DataTable";
 import ConfirmationModal from "../Modals/ConfirmationModal";
 import {
@@ -12,6 +13,7 @@ import AddFeatureModal from "../Modals/AddFeatureModal";
 import FeatureDetailsModal from "../Modals/FeatureDetailsModal";
 
 const Features = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [features, setFeatures] = useState([]);
   const [count, setCount] = useState();
@@ -139,6 +141,17 @@ const Features = () => {
   accessor: "action",
   cell: (row) => (
     <div className="flex items-center gap-2">
+      {/* View Shops */}
+      <button
+        className="px-3 py-1 rounded text-sm font-medium bg-purple-500 text-white hover:bg-purple-600"
+        onClick={(e) => {
+          e.stopPropagation();
+          navigate(`/features/${row.id}/shops`);
+        }}
+      >
+        View Shops
+      </button>
+
       {/* View More */}
       <button
         className="px-3 py-1 rounded text-sm font-medium bg-gray-500 text-white hover:bg-gray-600"
