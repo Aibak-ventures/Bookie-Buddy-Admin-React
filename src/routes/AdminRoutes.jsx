@@ -41,7 +41,7 @@ const AdminRoutes = () => {
           <Route path="main-services" element={<MainServices />} />
           <Route path="general-services" element={<GeneralServices />} />
           <Route path="feature-management" element={<Features />} />
-          <Route path="features/:featureId/shops" element={<FeatureShops />} />
+          <Route path="features/:featureId" element={<FeatureShops />} />
           <Route path="subscription-management" element={<Subscription />} />
           <Route path="push-notifications" element={<PushNotifications />} />
           

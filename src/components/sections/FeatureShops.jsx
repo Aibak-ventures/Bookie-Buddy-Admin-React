@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Search, Store, Calendar, CheckCircle, XCircle } from "lucide-react";
+import { ArrowLeft, Search, Store, Calendar, CheckCircle, XCircle, Clock } from "lucide-react";
 import DataTable from "../ui components/DataTable";
 import { fetchShopsByFeature } from "../../api/AdminApis";
 
@@ -16,6 +16,15 @@ const FeatureShops = () => {
   const [previous, setPrevious] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  // Calculate days left between two dates
+  const calculateDaysLeft = (endDate) => {
+    const today = new Date();
+    const end = new Date(endDate);
+    const diffTime = end - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    return diffDays;
+  };
 
   // Load shops using this feature
   const loadShops = async () => {
@@ -44,46 +53,21 @@ const FeatureShops = () => {
 
   // Search filter
   const filteredShops = shops.filter((shop) =>
-    [shop.shop_name, shop.shop_phone, shop.shop_email, shop.shop_place]
+    [shop.shop_name, shop.shop_phone]
       .filter(Boolean)
       .some((field) =>
         field.toLowerCase().includes(searchTerm.toLowerCase())
       )
   );
 
+  // Check if any shop has extra_usage_limit or shop_feature_usage
+  const hasUsageFields = shops.some(
+    (shop) => shop.extra_usage_limit !== null || shop.shop_feature_usage !== null
+  );
+
   const columns = [
-    { header: "Shop ID", accessor: "shop_id" },
     { header: "Shop Name", accessor: "shop_name" },
     { header: "Phone", accessor: "shop_phone" },
-    { 
-      header: "Email", 
-      accessor: "shop_email",
-      cell: (row) => row.shop_email || "N/A"
-    },
-    { header: "Place", accessor: "shop_place" },
-    {
-      header: "Shop Status",
-      accessor: "shop_is_active",
-      cell: (row) => (
-        <span
-          className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium ${
-            row.shop_is_active
-              ? "bg-green-100 text-green-700"
-              : "bg-red-100 text-red-700"
-          }`}
-        >
-          {row.shop_is_active ? (
-            <>
-              <CheckCircle size={14} /> Active
-            </>
-          ) : (
-            <>
-              <XCircle size={14} /> Inactive
-            </>
-          )}
-        </span>
-      ),
-    },
     {
       header: "Feature Status",
       accessor: "feature_is_active",
@@ -108,14 +92,25 @@ const FeatureShops = () => {
       ),
     },
     {
-      header: "Start Date",
-      accessor: "feature_start_date",
-      cell: (row) => new Date(row.feature_start_date).toLocaleDateString(),
-    },
-    {
-      header: "End Date",
-      accessor: "feature_end_date",
-      cell: (row) => new Date(row.feature_end_date).toLocaleDateString(),
+      header: "Days Left",
+      accessor: "days_left",
+      cell: (row) => {
+        const daysLeft = calculateDaysLeft(row.feature_end_date);
+        return (
+          <span
+            className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium ${
+              daysLeft > 7
+                ? "bg-green-100 text-green-700"
+                : daysLeft > 0
+                ? "bg-yellow-100 text-yellow-700"
+                : "bg-red-100 text-red-700"
+            }`}
+          >
+            <Clock size={14} />
+            {daysLeft > 0 ? `${daysLeft} days` : "Expired"}
+          </span>
+        );
+      },
     },
     {
       header: "Subscription",
@@ -133,6 +128,30 @@ const FeatureShops = () => {
       ),
     },
   ];
+
+  // Conditionally add usage columns if they exist
+  if (hasUsageFields) {
+    columns.push(
+      {
+        header: "Extra Usage Limit",
+        accessor: "extra_usage_limit",
+        cell: (row) => (
+          <span className="text-sm font-medium text-gray-700">
+            {row.extra_usage_limit !== null ? row.extra_usage_limit : "N/A"}
+          </span>
+        ),
+      },
+      {
+        header: "Feature Usage",
+        accessor: "shop_feature_usage",
+        cell: (row) => (
+          <span className="text-sm font-medium text-gray-700">
+            {row.shop_feature_usage !== null ? row.shop_feature_usage : "N/A"}
+          </span>
+        ),
+      }
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">

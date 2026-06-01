@@ -141,17 +141,6 @@ const Features = () => {
   accessor: "action",
   cell: (row) => (
     <div className="flex items-center gap-2">
-      {/* View Shops */}
-      <button
-        className="px-3 py-1 rounded text-sm font-medium bg-purple-500 text-white hover:bg-purple-600"
-        onClick={(e) => {
-          e.stopPropagation();
-          navigate(`/features/${row.id}/shops`);
-        }}
-      >
-        View Shops
-      </button>
-
       {/* View More */}
       <button
         className="px-3 py-1 rounded text-sm font-medium bg-gray-500 text-white hover:bg-gray-600"
@@ -231,7 +220,7 @@ const Features = () => {
             onPreviousPage={() => setCurrentUrl(previous)}
             disableNext={!next}
             disablePrevious={!previous}
-            rowClickPath="features"
+            onRowClick={(row) => navigate(`/features/${row.id}`)}
           />
         )}
       </div>
