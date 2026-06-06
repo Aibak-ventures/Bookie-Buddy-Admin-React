@@ -11,13 +11,16 @@ const DataTable = ({
   onPreviousPage,
   disableNext,
   disablePrevious,
-   rowClickPath = '',
+  rowClickPath = '',
+  onRowClick,
 }) => {
   const navigate = useNavigate();
 
 
   const handleRowClick = (row) => {
-    if (row?.id && rowClickPath) {
+    if (onRowClick) {
+      onRowClick(row);
+    } else if (row?.id && rowClickPath) {
       navigate(`/${rowClickPath}/${row.id}`);
     }
   }

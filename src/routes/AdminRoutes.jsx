@@ -12,6 +12,7 @@ import SingleUser from "../components/sections/SingleUser";
 import MainServices from "../components/sections/MainServices";
 import GeneralServices from "../components/sections/GeneralServices";
 import Features from "../components/sections/Features";
+import FeatureShops from "../components/sections/FeatureShops";
 import Subscription from "../components/sections/Subscription";
 import PushNotifications from "../components/sections/PushNotifications";
 import IdleDaysReport from "../components/sections/IdleDaysReport";
@@ -40,6 +41,7 @@ const AdminRoutes = () => {
           <Route path="main-services" element={<MainServices />} />
           <Route path="general-services" element={<GeneralServices />} />
           <Route path="feature-management" element={<Features />} />
+          <Route path="features/:featureId" element={<FeatureShops />} />
           <Route path="subscription-management" element={<Subscription />} />
           <Route path="push-notifications" element={<PushNotifications />} />
           

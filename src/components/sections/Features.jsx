@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Plus, Search } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import DataTable from "../ui components/DataTable";
 import ConfirmationModal from "../Modals/ConfirmationModal";
 import {
@@ -12,6 +13,7 @@ import AddFeatureModal from "../Modals/AddFeatureModal";
 import FeatureDetailsModal from "../Modals/FeatureDetailsModal";
 
 const Features = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [features, setFeatures] = useState([]);
   const [count, setCount] = useState();
@@ -218,7 +220,7 @@ const Features = () => {
             onPreviousPage={() => setCurrentUrl(previous)}
             disableNext={!next}
             disablePrevious={!previous}
-            rowClickPath="features"
+            onRowClick={(row) => navigate(`/features/${row.id}`)}
           />
         )}
       </div>
