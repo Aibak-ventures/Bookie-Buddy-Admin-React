@@ -615,9 +615,10 @@ export const deleteFeature = async (id) => {
 };
 
 // Fetch shops by feature
-export const fetchShopsByFeature = async (featureId) => {
+export const fetchShopsByFeature = async (featureId, url = null) => {
   try {
-    const response = await apiClient.get(API_URLS.SHOPS_BY_FEATURE(featureId));
+    const endpoint = url || API_URLS.SHOPS_BY_FEATURE(featureId);
+    const response = await apiClient.get(endpoint);
     return response.data.data;
   } catch (error) {
     console.error('Failed to fetch shops by feature:', error);

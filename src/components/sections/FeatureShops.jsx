@@ -27,11 +27,13 @@ const FeatureShops = () => {
   };
 
   // Load shops using this feature
-  const loadShops = async () => {
+  const loadShops = async (url = null) => {
     setLoading(true);
     setError(null);
     try {
-      const data = await fetchShopsByFeature(featureId);
+      const data = url 
+        ? await fetchShopsByFeature(featureId, url)
+        : await fetchShopsByFeature(featureId);
       setShops(data.results || []);
       setSummary(data.summary || null);
       setCount(data.count || 0);
