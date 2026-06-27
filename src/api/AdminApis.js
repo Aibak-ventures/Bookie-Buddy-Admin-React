@@ -740,3 +740,132 @@ export const fetchIdleDaysReport = async ({
     throw error;
   }
 };
+
+
+
+
+
+
+
+//////////////////////////////////////////////////////  organization apis  ////////////////////////////////
+
+
+// Fetch all organizations
+export const fetchOrganizations = async (url) => {
+  try {
+    const response = await apiClient.get(url);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Create a new organization
+export const createOrganization = async (formData, logoFile) => {
+  try {
+
+    const data = new FormData();
+
+    data.append("name", formData.name);
+    data.append("phone", formData.phone);
+    data.append("phone2", formData.phone2 || "");
+    data.append("street", formData.street || "");
+    data.append("gst_number", formData.gst_number || "");
+    data.append("place", formData.place || "");
+    data.append("email", formData.email || "");
+    data.append("city", formData.city || "");
+    data.append("state", formData.state || "");
+    data.append("pincode", formData.pincode || "");
+    data.append("is_active", formData.is_active);
+    data.append(
+      "public_listing_enabled",
+      formData.public_listing_enabled
+    );
+    console.log("ddddddddd",logoFile)
+    if (logoFile) {
+      data.append("image", logoFile);
+    }
+
+    const response = await multipartClient.post(
+      API_URLS.ORGANIZATIONS,
+      data
+    );
+
+    return response;
+
+  } catch (error) {
+    throw error;
+  }
+};
+// Fetch a single organization's details
+export const fetchSingleOrganization = async (orgId) => {
+  try {
+    const response = await apiClient.get(API_URLS.SINGLE_ORGANIZATION(orgId));
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Update an organization
+export const updateOrganization = async (
+  orgId,
+  formData,
+  logoFile
+) => {
+  try {
+
+    const data = new FormData();
+
+    data.append("name", formData.name);
+    data.append("phone", formData.phone);
+    data.append("phone2", formData.phone2 || "");
+    data.append("street", formData.street || "");
+    data.append("gst_number", formData.gst_number || "");
+    data.append("place", formData.place || "");
+    data.append("email", formData.email || "");
+    data.append("city", formData.city || "");
+    data.append("state", formData.state || "");
+    data.append("pincode", formData.pincode || "");
+    data.append(
+    "public_listing_enabled",
+    String(formData.public_listing_enabled)
+  );
+
+    if (logoFile) {
+      data.append("image", logoFile);
+    }
+
+    const response = await multipartClient.patch(
+      API_URLS.SINGLE_ORGANIZATION(orgId),
+      data
+    );
+
+    return response.data;
+
+  } catch (error) {
+    throw error;
+  }
+};
+
+// Delete an organization
+export const deleteOrganization = async (orgId) => {
+  try {
+    const response = await apiClient.delete(API_URLS.SINGLE_ORGANIZATION(orgId));
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const assignOrganizationShops = async (orgId, data) => {
+  try {
+    const response = await apiClient.post(
+      API_URLS.ASSIGN_SHOPS(orgId),
+      data
+    );
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};

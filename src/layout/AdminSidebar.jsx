@@ -1,7 +1,7 @@
 // components/AdminSidebar.jsx
 import React from 'react';
 import {
-  LayoutDashboard, Plus, Store, Users,
+  LayoutDashboard, Plus, Store, Users,Building2,
   FolderOpen, DollarSign, Settings, LogOut,PercentDiamond,FileCode,Clock 
 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -9,9 +9,8 @@ import { logoutUser } from '../api/AdminApis';
 
 const menuItems = [
   { name: 'Dashboard', icon: LayoutDashboard, path: '/' },
-//   { name: 'Add bookings', icon: Plus, path: '/admin/add-bookings' },
+  { name: 'Organizations', icon: Building2, path: '/organizations' },
   { name: 'Add shops', icon: Plus, path: '/add-shop' },
-
   { name: 'Shops', icon: Store, path: '/shops' },
   { name: 'Idle Days Report', icon: Clock, path: '/idle-days-report' },
   { name: 'Users', icon: Users, path: '/users' },
@@ -50,6 +49,7 @@ const AdminSidebar = ({ isOpen, setIsOpen }) => {
           </div>
         </div>
       </div>
+
 
       <nav className="flex-1 px-4 py-6 overflow-y-auto">
         <ul className="space-y-2">
