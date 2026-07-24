@@ -57,6 +57,12 @@ const API_URLS = {
   // IDLE DAYS REPORT
   IDLE_DAYS_REPORT: '/api/v1/shop/admin/shops/idle-days-report/',
 
+
+  // organization urls
+  ORGANIZATIONS: '/api/v1/shop/admin/organizations/',
+  SINGLE_ORGANIZATION: (orgId) => `/api/v1/shop/admin/organizations/${orgId}/`,
+  ASSIGN_SHOPS: (orgId) =>`/api/v1/shop/admin/organizations/assign-shops/${orgId}/`,
+
   
 };
 
