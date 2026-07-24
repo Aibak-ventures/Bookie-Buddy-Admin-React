@@ -63,6 +63,10 @@ const API_URLS = {
   SINGLE_ORGANIZATION: (orgId) => `/api/v1/shop/admin/organizations/${orgId}/`,
   ASSIGN_SHOPS: (orgId) =>`/api/v1/shop/admin/organizations/assign-shops/${orgId}/`,
 
+  // WHATSAPP CONFIGURATION
+  WHATSAPP_CONFIG_BY_SHOP: (shopId) => `/api/v1/whatsapp/admin/configurations/shop/${shopId}/`,
+  WHATSAPP_CONFIG: (configId) => `/api/v1/whatsapp/admin/configurations/${configId}/`,
+
   
 };
 

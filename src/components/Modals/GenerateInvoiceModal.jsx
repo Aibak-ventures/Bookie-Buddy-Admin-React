@@ -24,6 +24,7 @@ const DEFAULT_TERMS = [
 const DEFAULT_ITEMS = [
   {
     description: "Bookie Buddy mobile application",
+    quantity: 1,
     price: 12000,
     priceLabel: "",
     offer: 0,
@@ -31,6 +32,7 @@ const DEFAULT_ITEMS = [
   },
   {
     description: "Database service",
+    quantity: 1,
     price: 0,
     priceLabel: "1ST YEAR FREE",
     offer: 100,
@@ -38,6 +40,7 @@ const DEFAULT_ITEMS = [
   },
   {
     description: "Cloud maintenance",
+    quantity: 1,
     price: 0,
     priceLabel: "1ST YEAR FREE",
     offer: 0,
@@ -45,6 +48,7 @@ const DEFAULT_ITEMS = [
   },
   {
     description: "Software updates",
+    quantity: 1,
     price: 0,
     priceLabel: "LIFE TIME FREE",
     offer: 0,
@@ -72,6 +76,9 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
   
     return `BB${dd}${mm}${yyyy}${sequence}`;
   };
+  
+  const [invoiceType, setInvoiceType] = useState("onboarding"); // New state for invoice type
+  
   const [from, setFrom] = useState({
     orgName: "Bookie Buddy",
     address: DEFAULT_FROM_ADDRESS,
@@ -122,12 +129,21 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
   }, [shopData]);
 
   /* ---------------- CALCULATIONS ---------------- */
-  const calculateRowTotal = (price, offer) => {
-    return Number(price) - (Number(price) * Number(offer)) / 100;
+  const calculateRowTotal = (quantity, price, offer) => {
+    const subtotal = Number(quantity) * Number(price);
+    return subtotal - (subtotal * Number(offer)) / 100;
   };
 
   const subTotal = items.reduce((sum, i) => sum + Number(i.total || 0), 0);
-  const balance = subTotal - Number(invoice.paidTotal || 0);
+  
+  // Allow editing total invoice amount
+  const [editableTotal, setEditableTotal] = useState(0);
+  
+  useEffect(() => {
+    setEditableTotal(subTotal);
+  }, [subTotal]);
+
+  const balance = editableTotal - Number(invoice.paidTotal || 0);
 
   /* ---------------- VALIDATION ---------------- */
   const validateForm = () => {
@@ -157,12 +173,13 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
   const updateItem = (index, field, value) => {
     const updated = [...items];
   
-    if (field === "price" || field === "offer") {
+    if (field === "quantity" || field === "price" || field === "offer") {
       // allow empty string in UI, but treat it as 0 internally
       const numValue = value === "" ? 0 : Math.max(0, Number(value) || 0);
   
       updated[index][field] = numValue;
       updated[index].total = calculateRowTotal(
+        updated[index].quantity,
         updated[index].price,
         updated[index].offer
       );
@@ -174,7 +191,7 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
   };
 
   const addItem = () =>
-    setItems([...items, { description: "", price: 0, offer: 0, total: 0 }]);
+    setItems([...items, { description: "", quantity: 1, price: 0, offer: 0, total: 0 }]);
 
   const removeItem = (index) =>
     setItems(items.filter((_, i) => i !== index));
@@ -253,6 +270,42 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
 
           {/* CONTENT */}
           <div className="p-8 overflow-y-auto flex-1 space-y-8">
+
+            {/* INVOICE TYPE SELECTION */}
+            <section className="bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-6 border-2 border-purple-200">
+              <div className="flex items-center mb-4">
+                <div className="w-1 h-6 bg-purple-600 rounded mr-3"></div>
+                <h3 className="text-lg font-semibold text-gray-800">Invoice Type</h3>
+              </div>
+              <div className="flex gap-6">
+                <label className="flex items-center space-x-3 cursor-pointer group">
+                  <input
+                    type="radio"
+                    name="invoiceType"
+                    value="onboarding"
+                    checked={invoiceType === "onboarding"}
+                    onChange={(e) => setInvoiceType(e.target.value)}
+                    className="w-5 h-5 text-purple-600 focus:ring-2 focus:ring-purple-500 cursor-pointer"
+                  />
+                  <span className="text-base font-medium text-gray-700 group-hover:text-purple-700 transition">
+                    Onboarding Invoice
+                  </span>
+                </label>
+                <label className="flex items-center space-x-3 cursor-pointer group">
+                  <input
+                    type="radio"
+                    name="invoiceType"
+                    value="renewal"
+                    checked={invoiceType === "renewal"}
+                    onChange={(e) => setInvoiceType(e.target.value)}
+                    className="w-5 h-5 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                  />
+                  <span className="text-base font-medium text-gray-700 group-hover:text-blue-700 transition">
+                    Renewal Invoice
+                  </span>
+                </label>
+              </div>
+            </section>
 
             {/* FROM SECTION */}
             <section className="bg-gray-50 rounded-xl p-6 border border-gray-200">
@@ -444,7 +497,8 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
               <div className="space-y-3">
                 <div className="grid grid-cols-12 gap-2 text-sm font-medium text-gray-600 px-2">
                   <div className="col-span-1">#</div>
-                  <div className="col-span-4">Description</div>
+                  <div className="col-span-3">Description</div>
+                  <div className="col-span-1">Qty</div>
                   <div className="col-span-2">Price (₹)</div>
                   <div className="col-span-2">Offer (%)</div>
                   <div className="col-span-2">Total (₹)</div>
@@ -456,10 +510,18 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
                       {i + 1}
                     </div>
                     <input
-                      className="col-span-4 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition"
+                      className="col-span-3 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition"
                       value={item.description}
                       onChange={(e) => updateItem(i, "description", e.target.value)}
                       placeholder="Item description"
+                    />
+                    <input
+                      type="number"
+                      min="1"
+                      className="col-span-1 px-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition text-center"
+                      value={item.quantity === 0 ? "" : item.quantity}
+                      onChange={(e) => updateItem(i, "quantity", e.target.value)}
+                      placeholder="1"
                     />
                    <div className="col-span-2">
                     {item.priceLabel ? (
@@ -510,8 +572,25 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
               <div className="mt-6 bg-white rounded-lg p-4 border border-gray-300">
                 <div className="flex flex-col gap-3 max-w-md ml-auto">
                   <div className="flex justify-between items-center text-base">
-                    <span className="font-medium text-gray-700">Subtotal:</span>
+                    <span className="font-medium text-gray-700">Calculated Subtotal:</span>
                     <span className="font-bold text-gray-900">₹{subTotal.toFixed(2)}</span>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Invoice Total (Editable)
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      className="w-full px-4 py-2 border-2 border-blue-400 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition font-bold text-lg"
+                      placeholder="Enter total invoice amount"
+                      value={editableTotal}
+                      onChange={(e) => setEditableTotal(Number(e.target.value) || 0)}
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      You can adjust the total amount if needed (e.g., for discounts or adjustments)
+                    </p>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -636,9 +715,10 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
             to,
             invoice,
             items,
-            subTotal,
+            subTotal: editableTotal, // Pass editable total
             balance,
-            terms
+            terms,
+            invoiceType,
           }}
           onClose={() => setShowPreview(false)}
           onDownload={generatePDF}

@@ -96,7 +96,9 @@ const SubscriptionTab = ({ shop_id, shopSubscriptionStatus }) => {
     setLoading(true);
     try {
       const res = await getShopSubscriptionDetails(shop_id);
+
       const data = res?.data?.subscription || null;
+      
       console.log("this is my response", res);
       setSubscriptionData(data);
       setStatus(data?.status === "ACTIVE" ? "ACTIVE" : "NONE");
@@ -427,9 +429,21 @@ const SubscriptionTab = ({ shop_id, shopSubscriptionStatus }) => {
                   >
                     <div className="flex justify-between items-start mb-3 sm:mb-4">
                       <div className="flex-1">
-                        <h5 className="text-lg sm:text-xl font-bold text-purple-700 mb-1 group-hover:text-purple-800 transition-colors">
-                          {feature.name}
-                        </h5>
+                        <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-1">
+                          <h5 className="text-lg sm:text-xl font-bold text-purple-700 group-hover:text-purple-800 transition-colors">
+                            {feature.name}
+                          </h5>
+                          {/* Status Badge */}
+                          <span
+                            className={`px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wide w-fit ${
+                              feature.is_active
+                                ? 'bg-green-500 text-white'
+                                : 'bg-red-500 text-white'
+                            }`}
+                          >
+                            {feature.is_active ? '● Active' : '● Inactive'}
+                          </span>
+                        </div>
                         <div className="flex items-center gap-2">
                           <span className="text-xl sm:text-2xl font-extrabold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
                             ₹{feature.price_paid}

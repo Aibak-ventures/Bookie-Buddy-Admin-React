@@ -35,17 +35,28 @@ const InvoicePreview = ({ data, onClose, onDownload }) => {
                 }}
               >
                 {/* HEADER */}
-                <div className="flex justify-between mb-10">
+                <div className="flex justify-between mb-6">
                   <div />
-                  <h1
-                    style={{
-                      fontSize: "40px",
-                      fontWeight: 700, // ✅ FIX 2: reduced boldness
-                      letterSpacing: "0.5px",
-                    }}
-                  >
-                    INVOICE
-                  </h1>
+                  <div className="text-right">
+                    <h1
+                      style={{
+                        fontSize: "40px",
+                        fontWeight: 700,
+                        letterSpacing: "0.5px",
+                      }}
+                    >
+                      INVOICE
+                    </h1>
+                    {/* Invoice Type Badge */}
+                    <div
+                      className="inline-block mt-3 px-4 py-1 rounded-full text-white text-sm font-semibold"
+                      style={{
+                        backgroundColor: data.invoiceType === "onboarding" ? "#6B4C7A" : "#3B82F6",
+                      }}
+                    >
+                      {data.invoiceType === "onboarding" ? "ONBOARDING" : "RENEWAL"}
+                    </div>
+                  </div>
                 </div>
 
                 {/* FROM / TO */}
@@ -112,6 +123,7 @@ const InvoicePreview = ({ data, onClose, onDownload }) => {
                     >
                       <th className="py-2 px-3 text-left">NO</th>
                       <th className="py-2 px-3 text-left">DESCRIPTION</th>
+                      <th className="py-2 px-3 text-center">QTY</th>
                       <th className="py-2 px-3 text-center">PRICE</th>
                       <th className="py-2 px-3 text-center">OFFER</th>
                       <th className="py-2 px-3 text-center">TOTAL</th>
@@ -131,6 +143,9 @@ const InvoicePreview = ({ data, onClose, onDownload }) => {
                       >
                         <td className="py-2 px-3 font-bold" style={{ fontFamily: "revert-layer",  }}>{idx + 1}</td>
                           <td className="py-2 px-3 font-bold" style={{ fontFamily: "revert", }}>{item.description}</td>
+                          <td className="py-2 px-3 text-center font-bold" style={{ fontFamily: "revert", }}>
+                            {item.quantity || 1}
+                          </td>
                           <td
                               className="py-2 px-3 text-center font-bold"
                               style={{

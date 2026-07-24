@@ -742,6 +742,53 @@ export const fetchIdleDaysReport = async ({
 };
 
 
+//////////////////////////////////////////////    WHATSAPP CONFIGURATION CRUD    /////////////////////////////////////////
+
+// Get WhatsApp configuration for a shop
+export const getWhatsAppConfig = async (shopId) => {
+  try {
+    const response = await apiClient.get(API_URLS.WHATSAPP_CONFIG_BY_SHOP(shopId));
+    return response.data;
+  } catch (error) {
+    console.error('Failed to fetch WhatsApp configuration:', error);
+    throw error;
+  }
+};
+
+// Create WhatsApp configuration for a shop
+export const createWhatsAppConfig = async (shopId, configData) => {
+  try {
+    const response = await apiClient.post(API_URLS.WHATSAPP_CONFIG_BY_SHOP(shopId), configData);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to create WhatsApp configuration:', error);
+    throw error;
+  }
+};
+
+// Update WhatsApp configuration
+export const updateWhatsAppConfig = async (configId, configData) => {
+  try {
+    const response = await apiClient.patch(API_URLS.WHATSAPP_CONFIG(configId), configData);
+    return response.data;
+  } catch (error) {
+    console.error('Failed to update WhatsApp configuration:', error);
+    throw error;
+  }
+};
+
+// Delete WhatsApp configuration
+export const deleteWhatsAppConfig = async (configId) => {
+  try {
+    const response = await apiClient.delete(API_URLS.WHATSAPP_CONFIG(configId));
+    return response.data;
+  } catch (error) {
+    console.error('Failed to delete WhatsApp configuration:', error);
+    throw error;
+  }
+};
+
+
 
 
 
