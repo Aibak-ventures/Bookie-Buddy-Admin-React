@@ -3,6 +3,7 @@ import html2pdf from "html2pdf.js";
 import InvoicePreview from "../cards/InvoicePreview";
 import { jsPDF } from 'jspdf';
 import { toPng } from "html-to-image";
+import { getShopSubscriptionDetails } from "../../api/AdminApis";
 
 
 
@@ -18,7 +19,11 @@ const DEFAULT_TERMS = [
   "Provide all stock details within 7 days of purchase to avoid setup issues.",
   "After one year, maintenance is minimum ₹500/month (billed yearly).",
   "Premium features are free for the first year, except Third-party integrations"
+];
 
+const RENEWAL_TERMS = [
+  "Premium Features: Complimentary for the first year. Charged separately from the second year onwards.",
+  "Subscription renewal fee: ₹899/month (applicable from this renewal cycle)."
 ];
 
 const DEFAULT_ITEMS = [
@@ -27,7 +32,7 @@ const DEFAULT_ITEMS = [
     quantity: 1,
     price: 12000,
     priceLabel: "",
-    offer: 0,
+    offerAmount: 0,
     total: 12000,
   },
   {
@@ -35,7 +40,7 @@ const DEFAULT_ITEMS = [
     quantity: 1,
     price: 0,
     priceLabel: "1ST YEAR FREE",
-    offer: 100,
+    offerAmount: 0,
     total: 0,
   },
   {
@@ -43,7 +48,7 @@ const DEFAULT_ITEMS = [
     quantity: 1,
     price: 0,
     priceLabel: "1ST YEAR FREE",
-    offer: 0,
+    offerAmount: 0,
     total: 0,
   },
   {
@@ -51,7 +56,7 @@ const DEFAULT_ITEMS = [
     quantity: 1,
     price: 0,
     priceLabel: "LIFE TIME FREE",
-    offer: 0,
+    offerAmount: 0,
     total: 0,
   },
 ];
@@ -77,7 +82,9 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
     return `BB${dd}${mm}${yyyy}${sequence}`;
   };
   
-  const [invoiceType, setInvoiceType] = useState("onboarding"); // New state for invoice type
+  const [invoiceType, setInvoiceType] = useState("onboarding");
+  const [subscriptionPlan, setSubscriptionPlan] = useState(null);
+  const [loadingSubscription, setLoadingSubscription] = useState(false);
   
   const [from, setFrom] = useState({
     orgName: "Bookie Buddy",
@@ -122,16 +129,65 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
         paidTotal: 0,
         dueDate: "",
       });
+
+      // Fetch subscription details if available
+      if (shopData.id) {
+        fetchSubscriptionPlan();
+      }
     }
-  
-    setTerms(DEFAULT_TERMS);
-    setItems(DEFAULT_ITEMS);
   }, [shopData]);
 
+  // Fetch subscription plan details
+  const fetchSubscriptionPlan = async () => {
+    setLoadingSubscription(true);
+    try {
+      const response = await getShopSubscriptionDetails(shopData.id);
+      if (response?.data?.subscription) {
+        console.log("333333333333333333",response?.data?.subscription);
+        
+        setSubscriptionPlan(response.data.subscription);
+        
+      }
+    } catch (error) {
+      console.error("Failed to fetch subscription details:", error);
+      setSubscriptionPlan(null);
+    } finally {
+      setLoadingSubscription(false);
+    }
+  };
+
+  // Update items and terms based on invoice type
+  useEffect(() => {
+    if (invoiceType === "renewal" && shopData) {
+      // Renewal invoice items based on shop subscription
+      const renewalPrice = shopData.subscription_renewal_price || 7188;
+      const offerAmount = renewalPrice - 7000; // Calculate offer amount (188)
+      
+      // Get plan name from subscription data
+      const planName = subscriptionPlan?.plan?.name || "Basic plan";
+      
+      setItems([
+        {
+          description: `Bookie Buddy mobile subscription renewal (${planName})`,
+          quantity: 1,
+          price: renewalPrice,
+          priceLabel: "",
+          offerAmount: offerAmount,
+          total: 7000,
+        }
+      ]);
+      setTerms(RENEWAL_TERMS);
+    } else {
+      // Onboarding invoice
+      setItems(DEFAULT_ITEMS);
+      setTerms(DEFAULT_TERMS);
+    }
+  }, [invoiceType, shopData, subscriptionPlan]);
+
   /* ---------------- CALCULATIONS ---------------- */
-  const calculateRowTotal = (quantity, price, offer) => {
+  const calculateRowTotal = (quantity, price, offerAmount) => {
     const subtotal = Number(quantity) * Number(price);
-    return subtotal - (subtotal * Number(offer)) / 100;
+    return subtotal - Number(offerAmount);
   };
 
   const subTotal = items.reduce((sum, i) => sum + Number(i.total || 0), 0);
@@ -173,7 +229,7 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
   const updateItem = (index, field, value) => {
     const updated = [...items];
   
-    if (field === "quantity" || field === "price" || field === "offer") {
+    if (field === "quantity" || field === "price" || field === "offerAmount") {
       // allow empty string in UI, but treat it as 0 internally
       const numValue = value === "" ? 0 : Math.max(0, Number(value) || 0);
   
@@ -181,7 +237,7 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
       updated[index].total = calculateRowTotal(
         updated[index].quantity,
         updated[index].price,
-        updated[index].offer
+        updated[index].offerAmount
       );
     } else {
       updated[index][field] = value;
@@ -191,7 +247,7 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
   };
 
   const addItem = () =>
-    setItems([...items, { description: "", quantity: 1, price: 0, offer: 0, total: 0 }]);
+    setItems([...items, { description: "", quantity: 1, price: 0, offerAmount: 0, total: 0 }]);
 
   const removeItem = (index) =>
     setItems(items.filter((_, i) => i !== index));
@@ -500,7 +556,7 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
                   <div className="col-span-3">Description</div>
                   <div className="col-span-1">Qty</div>
                   <div className="col-span-2">Price (₹)</div>
-                  <div className="col-span-2">Offer (%)</div>
+                  <div className="col-span-2">Offer (₹)</div>
                   <div className="col-span-2">Total (₹)</div>
                   <div className="col-span-1"></div>
                 </div>
@@ -542,10 +598,9 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
                     <input
                       type="number"
                       min="0"
-                      max="100"
                       className="col-span-2 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent outline-none transition"
-                      value={item.offer === 0 ? "" : item.offer}
-                      onChange={(e) => updateItem(i, "offer", e.target.value)}
+                      value={item.offerAmount === 0 ? "" : item.offerAmount}
+                      onChange={(e) => updateItem(i, "offerAmount", e.target.value)}
                       placeholder="0"
                     />
                     <input
