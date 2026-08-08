@@ -35,12 +35,12 @@ const InvoicePreview = ({ data, onClose, onDownload }) => {
                 }}
               >
                 {/* HEADER */}
-                <div className="flex justify-between mb-10">
+                <div className="flex justify-between mb-6">
                   <div />
                   <h1
                     style={{
                       fontSize: "40px",
-                      fontWeight: 700, // ✅ FIX 2: reduced boldness
+                      fontWeight: 700,
                       letterSpacing: "0.5px",
                     }}
                   >
@@ -112,6 +112,7 @@ const InvoicePreview = ({ data, onClose, onDownload }) => {
                     >
                       <th className="py-2 px-3 text-left">NO</th>
                       <th className="py-2 px-3 text-left">DESCRIPTION</th>
+                      <th className="py-2 px-3 text-center">QTY</th>
                       <th className="py-2 px-3 text-center">PRICE</th>
                       <th className="py-2 px-3 text-center">OFFER</th>
                       <th className="py-2 px-3 text-center">TOTAL</th>
@@ -119,39 +120,49 @@ const InvoicePreview = ({ data, onClose, onDownload }) => {
                   </thead>
 
                   <tbody>
-                    {data.items.map((item, idx) => (
-                      <tr
-                        key={idx}
-                        style={{
-                          backgroundColor: "#F2F6FF", 
-                         fontFamily: "revert-layer",   // ✅ font family
-                         fontSize: "13px",
-                        // ✅ FIX 3: full blue rows
-                        }}
-                      >
-                        <td className="py-2 px-3 font-bold" style={{ fontFamily: "revert-layer",  }}>{idx + 1}</td>
+                    {data.items.map((item, idx) => {
+                      // Calculate offer percentage from offer amount
+                      const itemSubtotal = (item.quantity || 1) * (item.price || 0);
+                      const offerPercentage = itemSubtotal > 0 
+                        ? ((item.offerAmount || 0) / itemSubtotal * 100).toFixed(2)
+                        : 0;
+                      
+                      return (
+                        <tr
+                          key={idx}
+                          style={{
+                            backgroundColor: "#F2F6FF", 
+                           fontFamily: "revert-layer",
+                           fontSize: "13px",
+                          }}
+                        >
+                          <td className="py-2 px-3 font-bold" style={{ fontFamily: "revert-layer",  }}>{idx + 1}</td>
                           <td className="py-2 px-3 font-bold" style={{ fontFamily: "revert", }}>{item.description}</td>
+                          <td className="py-2 px-3 text-center font-bold" style={{ fontFamily: "revert", }}>
+                            {item.quantity || 1}
+                          </td>
                           <td
-                              className="py-2 px-3 text-center font-bold"
-                              style={{
-                                fontFamily: "revert",
-                                whiteSpace: "nowrap", // 👈 prevents wrapping
-                              }}
-                            >
-                              {item.priceLabel
-                                ? item.priceLabel
-                                : item.price > 0
-                                  ? `₹ ${item.price.toLocaleString()}`
-                                  : "₹ 0"}
-                            </td>
-                        <td className="py-2 px-3 text-center font-bold" style={{ fontFamily: "revert",  }}>
-                          {item.offer}%
-                        </td>
-                        <td className="py-2 px-3 text-center font-bold" style={{ fontFamily: "revert", }}>
-                          {item.total.toLocaleString()}
-                        </td>
-                      </tr>
-                    ))}
+                            className="py-2 px-3 text-center font-bold"
+                            style={{
+                              fontFamily: "revert",
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            {item.priceLabel
+                              ? item.priceLabel
+                              : item.price > 0
+                                ? `₹ ${item.price.toLocaleString()}`
+                                : "₹ 0"}
+                          </td>
+                          <td className="py-2 px-3 text-center font-bold" style={{ fontFamily: "revert",  }}>
+                            {offerPercentage}%
+                          </td>
+                          <td className="py-2 px-3 text-center font-bold" style={{ fontFamily: "revert", }}>
+                            ₹ {item.total.toLocaleString()}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
 
