@@ -159,9 +159,11 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
   // Update items and terms based on invoice type
   useEffect(() => {
     if (invoiceType === "renewal" && shopData) {
+      console.log("my shop pricemmmmmmmmmmmmm",shopData);
+      
       // Renewal invoice items based on shop subscription
-      const renewalPrice = shopData.subscription_renewal_price || 7188;
-      const offerAmount = renewalPrice - 7000; // Calculate offer amount (188)
+      const renewalPrice = shopData.subscription_renewal_price || 0;
+      const offerAmount = 0; // Calculate offer amount (188)
       
       // Get plan name from subscription data
       const planName = subscriptionPlan?.plan?.name || "Basic plan";
@@ -169,18 +171,17 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
       setItems([
         {
           description: `Bookie Buddy mobile subscription renewal (${planName})`,
-          quantity: 1,
+          quantity: 12,
           price: renewalPrice,
           priceLabel: "",
           offerAmount: offerAmount,
-          total: 7000,
+          total: 12 * renewalPrice,
         }
       ]);
       setTerms(RENEWAL_TERMS);
     } else {
       // Onboarding invoice
       setItems(DEFAULT_ITEMS);
-      setTerms(DEFAULT_TERMS);
     }
   }, [invoiceType, shopData, subscriptionPlan]);
 

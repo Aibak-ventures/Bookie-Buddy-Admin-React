@@ -2,6 +2,8 @@ import React from "react";
 import invoiceBg from "../../assets/invoice-bg.svg";
 
 const InvoicePreview = ({ data, onClose, onDownload }) => {
+  console.log("this is my data",data);
+  
   return (
     <div className="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-4">
       <div className="bg-white w-full max-w-[900px] rounded-xl shadow-2xl flex flex-col max-h-[95vh]">
@@ -173,19 +175,22 @@ const InvoicePreview = ({ data, onClose, onDownload }) => {
                   >
                   {/* LEFT */}
                   <div>
-                    <div style={{
-                              backgroundColor: "#FFF7E6", // 🌟 soft cream
-                              padding: "12px",
-                              textAlign: "center",
-                              color: "#B45309",           // muted gold
-                              fontWeight: 700,
-                              borderRadius: "6px",
-                            }}
->
-                    <span style={{ fontWeight: 700 }}>
-                        👑 1 Year of Premium Features — Absolutely Free
-                      </span>
-                    </div>
+                    {/* Only show promotional banner if NOT renewal */}
+                    {data.invoiceType !== "renewal" && (
+                      <div style={{
+                                backgroundColor: "#FFF7E6", // 🌟 soft cream
+                                padding: "12px",
+                                textAlign: "center",
+                                color: "#B45309",           // muted gold
+                                fontWeight: 700,
+                                borderRadius: "6px",
+                              }}
+  >
+                        <span style={{ fontWeight: 700 }}>
+                            👑 1 Year of Premium Features — Absolutely Free
+                          </span>
+                      </div>
+                    )}
 
                     {data.balance > 0 && data.invoice.dueDate && (
                       <p className="text-red-600 mt-4 font-semibold" >
