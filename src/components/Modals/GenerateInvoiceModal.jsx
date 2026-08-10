@@ -1,12 +1,8 @@
 import React, { useEffect, useState } from "react";
-import html2pdf from "html2pdf.js";
+import { jsPDF } from "jspdf";
+import { toJpeg } from "html-to-image";
 import InvoicePreview from "../cards/InvoicePreview";
-import { jsPDF } from 'jspdf';
-import { toPng } from "html-to-image";
 import { getShopSubscriptionDetails } from "../../api/AdminApis";
-
-
-
 
 const DEFAULT_FROM_ADDRESS = `2nd Floor, Venture Arcade,
 Mavoor Road, Thondayad,
@@ -18,7 +14,7 @@ const DEFAULT_TERMS = [
   "Basic plan includes up to 150 stocks.",
   "Provide all stock details within 7 days of purchase to avoid setup issues.",
   "After one year, maintenance is minimum ₹500/month (billed yearly).",
-  "Premium features are free for the first year, except Third-party integrations"
+  "Premium features and desktop version free for the first year, except Third-party integrations"
 ];
 
 const RENEWAL_TERMS = [
@@ -143,7 +139,7 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
     try {
       const response = await getShopSubscriptionDetails(shopData.id);
       if (response?.data?.subscription) {
-        console.log("333333333333333333",response?.data?.subscription);
+       
         
         setSubscriptionPlan(response.data.subscription);
         
@@ -159,7 +155,7 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
   // Update items and terms based on invoice type
   useEffect(() => {
     if (invoiceType === "renewal" && shopData) {
-      console.log("my shop pricemmmmmmmmmmmmm",shopData);
+
       
       // Renewal invoice items based on shop subscription
       const renewalPrice = shopData.subscription_renewal_price || 0;
@@ -171,11 +167,11 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
       setItems([
         {
           description: `Bookie Buddy mobile subscription renewal (${planName})`,
-          quantity: 12,
+          quantity: 1,
           price: renewalPrice,
           priceLabel: "",
           offerAmount: offerAmount,
-          total: 12 * renewalPrice,
+          total: 1 * renewalPrice,
         }
       ]);
       setTerms(RENEWAL_TERMS);
@@ -276,40 +272,56 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
 
 
   
-  const generatePDF = async () => {
-    try {
-      const node = document.querySelector(".invoice-page");
-      if (!node) {
-        alert("Invoice not found");
-        return;
-      }
-  
-      const dataUrl = await toPng(node, {
-        quality: 1,
-        pixelRatio: 2,
-        backgroundColor: "#ffffff",
-        cacheBust: true,
-      });
-  
-      const pdf = new jsPDF("p", "mm", "a4");
-      pdf.addImage(dataUrl, "PNG", 0, 0, 210, 297);
-  
-      // ✅ SAME NAMING LOGIC AS BEFORE
-      const safeShopName = shopData?.name
-        ?.replace(/[^a-z0-9]/gi, "_")
-        ?.toLowerCase();
-  
-      const fileName = `${safeShopName}_${invoice.invoiceNo}.pdf`;
-  
-      pdf.save(fileName);
-  
-      setShowPreview(false);
-      onClose();
-    } catch (error) {
-      console.error("PDF generation error:", error);
-      alert(`Error generating PDF: ${error.message}`);
+ const generatePDF = async () => {
+  try {
+    const node = document.querySelector(".invoice-page");
+
+    if (!node) {
+      alert("Invoice not found");
+      return;
     }
-  };
+
+    const dataUrl = await toJpeg(node, {
+      quality: 0.92,
+      pixelRatio: 2,
+      backgroundColor: "#ffffff",
+      cacheBust: true,
+    });
+
+    const pdf = new jsPDF({
+      orientation: "portrait",
+      unit: "mm",
+      format: "a4",
+      compress: true,
+    });
+
+    pdf.addImage(
+      dataUrl,
+      "JPEG",
+      0,
+      0,
+      210,
+      297,
+      undefined,
+      "FAST"
+    );
+
+    const safeShopName =
+      shopData?.name
+        ?.replace(/[^a-z0-9]/gi, "_")
+        ?.toLowerCase() || "invoice";
+
+    const fileName = `${safeShopName}_${invoice.invoiceNo}.pdf`;
+
+    pdf.save(fileName);
+
+    setShowPreview(false);
+    onClose();
+  } catch (error) {
+    console.error("PDF generation error:", error);
+    alert(`Error generating PDF: ${error.message}`);
+  }
+};
   
   
   

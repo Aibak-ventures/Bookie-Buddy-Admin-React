@@ -30,10 +30,12 @@ const InvoicePreview = ({ data, onClose, onDownload }) => {
 
               {/* CONTENT */}
               <div
-                className="relative z-10 mx-auto text-sm text-gray-900"
+                className="relative z-10 mx-auto text-sm text-gray-900 flex flex-col"
                 style={{
                   maxWidth: "190mm",
-                  paddingTop: "120px", // ✅ FIX 1: push content below SVG logo
+                  height: "calc(297mm - 120px - 20px)",
+                  paddingTop: "120px",
+                  boxSizing: "border-box",
                 }}
               >
                 {/* HEADER */}
@@ -255,15 +257,28 @@ const InvoicePreview = ({ data, onClose, onDownload }) => {
                 </div>
 
                 {/* TERMS */}
-                <div className="mt-7">
-                  <p className=" mb-2" style={{
-                         fontFamily: "revert-layer",   // ✅ font family
-                         fontSize: "16px",
-                         fontWeight: 700,
-                        // ✅ FIX 3: full blue rows
-                        }}>
+                {/* BOTTOM SECTION */}
+              {/* TERMS AND THANK YOU SECTION */}
+              <div
+  style={{
+    marginTop: "auto",
+    paddingBottom: "0px",
+    transform: "translateY(30px)",
+  }}
+>
+                {/* TERMS */}
+                <div>
+                  <p
+                    className="mb-2"
+                    style={{
+                      fontFamily: "revert-layer",
+                      fontSize: "16px",
+                      fontWeight: 700,
+                    }}
+                  >
                     TERMS AND CONDITIONS
                   </p>
+
                   <ul className="list-disc ml-5 space-y-1 font-semibold">
                     {data.terms.map((t, i) => (
                       <li key={i}>{t}</li>
@@ -271,15 +286,23 @@ const InvoicePreview = ({ data, onClose, onDownload }) => {
                   </ul>
                 </div>
 
-                {/* THANK YOU — LEFT */}
-                <div className="mt-12 pb-10">
+                {/* THANK YOU */}
+                <div className="mt-8">
                   <p className="font-bold text-purple-700 text-xl">
                     THANK YOU FOR CHOOSING BOOKIE BUDDY!
                   </p>
-                  <p className="text-black" style={{fontSize:"13px",fontWeight: 500,}}>
+
+                  <p
+                    className="text-black"
+                    style={{
+                      fontSize: "13px",
+                      fontWeight: 500,
+                    }}
+                  >
                     We appreciate your trust and look forward to supporting your business.
                   </p>
                 </div>
+              </div>
               </div>
             </div>
           </div>
