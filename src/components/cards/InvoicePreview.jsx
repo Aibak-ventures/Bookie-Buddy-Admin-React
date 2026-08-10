@@ -2,6 +2,8 @@ import React from "react";
 import invoiceBg from "../../assets/invoice-bg.svg";
 
 const InvoicePreview = ({ data, onClose, onDownload }) => {
+  console.log("this is my data",data);
+  
   return (
     <div className="fixed inset-0 bg-black/60 z-[60] flex items-center justify-center p-4">
       <div className="bg-white w-full max-w-[900px] rounded-xl shadow-2xl flex flex-col max-h-[95vh]">
@@ -37,26 +39,15 @@ const InvoicePreview = ({ data, onClose, onDownload }) => {
                 {/* HEADER */}
                 <div className="flex justify-between mb-6">
                   <div />
-                  <div className="text-right">
-                    <h1
-                      style={{
-                        fontSize: "40px",
-                        fontWeight: 700,
-                        letterSpacing: "0.5px",
-                      }}
-                    >
-                      INVOICE
-                    </h1>
-                    {/* Invoice Type Badge */}
-                    <div
-                      className="inline-block mt-3 px-4 py-1 rounded-full text-white text-sm font-semibold"
-                      style={{
-                        backgroundColor: data.invoiceType === "onboarding" ? "#6B4C7A" : "#3B82F6",
-                      }}
-                    >
-                      {data.invoiceType === "onboarding" ? "ONBOARDING" : "RENEWAL"}
-                    </div>
-                  </div>
+                  <h1
+                    style={{
+                      fontSize: "40px",
+                      fontWeight: 700,
+                      letterSpacing: "0.5px",
+                    }}
+                  >
+                    INVOICE
+                  </h1>
                 </div>
 
                 {/* FROM / TO */}
@@ -131,42 +122,49 @@ const InvoicePreview = ({ data, onClose, onDownload }) => {
                   </thead>
 
                   <tbody>
-                    {data.items.map((item, idx) => (
-                      <tr
-                        key={idx}
-                        style={{
-                          backgroundColor: "#F2F6FF", 
-                         fontFamily: "revert-layer",   // ✅ font family
-                         fontSize: "13px",
-                        // ✅ FIX 3: full blue rows
-                        }}
-                      >
-                        <td className="py-2 px-3 font-bold" style={{ fontFamily: "revert-layer",  }}>{idx + 1}</td>
+                    {data.items.map((item, idx) => {
+                      // Calculate offer percentage from offer amount
+                      const itemSubtotal = (item.quantity || 1) * (item.price || 0);
+                      const offerPercentage = itemSubtotal > 0 
+                        ? ((item.offerAmount || 0) / itemSubtotal * 100).toFixed(2)
+                        : 0;
+                      
+                      return (
+                        <tr
+                          key={idx}
+                          style={{
+                            backgroundColor: "#F2F6FF", 
+                           fontFamily: "revert-layer",
+                           fontSize: "13px",
+                          }}
+                        >
+                          <td className="py-2 px-3 font-bold" style={{ fontFamily: "revert-layer",  }}>{idx + 1}</td>
                           <td className="py-2 px-3 font-bold" style={{ fontFamily: "revert", }}>{item.description}</td>
                           <td className="py-2 px-3 text-center font-bold" style={{ fontFamily: "revert", }}>
                             {item.quantity || 1}
                           </td>
                           <td
-                              className="py-2 px-3 text-center font-bold"
-                              style={{
-                                fontFamily: "revert",
-                                whiteSpace: "nowrap", // 👈 prevents wrapping
-                              }}
-                            >
-                              {item.priceLabel
-                                ? item.priceLabel
-                                : item.price > 0
-                                  ? `₹ ${item.price.toLocaleString()}`
-                                  : "₹ 0"}
-                            </td>
-                        <td className="py-2 px-3 text-center font-bold" style={{ fontFamily: "revert",  }}>
-                          {item.offer}%
-                        </td>
-                        <td className="py-2 px-3 text-center font-bold" style={{ fontFamily: "revert", }}>
-                          {item.total.toLocaleString()}
-                        </td>
-                      </tr>
-                    ))}
+                            className="py-2 px-3 text-center font-bold"
+                            style={{
+                              fontFamily: "revert",
+                              whiteSpace: "nowrap",
+                            }}
+                          >
+                            {item.priceLabel
+                              ? item.priceLabel
+                              : item.price > 0
+                                ? `₹ ${item.price.toLocaleString()}`
+                                : "₹ 0"}
+                          </td>
+                          <td className="py-2 px-3 text-center font-bold" style={{ fontFamily: "revert",  }}>
+                            {offerPercentage}%
+                          </td>
+                          <td className="py-2 px-3 text-center font-bold" style={{ fontFamily: "revert", }}>
+                            ₹ {item.total.toLocaleString()}
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
 
@@ -177,19 +175,22 @@ const InvoicePreview = ({ data, onClose, onDownload }) => {
                   >
                   {/* LEFT */}
                   <div>
-                    <div style={{
-                              backgroundColor: "#FFF7E6", // 🌟 soft cream
-                              padding: "12px",
-                              textAlign: "center",
-                              color: "#B45309",           // muted gold
-                              fontWeight: 700,
-                              borderRadius: "6px",
-                            }}
->
-                    <span style={{ fontWeight: 700 }}>
-                        👑 1 Year of Premium Features — Absolutely Free
-                      </span>
-                    </div>
+                    {/* Only show promotional banner if NOT renewal */}
+                    {data.invoiceType !== "renewal" && (
+                      <div style={{
+                                backgroundColor: "#FFF7E6", // 🌟 soft cream
+                                padding: "12px",
+                                textAlign: "center",
+                                color: "#B45309",           // muted gold
+                                fontWeight: 700,
+                                borderRadius: "6px",
+                              }}
+  >
+                        <span style={{ fontWeight: 700 }}>
+                            👑 1 Year of Premium Features — Absolutely Free
+                          </span>
+                      </div>
+                    )}
 
                     {data.balance > 0 && data.invoice.dueDate && (
                       <p className="text-red-600 mt-4 font-semibold" >

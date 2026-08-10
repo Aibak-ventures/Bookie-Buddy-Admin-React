@@ -70,6 +70,8 @@ const FeatureShops = () => {
   const columns = [
     { header: "Shop Name", accessor: "shop_name" },
     { header: "Phone", accessor: "shop_phone" },
+    { header: "Place", accessor: "shop_place" },
+
     {
       header: "Feature Status",
       accessor: "feature_is_active",
