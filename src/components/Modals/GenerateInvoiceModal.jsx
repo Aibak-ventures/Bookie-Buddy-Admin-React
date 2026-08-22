@@ -156,6 +156,7 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
   useEffect(() => {
     if (invoiceType === "renewal" && shopData) {
 
+      console.log("my shop pricemmmmmmmmmmmmm",shopData);
       
       // Renewal invoice items based on shop subscription
       const renewalPrice = shopData.subscription_renewal_price || 0;
@@ -167,7 +168,7 @@ const GenerateInvoiceModal = ({ isOpen, onClose, shopData }) => {
       setItems([
         {
           description: `Bookie Buddy mobile subscription renewal (${planName})`,
-          quantity: 1,
+          quantity: 12,
           price: renewalPrice,
           priceLabel: "",
           offerAmount: offerAmount,
