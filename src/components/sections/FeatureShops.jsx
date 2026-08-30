@@ -1,13 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Search, Store, Calendar, CheckCircle, XCircle, Clock } from "lucide-react";
+import {
+  ArrowLeft,
+  Search,
+  Store,
+  Calendar,
+  CheckCircle,
+  XCircle,
+  Clock,
+  ArrowUpDown,
+} from "lucide-react";
 import DataTable from "../ui components/DataTable";
 import { fetchShopsByFeature } from "../../api/AdminApis";
 
 const FeatureShops = () => {
   const { featureId } = useParams();
   const navigate = useNavigate();
-  
+
   const [searchTerm, setSearchTerm] = useState("");
   const [shops, setShops] = useState([]);
   const [summary, setSummary] = useState(null);
@@ -16,6 +25,9 @@ const FeatureShops = () => {
   const [previous, setPrevious] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  
+  // New state for usage sorting order
+  const [sortOrder, setSortOrder] = useState("desc");
 
   // Calculate days left between two dates
   const calculateDaysLeft = (endDate) => {
@@ -26,14 +38,14 @@ const FeatureShops = () => {
     return diffDays;
   };
 
-  // Load shops using this feature
-  const loadShops = async (url = null) => {
+  // Load shops using this feature with optional sorting
+  const loadShops = async (url = null, order = sortOrder) => {
     setLoading(true);
     setError(null);
     try {
-      const data = url 
-        ? await fetchShopsByFeature(featureId, url)
-        : await fetchShopsByFeature(featureId);
+      const data = url
+        ? await fetchShopsByFeature(featureId, url, order)
+        : await fetchShopsByFeature(featureId, null, order);
       setShops(data.results || []);
       setSummary(data.summary || null);
       setCount(data.count || 0);
@@ -49,9 +61,15 @@ const FeatureShops = () => {
 
   useEffect(() => {
     if (featureId) {
-      loadShops();
+      loadShops(null, sortOrder);
     }
-  }, [featureId]);
+  }, [featureId, sortOrder]);
+
+  // Toggle sorting handler
+  const handleSortToggle = () => {
+    const newOrder = sortOrder === "desc" ? "asc" : "desc";
+    setSortOrder(newOrder);
+  };
 
   // Search filter
   const filteredShops = shops.filter((shop) =>
@@ -236,15 +254,30 @@ const FeatureShops = () => {
           <h2 className="text-xl font-semibold text-gray-800">
             Shops List ({count})
           </h2>
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search shops..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-64"
-            />
+
+          <div className="flex items-center gap-3">
+            {/* Sort Toggle Button */}
+            <button
+              onClick={handleSortToggle}
+              className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 transition-colors"
+            >
+              <ArrowUpDown size={16} />
+              <span>
+                Usage: {sortOrder === "desc" ? "High to Low" : "Low to High"}
+              </span>
+            </button>
+
+            {/* Search Input */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search shops..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 w-64"
+              />
+            </div>
           </div>
         </div>
 
@@ -265,8 +298,8 @@ const FeatureShops = () => {
             columns={columns}
             data={filteredShops}
             totalEntries={count}
-            onNextPage={() => next && loadShops(next)}
-            onPreviousPage={() => previous && loadShops(previous)}
+            onNextPage={() => next && loadShops(next, sortOrder)}
+            onPreviousPage={() => previous && loadShops(previous, sortOrder)}
             disableNext={!next}
             disablePrevious={!previous}
             rowClickPath="shops"

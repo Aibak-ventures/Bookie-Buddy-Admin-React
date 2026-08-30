@@ -615,17 +615,19 @@ export const deleteFeature = async (id) => {
 };
 
 // Fetch shops by feature
-export const fetchShopsByFeature = async (featureId, url = null) => {
+// Fetch shops by feature
+export const fetchShopsByFeature = async (featureId, url = null, sortOrder = "desc") => {
   try {
-    const endpoint = url || API_URLS.SHOPS_BY_FEATURE(featureId);
+    const endpoint =
+      url ||
+      `${API_URLS.SHOPS_BY_FEATURE(featureId)}&sort_order=${sortOrder}`;
     const response = await apiClient.get(endpoint);
     return response.data.data;
   } catch (error) {
-    console.error('Failed to fetch shops by feature:', error);
+    console.error("Failed to fetch shops by feature:", error);
     throw error;
   }
 };
-
 
 
 
