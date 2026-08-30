@@ -19,15 +19,15 @@ const menuItems = [
   { name: 'Feature management', icon: FileCode, path: '/feature-management' },
   { name: 'Subscritpions', icon: Settings, path: '/subscription-management' },
   { name: 'Push Notifications', icon: DollarSign, path: '/push-notifications' },
+  { name: 'Marketplace', icon: FolderOpen, path: '/marketplace' },
+
   
 
 
   
 
   
-//   { name: 'Category Management', icon: FolderOpen, path: '/admin/categories' },
-//   { name: 'Revenue', icon: DollarSign, path: '/admin/revenue' },
-//   { name: 'Settings', icon: Settings, path: '/admin/settings' },
+
 ];
 
 const AdminSidebar = ({ isOpen, setIsOpen }) => {

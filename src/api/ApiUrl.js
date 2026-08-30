@@ -67,7 +67,26 @@ const API_URLS = {
   WHATSAPP_CONFIG_BY_SHOP: (shopId) => `/api/v1/whatsapp/admin/configurations/shop/${shopId}/`,
   WHATSAPP_CONFIG: (configId) => `/api/v1/whatsapp/admin/configurations/${configId}/`,
 
-  
+
+
+  // CATEGORIES
+  MARKETPLACE_CATEGORIES: '/api/v1/marketplace/admin/categories/',
+  MARKETPLACE_CATEGORY: (id) => `/api/v1/marketplace/admin/categories/${id}/`,
+
+
+  //FABRIC:
+  MARKETPLACE_FABRICS: '/api/v1/marketplace/admin/fabrics/',
+  MARKETPLACE_FABRIC: (id) => `/api/v1/marketplace/admin/fabrics/${id}/`,
+
+  //SUB CATEGORIES
+  MARKETPLACE_SUBCATEGORIES: '/api/v1/marketplace/admin/subcategories/',
+  MARKETPLACE_SUBCATEGORY: (id) => `/api/v1/marketplace/admin/subcategories/${id}/`,
+
+  //PRODUCTS
+  MARKETPLACE_PRODUCTS: '/api/v1/marketplace/admin/products/',
+  MARKETPLACE_PRODUCT: (id) => `/api/v1/marketplace/admin/products/${id}/`,
+  MARKETPLACE_PRODUCT_PRESIGNED_URLS: (id) => `/api/v1/marketplace/admin/products/${id}/media/presigned-urls/`,
+  MARKETPLACE_PRODUCT_MEDIA: (id) => `/api/v1/marketplace/admin/products/${id}/media/`,
 };
 
 export default API_URLS;
