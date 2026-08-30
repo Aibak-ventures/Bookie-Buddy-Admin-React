@@ -18,6 +18,7 @@ import PushNotifications from "../components/sections/PushNotifications";
 import IdleDaysReport from "../components/sections/IdleDaysReport";
 import OrganizationsList from "../components/sections/OrganizationsList";
 import SingleOrganization from "../components/sections/SingleOrganization";
+import { Marketplace } from "../components/sections/Marketplace";
 
 
 
@@ -46,6 +47,9 @@ const AdminRoutes = () => {
           <Route path="features/:featureId" element={<FeatureShops />} />
           <Route path="subscription-management" element={<Subscription />} />
           <Route path="push-notifications" element={<PushNotifications />} />
+          <Route path="marketplace" element={<Marketplace />} />
+
+
           <Route path="organizations" element={<OrganizationsList />} />
           <Route path="organizations/:orgId" element={<SingleOrganization />} />
 
